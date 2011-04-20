@@ -1,0 +1,8 @@
+org.openmrs.module.addresshierarchy
+org.openmrs.module.addresshierarchy.db
+org.openmrs.module.addresshierarchy.db.hibernate
+org.openmrs.module.addresshierarchy.extension.html
+org.openmrs.module.addresshierarchy.impl
+org.openmrs.module.addresshierarchy.web.controller
+org.openmrs.module.addresshierarchy.web.dwr
+org.openmrs.module.addresshierarchy.web.servlet
