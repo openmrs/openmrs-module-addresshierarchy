@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.1//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+    <hibernate-mapping package="org.openmrs.module.addresshierarchy">
+    	
+    	<class name="AddressHierarchy" table="address_hierarchy">
+    	
+    		<id name="locationId" type="int" column="location_attribute_type_value_id" unsaved-value="0">
+    			<generator class="native" />
+    		</id>
+    		
+    		
+    		
+    		<property name="locationName" type="java.lang.String" column="name" not-null="true" length="255" />
+    		
+    		<property name="typeId" type="int" column="type_id" not-null="true" />
+    		
+    		<property name="parentId" type="int" column="parent_location_attribute_type_value_id" />
+    		
+    	</class>
+    	
+    </hibernate-mapping>
