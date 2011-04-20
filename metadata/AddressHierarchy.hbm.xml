@@ -3,22 +3,51 @@
     "-//Hibernate/Hibernate Mapping DTD 3.1//EN"
     "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 
-    <hibernate-mapping package="org.openmrs.module.addresshierarchy">
-    	
-    	<class name="AddressHierarchy" table="address_hierarchy">
-    	
-    		<id name="locationId" type="int" column="location_attribute_type_value_id" unsaved-value="0">
-    			<generator class="native" />
-    		</id>
-    		
-    		
-    		
-    		<property name="locationName" type="java.lang.String" column="name" not-null="true" length="255" />
-    		
-    		<property name="typeId" type="int" column="type_id" not-null="true" />
-    		
-    		<property name="parentId" type="int" column="parent_location_attribute_type_value_id" />
-    		
-    	</class>
-    	
-    </hibernate-mapping>
+<hibernate-mapping package="org.openmrs.module.addresshierarchy">
+
+	<class name="AddressHierarchy" table="address_hierarchy">
+
+		<id name="addressHierarchyId" type="int" column="address_hierarchy_id"
+			unsaved-value="0">
+			<generator class="native" />
+		</id>
+
+		<property name="locationName" type="string" column="name"
+			not-null="true" length="255" />
+
+		<many-to-one name="hierarchyType" class="AddressHierarchyType"
+			column="type_id" lazy="false" />
+
+		<many-to-one name="parent" class="AddressHierarchy"
+			column="parent_id" />
+
+		<property name="userGeneratedId" type="string" column="user_generated_id" />
+
+		<property name="latitude" type="double" column="latitude" />
+
+		<property name="longitude" type="double" column="longitude" />
+
+		<property name="elevation" type="double" column="elevation" />
+
+		<!--  standard OpenmrsMetaData -->
+		<property name="uuid" type="string" length="38" not-null="true" />
+		<property name="description" type="string" />
+
+		<many-to-one name="creator" class="org.openmrs.User"
+			not-null="true" />
+		<property name="dateCreated" type="java.util.Date" column="date_created"
+			not-null="true" />
+		<many-to-one name="changedBy" class="org.openmrs.User"
+			column="changed_by" />
+		<property name="dateChanged" type="java.util.Date" column="date_changed" />
+		<property name="retired" type="java.lang.Boolean" length="1"
+			not-null="true" />
+		<many-to-one name="retiredBy" class="org.openmrs.User"
+			column="retired_by" />
+		<property name="dateRetired" type="java.util.Date" column="date_retired" />
+		<property name="retireReason" type="string" column="retire_reason" />
+
+
+	</class>
+
+</hibernate-mapping>

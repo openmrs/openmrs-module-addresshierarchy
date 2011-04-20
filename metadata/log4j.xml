@@ -3,6 +3,7 @@
  
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
  
+
 	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern"
@@ -10,13 +11,13 @@
 		</layout>
 	</appender>
  
- 	<logger name="org.openmrs.module.remoteformentry">
-		<level value="DEBUG" />
+	<logger name="org.openmrs.module.addresshierarchy">
+		<level value="INFO" />
  	</logger>
- 
-	<root>
-		<level value="ERROR" />
+ 	 
+  <root>
+		<level value="INFO" />
 		<appender-ref ref="CONSOLE" />
 	</root>
- 
+
 </log4j:configuration>

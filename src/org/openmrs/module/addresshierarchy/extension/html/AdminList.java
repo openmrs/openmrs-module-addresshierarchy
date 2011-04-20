@@ -13,8 +13,8 @@
  */
 package org.openmrs.module.addresshierarchy.extension.html;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.openmrs.module.Extension;
 import org.openmrs.module.web.extension.AdministrationSectionExt;
@@ -46,11 +46,10 @@ public class AdminList extends AdministrationSectionExt {
 	 * @see org.openmrs.module.web.extension.AdministrationSectionExt#getLinks()
 	 */
 	public Map<String, String> getLinks() {
-		
-		Map<String, String> map = new HashMap<String, String>();
-		
-		map.put("module/addresshierarchy/addresshierarchyTree.htm", "addresshierarchy.tree");
-		map.put("module/addresshierarchy/manageHierarchy.htm", "addresshierarchy.manage");
+		Map<String, String> map = new TreeMap<String, String>();
+		//map.put("module/addresshierarchy/initializeHierarchy.htm", "addresshierarchy.initialize");
+		//map.put("module/addresshierarchy/editHierarchy.htm", "addresshierarchy.edit");
+		//map.put("module/addresshierarchy/unstructuredAddresses.htm", "Find Unstructured Addresses");
 		
 		return map;
 	}

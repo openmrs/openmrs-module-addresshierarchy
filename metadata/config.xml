@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- <!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.0.dtd">-->
+<!--   <!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.0.dtd"> -->
 
-<module configVersion="1.0">
+<module configVersion="1.6">
 	
 	<!-- Base Module Properties -->
 	<id>addresshierarchy</id>
-	<name>Address Hierarchy Module</name>
-	<version>1.2</version>
+	<name>Address Hierarchy</name>
+	<version>1.6</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
-	<author>Sri Prasanna</author>
+	<author>John DeRiggi, Mark Goodrich</author>
 	<description>
-			Address Hierarchy Module. This module is useful in maintaining the person address in hierarchial order.
+			Allows for the entry of structured addresses.
 	</description>
 
 	<activator>@MODULE_PACKAGE@.AddressHierarchyActivator</activator>
@@ -18,22 +18,13 @@
 	<!-- <updateURL>https://dev.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL> -->
 	<!-- /Base Module Properties -->
 	
-	<require_version>1.2.0.3400</require_version>
+	<require_version>1.6.1.12909</require_version>
 	
 	<!-- Extensions -->
 	<extension>
 		<point>org.openmrs.admin.list</point>
 		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
 	</extension>
-	
-	
-	<!-- AOP
-	<advice>
-		<point>org.openmrs.api.FormService</point>
-		<class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
-	</advice>
-	 /AOP -->
-	
 	
 	<!-- Required Privileges -->
 	<privilege>
@@ -43,70 +34,14 @@
 	 <!-- /Required Privileges -->
 
 
-	<!-- Required Global Properties 
-	<globalProperty>
-		<property>@MODULE_ID@.someProperty</property>
-		<defaultValue></defaultValue>
-		<description>
-			A description of the global property goes here.  The description
-			should explain enough for administrators to understand the purpose
-			and possible values for the global property.
-		</description>
-	</globalProperty>
-	/Required Global Properties -->
-	
-	
-	<dwr>
-		<allow>
-			<create creator="new" javascript="AddressHierarchy">
-				<param name="class" value="org.openmrs.module.addresshierarchy.web.dwr.DWRAddressHierarchyService"/>
-				<include method="getNextComponent"/>
-				<include method="getCountryList"/>
-				<include method="getNextParamName"/>
-				<include method="getLocationId"/>
-				<include method="getLocationCount"/>
-				<include method="autocomplete" />
-				<include method="createLocation" />
-				<include method="deleteLocation" />
-				<include method="editLocation" />
-				<include method="getLocationType" />
-				<include method="updateLocationTypeTable" />
-				<include method="getAddressHierarchyTypeList" />
-				<include method="getSizeOfPersonTable" />
-				<include method="processForm" />
-				<include method="getLocation" />
-			</create>
-		</allow>
-
-		<signatures>
-			<![CDATA[
-			import org.openmrs.module.addresshierarchy.web.dwr.DWRAddressHierarchyService;
-			DWRAddressHierarchyService.getCountryList();
-			DWRAddressHierarchyService.getNextComponent(Integer typeId,Integer parentId);
-			DWRAddressHierarchyService.getNextParamName(Integer typeId);
-			DWRAddressHierarchyService.getLocationId(Integer typeId,Integer parentId,String locationName);
-			DWRAddressHierarchyService.getLocationCount();
-			DWRAddressHierarchyService.autocomplete(Integer id,String str);
-			DWRAddressHierarchyService.createLocation(String name, Integer typeId, Integer parentId );
-			DWRAddressHierarchyService.deleteLocation(Integer parentId, String childName);
-			DWRAddressHierarchyService.editLocation(Integer parentLocationId,String oldName,String newName);
-			DWRAddressHierarchyService.getLocationType();
-			DWRAddressHierarchyService.updateLocationTypeTable(String[] arr);
-			DWRAddressHierarchyService.getAddressHierarchyTypeList(Integer typeid);
-			DWRAddressHierarchyService.getSizeOfPersonTable();
-			DWRAddressHierarchyService.processForm(String[] arr);
-			DWRAddressHierarchyService.getLocation(Integer id);
-			]]>
-		</signatures>	
-	</dwr>
-	
+	<!-- Required Global Properties -->
 	
 	<!-- Servlets -->
 	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name>--> 
-	<servlet>
+	<!--   <servlet>
 		<servlet-name>addressTree</servlet-name>
 		<servlet-class>@MODULE_PACKAGE@.web.servlet.AddressHierarchyServlet</servlet-class>
-	</servlet>
+	</servlet>  -->
 	
 	<!-- /Servlets -->
 	
@@ -130,7 +65,6 @@
 	<mappingFiles>
 		AddressHierarchy.hbm.xml
 		AddressHierarchyType.hbm.xml
-		
 	</mappingFiles>
 	
 </module>

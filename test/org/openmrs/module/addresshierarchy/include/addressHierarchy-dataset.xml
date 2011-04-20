@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dataset>
+
+<!-- define some address hierarchy types -->
+<address_hierarchy_type address_hierarchy_type_id="1" child_type_id="2" name="Country" address_field="COUNTRY" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_type address_hierarchy_type_id="2" parent_type_id="1" child_type_id="3" name="District" address_field="COUNTY_DISTRICT" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_type address_hierarchy_type_id="3" parent_type_id="2" child_type_id="4" name="Constituency" address_field="REGION" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_type address_hierarchy_type_id="4" parent_type_id="3" child_type_id="5" name="Community Council" address_field="SUBREGION" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_type address_hierarchy_type_id="5" parent_type_id="4" name="Village" address_field="CITY_VILLAGE" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
+
+
+</dataset>

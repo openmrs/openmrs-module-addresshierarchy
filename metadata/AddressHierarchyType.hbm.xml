@@ -3,16 +3,45 @@
     "-//Hibernate/Hibernate Mapping DTD 3.1//EN"
     "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 
-    <hibernate-mapping package="org.openmrs.module.addresshierarchy">
-    	
-    	<class name="AddressHierarchyType" table="address_hierarchy_type">
-    	
-    		<id name="typeId" type="int" column="location_attribute_type_id" unsaved-value="0">
-    			<generator class="native" />
-    		</id>
-    		
-    		<property name="name" type="java.lang.String" column="name" not-null="true" length="255" />
-    		
-    	</class>
-    	
-    </hibernate-mapping>
+<hibernate-mapping package="org.openmrs.module.addresshierarchy">
+
+	<class name="AddressHierarchyType" table="address_hierarchy_type">
+
+		<id name="typeId" type="int" column="address_hierarchy_type_id"
+			unsaved-value="0">
+			<generator class="native" />
+		</id>
+
+		<many-to-one name="parentType" class="AddressHierarchyType"
+			column="parent_type_id" cascade="all" />
+
+		<many-to-one name="childType" class="AddressHierarchyType"
+			column="child_type_id" cascade="all" />
+
+		<property name="name" type="string" column="name" not-null="true"
+			length="255" />
+
+		<property name="addressField" type="string" column="address_field"
+			not-null="true" length="255" />
+
+		<!--  standard OpenmrsMetaData -->
+		<property name="uuid" type="string" length="38" not-null="true" />
+		<property name="description" type="string" />
+
+		<many-to-one name="creator" class="org.openmrs.User"
+			not-null="true" />
+		<property name="dateCreated" type="java.util.Date" column="date_created"
+			not-null="true" />
+		<many-to-one name="changedBy" class="org.openmrs.User"
+			column="changed_by" />
+		<property name="dateChanged" type="java.util.Date" column="date_changed" />
+		<property name="retired" type="java.lang.Boolean" length="1"
+			not-null="true" />
+		<many-to-one name="retiredBy" class="org.openmrs.User"
+			column="retired_by" />
+		<property name="dateRetired" type="java.util.Date" column="date_retired" />
+		<property name="retireReason" type="string" column="retire_reason" />
+
+	</class>
+
+</hibernate-mapping>

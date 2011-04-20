@@ -31,7 +31,7 @@
 		</filterset>
 		
 		<path id="classpath">
-			<fileset dir="lib">
+			<fileset dir="../openmrs-1.6.x/lib">
 				<include name="**/*.jar"/>
 			</fileset>
 			<fileset dir="lib-common">
