@@ -12,6 +12,8 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyType;
  */
 public interface AddressHierarchyDAO {
 	
+	// TODO: remove or deprecate unused methods
+	
 	public int getAddressHierarchyCount();
 	
 	public AddressHierarchy getAddressHierarchy(int addressHierarchyId);
@@ -28,13 +30,15 @@ public interface AddressHierarchyDAO {
 	
 	public List<AddressHierarchyType> getAddressHierarchyTypes();
 	
+	public AddressHierarchyType getTopLevelAddressHierarchyType();
+	
 	public AddressHierarchyType getHierarchyType(int typeId);
 	
 	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah);
 	
 	public List<AddressHierarchy> getNextComponent(Integer locationId);
 	
-	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId);
+	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId, Boolean exact);
 	
 	public void associateCoordinates(AddressHierarchy ah, double latitude, double longitude);
 	

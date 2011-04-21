@@ -99,6 +99,9 @@ public class AddressHierarchy extends BaseOpenmrsMetadata {
 		this.parent = parent;
 	}
 
+	/**
+	 * Getters and Setters to map fields to alternative names
+	 */
     public Integer getId() {
     	return this.addressHierarchyId;
     }
@@ -107,4 +110,11 @@ public class AddressHierarchy extends BaseOpenmrsMetadata {
 	    this.addressHierarchyId = id;	    
     }
 	
+    public String getName() {
+    	return this.locationName;
+    }
+    
+    public void setName(String name) {
+    	this.locationName = name;
+    }
 }

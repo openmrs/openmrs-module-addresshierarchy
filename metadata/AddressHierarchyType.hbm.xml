@@ -21,8 +21,12 @@
 		<property name="name" type="string" column="name" not-null="true"
 			length="255" />
 
-		<property name="addressField" type="string" column="address_field"
-			not-null="true" length="255" />
+		<property name="addressField" column="address_field" length="50"
+			not-null="true">
+			<type name="org.openmrs.module.addresshierarchy.util.HibernateEnumType">
+		    	<param name="enumClassName">org.openmrs.module.addresshierarchy.AddressField</param>
+		    </type>
+		</property>
 
 		<!--  standard OpenmrsMetaData -->
 		<property name="uuid" type="string" length="38" not-null="true" />

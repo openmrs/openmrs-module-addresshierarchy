@@ -1,5 +1,6 @@
 package org.openmrs.module.addresshierarchy.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openmrs.module.addresshierarchy.AddressHierarchy;
@@ -47,7 +48,21 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	public List<AddressHierarchyType> getAddressHierarchyTypes() {
-		return dao.getAddressHierarchyTypes();
+		List<AddressHierarchyType> types = new ArrayList<AddressHierarchyType>();
+		
+		// first, get the top level type
+		types.add(getTopLevelAddressHierarchyType());
+		
+		// now fetch the children in order
+		while (types.get(types.size()-1).getChildType() != null) {
+			types.add(types.get(types.size()-1).getChildType());
+		}
+		
+		return types;
+	}
+	
+	public AddressHierarchyType getTopLevelAddressHierarchyType() {
+		return dao.getTopLevelAddressHierarchyType();
 	}
 	
 	public AddressHierarchyType getHierarchyType(int typeId) {
@@ -63,7 +78,11 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId) {
-		return dao.searchHierarchy(searchString, locationTypeId);
+		return searchHierarchy(searchString, locationTypeId, false);
+	}
+	
+	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId, Boolean exact) {
+		return dao.searchHierarchy(searchString, locationTypeId, exact);
 	}
 	
 	public void associateCoordinates(AddressHierarchy ah, double latitude, double longitude) {

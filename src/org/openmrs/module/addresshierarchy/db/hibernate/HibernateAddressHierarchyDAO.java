@@ -16,6 +16,7 @@ import org.hibernate.criterion.Restrictions;
 import org.openmrs.module.addresshierarchy.AddressHierarchy;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
+import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 
 /**
  * The Class HibernateAddressHierarchyDAO which links to the tables address_hierarchy,
@@ -139,6 +140,23 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		return criteria.list();
 	}
 	
+	public AddressHierarchyType getTopLevelAddressHierarchyType() {
+		Session session = sessionFactory.getCurrentSession();
+		Criteria criteria = session.createCriteria(AddressHierarchyType.class);
+		criteria.add(Restrictions.isNull("parentType"));
+		
+		AddressHierarchyType topLevelType = null;
+		
+		try { 
+			topLevelType = (AddressHierarchyType) criteria.uniqueResult();
+		}
+		catch (Exception e) {
+			throw new AddressHierarchyModuleException("Unable to fetch top level address hierarchy type", e);
+		}
+		
+		return topLevelType;
+	}
+	
 	public AddressHierarchyType getHierarchyType(int typeId) {
 		Session session = sessionFactory.getCurrentSession();
 		AddressHierarchyType type = (AddressHierarchyType) session.load(AddressHierarchyType.class, typeId);
@@ -191,10 +209,10 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 * specifying a type id
 	 */
 	@SuppressWarnings("unchecked")
-	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId) {
+	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId, Boolean exact) {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchy.class);
-		criteria.add(Restrictions.like("locationName", searchString, MatchMode.ANYWHERE));
+		criteria.add(Restrictions.like("locationName", searchString, exact ? MatchMode.EXACT : MatchMode.ANYWHERE));
 		List<AddressHierarchy> hierarchyList;
 		if (locationTypeId != -1) {
 			criteria.createCriteria("hierarchyType").add(Restrictions.eq("typeId", locationTypeId));

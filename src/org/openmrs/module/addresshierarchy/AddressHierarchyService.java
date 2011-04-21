@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface AddressHierarchyService {
 	
+	// TODO: remove or deprecate unused methods
+	
 	public int getAddressHierarchyCount();
 	
 	public AddressHierarchy getAddressHierarchy(int addressHierarchyId);
@@ -24,7 +26,15 @@ public interface AddressHierarchyService {
 	
 	public AddressHierarchy getLocationFromUserGenId(String userGeneratedId);
 	
+	/**
+	 * Gets all address hierarchy types, ordered from the top of hierarchy to the bottom
+	 */
 	public List<AddressHierarchyType> getAddressHierarchyTypes();
+	
+	/**
+	 * Gets the address hierarchy type that represents the top level of the hierarchy
+	 */
+	public AddressHierarchyType getTopLevelAddressHierarchyType();
 	
 	public AddressHierarchyType getHierarchyType(int typeId);
 	
@@ -33,6 +43,8 @@ public interface AddressHierarchyService {
 	public List<AddressHierarchy> getNextComponent(Integer locationId);
 	
 	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId);
+	
+	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId, Boolean exact);
 	
 	public void associateCoordinates(AddressHierarchy ah, double latitude, double longitude);
 	
