@@ -14,25 +14,23 @@ public interface AddressHierarchyDAO {
 	
 	// TODO: remove or deprecate unused methods
 	
-	public int getAddressHierarchyCount();
+	public int getAddressHierarchyEntryCount();
 	
-	public AddressHierarchy getAddressHierarchy(int addressHierarchyId);
+	public AddressHierarchy getAddressHierarchyEntry(int addressHierarchyId);
 	
-	public void saveAddressHierarchy(AddressHierarchy ah);
+	public void saveAddressHierarchyEntry(AddressHierarchy ah);
 	
-	public AddressHierarchy addLocation(int parentId, String name, int typeId);
+	public AddressHierarchy addAddressHierarchyEntry(int parentId, String name, int typeId);
 	
-	public AddressHierarchy editLocationName(Integer parentLocationId, String newName);
+	public AddressHierarchy editAddressHierarchyEntryName(Integer parentLocationId, String newName);
 	
-	public AddressHierarchy getLocation(int addressHierarchyId);
-	
-	public AddressHierarchy getLocationFromUserGenId(String userGeneratedId);
+	public AddressHierarchy getAddressHierarchyEntryByUserGenId(String userGeneratedId);
 	
 	public List<AddressHierarchyType> getAddressHierarchyTypes();
 	
 	public AddressHierarchyType getTopLevelAddressHierarchyType();
 	
-	public AddressHierarchyType getHierarchyType(int typeId);
+	public AddressHierarchyType getAddressHierarchyType(int typeId);
 	
 	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah);
 	

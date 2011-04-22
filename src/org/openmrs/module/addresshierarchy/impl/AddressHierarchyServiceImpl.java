@@ -19,32 +19,28 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		this.dao = dao;
 	}
 	
-	public int getAddressHierarchyCount() {
-		return dao.getAddressHierarchyCount();
+	public int getAddressHierarchyEntryCount() {
+		return dao.getAddressHierarchyEntryCount();
 	}
 	
-	public void saveAddressHierarchy(AddressHierarchy ah) {
-		dao.saveAddressHierarchy(ah);
+	public AddressHierarchy getAddressHierarchyEntry(int addressHierarchyId) {
+		return dao.getAddressHierarchyEntry(addressHierarchyId);
 	}
 	
-	public AddressHierarchy addLocation(int parentId, String name, int typeId) {
-		return dao.addLocation(parentId, name, typeId);
+	public AddressHierarchy getAddressHierarchyEntryByUserGenId(String userGeneratedId) {
+		return dao.getAddressHierarchyEntryByUserGenId(userGeneratedId);
 	}
 	
-	public AddressHierarchy getAddressHierarchy(int addressHierarchyId) {
-		return dao.getLocation(addressHierarchyId);
+	public void saveAddressHierarchyEntry(AddressHierarchy entry) {
+		dao.saveAddressHierarchyEntry(entry);
 	}
 	
-	public AddressHierarchy editLocationName(Integer parentLocationId, String newName) {
-		return dao.editLocationName(parentLocationId, newName);
+	public AddressHierarchy addAddressHierarchyEntry(int parentId, String name, int typeId) {
+		return dao.addAddressHierarchyEntry(parentId, name, typeId);
 	}
 	
-	public AddressHierarchy getLocation(int location) {
-		return getAddressHierarchy(location);
-	}
-	
-	public AddressHierarchy getLocationFromUserGenId(String userGeneratedId) {
-		return dao.getLocationFromUserGenId(userGeneratedId);
+	public AddressHierarchy editAddressHierarchyEntryName(Integer parentLocationId, String newName) {
+		return dao.editAddressHierarchyEntryName(parentLocationId, newName);
 	}
 	
 	public List<AddressHierarchyType> getAddressHierarchyTypes() {
@@ -54,8 +50,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		types.add(getTopLevelAddressHierarchyType());
 		
 		// now fetch the children in order
-		while (types.get(types.size()-1).getChildType() != null) {
-			types.add(types.get(types.size()-1).getChildType());
+		while (types.get(types.size() - 1).getChildType() != null) {
+			types.add(types.get(types.size() - 1).getChildType());
 		}
 		
 		return types;
@@ -65,8 +61,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return dao.getTopLevelAddressHierarchyType();
 	}
 	
-	public AddressHierarchyType getHierarchyType(int typeId) {
-		return dao.getHierarchyType(typeId);
+	public AddressHierarchyType getAddressHierarchyType(int typeId) {
+		return dao.getAddressHierarchyType(typeId);
 	}
 	
 	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah) {
@@ -121,4 +117,45 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	public void initializeRwandaHierarchyTables() {
 		dao.initializeRwandaHierarchyTables();
 	}
+	
+	/**
+	 * I've renamed the following methods to make them a little more clear, but kept the old method
+	 * names for backwards compatibility
+	 */
+	
+	@Deprecated
+	public int getAddressHierarchyCount() {
+		return getAddressHierarchyEntryCount();
+	}
+	
+	@Deprecated
+	public void saveAddressHierarchy(AddressHierarchy ah) {
+		saveAddressHierarchyEntry(ah);
+	}
+	
+	@Deprecated
+	public AddressHierarchy getLocationFromUserGenId(String userGeneratedId) {
+		return getAddressHierarchyEntryByUserGenId(userGeneratedId);
+	}
+	
+	@Deprecated
+	public AddressHierarchy addLocation(int parentId, String name, int typeId) {
+		return addAddressHierarchyEntry(parentId, name, typeId);
+	}
+	
+	@Deprecated
+	public AddressHierarchy getAddressHierarchy(int addressHierarchyId) {
+		return getAddressHierarchyEntry(addressHierarchyId);
+	}
+	
+	@Deprecated
+	public AddressHierarchyType getHierarchyType(int typeId) {
+		return getAddressHierarchyType(typeId);
+	}
+	
+	@Deprecated
+	public AddressHierarchy editLocationName(Integer parentLocationId, String newName) {
+		return editAddressHierarchyEntryName(parentLocationId, newName);
+	}
+	
 }

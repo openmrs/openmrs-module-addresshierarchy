@@ -12,19 +12,17 @@ public interface AddressHierarchyService {
 	
 	// TODO: remove or deprecate unused methods
 	
-	public int getAddressHierarchyCount();
+	public int getAddressHierarchyEntryCount();
 	
-	public AddressHierarchy getAddressHierarchy(int addressHierarchyId);
+	public AddressHierarchy getAddressHierarchyEntry(int addressHierarchyEntryId);
 	
-	public void saveAddressHierarchy(AddressHierarchy ah);
+	public AddressHierarchy getAddressHierarchyEntryByUserGenId(String userGeneratedId);
 	
-	public AddressHierarchy addLocation(int parentId, String name, int typeId);
+	public void saveAddressHierarchyEntry(AddressHierarchy entry);
 	
-	public AddressHierarchy editLocationName(Integer parentLocationId, String newName);
+	public AddressHierarchy addAddressHierarchyEntry(int parentId, String name, int typeId);
 	
-	public AddressHierarchy getLocation(int addressHierarchyId);
-	
-	public AddressHierarchy getLocationFromUserGenId(String userGeneratedId);
+	public AddressHierarchy editAddressHierarchyEntryName(Integer parentLocationId, String newName);
 	
 	/**
 	 * Gets all address hierarchy types, ordered from the top of hierarchy to the bottom
@@ -36,7 +34,9 @@ public interface AddressHierarchyService {
 	 */
 	public AddressHierarchyType getTopLevelAddressHierarchyType();
 	
-	public AddressHierarchyType getHierarchyType(int typeId);
+	public AddressHierarchyType getAddressHierarchyType(int typeId);
+	
+	// TODO: figure out if I need to rename any of these
 	
 	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah);
 	
@@ -67,5 +67,31 @@ public interface AddressHierarchyService {
 	
 	@Deprecated
 	public List<Object[]> getAllAddresses(int page);
+	
+	/**
+	 * I've renamed the following methods to make them a little more clear, but kept the old methods
+	 * for backwards compatibility
+	 */
+	
+	@Deprecated
+	public int getAddressHierarchyCount();
+	
+	@Deprecated
+	public AddressHierarchy getAddressHierarchy(int addressHierarchyId);
+	
+	@Deprecated
+	public void saveAddressHierarchy(AddressHierarchy ah);
+	
+	@Deprecated
+	public AddressHierarchy addLocation(int parentId, String name, int typeId);
+	
+	@Deprecated
+	public AddressHierarchy editLocationName(Integer parentLocationId, String newName);
+	
+	@Deprecated
+	public AddressHierarchy getLocationFromUserGenId(String userGeneratedId);
+	
+	@Deprecated
+	public AddressHierarchyType getHierarchyType(int typeId);;
 	
 }

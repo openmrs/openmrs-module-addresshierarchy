@@ -28,7 +28,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	@Test
 	@Verifies(value = "should get hierarchy type by id", method = "getHierarchyType(int id)")
 	public void getHierarchyType_shouldHierarchyTypeById() throws Exception {
-		AddressHierarchyType type = Context.getService(AddressHierarchyService.class).getHierarchyType(1);
+		AddressHierarchyType type = Context.getService(AddressHierarchyService.class).getAddressHierarchyType(1);
 		
 		Assert.assertEquals("Country", type.getName());
 		Assert.assertEquals("country", type.getAddressField().getName());
@@ -56,11 +56,11 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertEquals(5, types.size());
 			
 		// make sure that the list returns the types in the proper order
-		Assert.assertTrue(types.get(0) == (ahService.getHierarchyType(1)));
-		Assert.assertTrue(types.get(1) == (ahService.getHierarchyType(4)));
-		Assert.assertTrue(types.get(2) == (ahService.getHierarchyType(2)));
-		Assert.assertTrue(types.get(3) == (ahService.getHierarchyType(5)));
-		Assert.assertTrue(types.get(4) == (ahService.getHierarchyType(3)));
+		Assert.assertTrue(types.get(0) == (ahService.getAddressHierarchyType(1)));
+		Assert.assertTrue(types.get(1) == (ahService.getAddressHierarchyType(4)));
+		Assert.assertTrue(types.get(2) == (ahService.getAddressHierarchyType(2)));
+		Assert.assertTrue(types.get(3) == (ahService.getAddressHierarchyType(5)));
+		Assert.assertTrue(types.get(4) == (ahService.getAddressHierarchyType(3)));
 	}
 	
 	@Test
@@ -68,8 +68,8 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	public void searchHierarchy_shouldFindAddressHierarchyById() throws Exception {	
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		Assert.assertTrue(ahService.getAddressHierarchy(3).getName().equals("Maine"));
-		Assert.assertTrue(ahService.getAddressHierarchy(5).getName().equals("Middlesex"));
+		Assert.assertTrue(ahService.getAddressHierarchyEntry(3).getName().equals("Maine"));
+		Assert.assertTrue(ahService.getAddressHierarchyEntry(5).getName().equals("Middlesex"));
 		
 	}
 	

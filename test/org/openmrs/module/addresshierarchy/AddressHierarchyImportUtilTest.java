@@ -31,7 +31,7 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		AddressHierarchyType district = ahService.getHierarchyType(2);
+		AddressHierarchyType district = ahService.getAddressHierarchyType(2);
 		
 		InputStream file = getClass().getClassLoader().getResourceAsStream(CSV_FILE_TO_IMPORT);
 		AddressHierarchyImportUtil.importAddressHierarchyFile(file, "\\|", district);

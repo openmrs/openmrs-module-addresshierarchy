@@ -40,7 +40,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 * Gets a count of the number of entries in the address hierarchy table
 	 */
 	@SuppressWarnings("unchecked")
-	public int getAddressHierarchyCount() {
+	public int getAddressHierarchyEntryCount() {
 		int x = 0;
 		Session session = sessionFactory.getCurrentSession();
 		Criteria c = session.createCriteria(AddressHierarchy.class);
@@ -52,13 +52,13 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		
 	}
 	
-	public AddressHierarchy getAddressHierarchy(int addressHierarchyId) {
+	public AddressHierarchy getAddressHierarchyEntry(int addressHierarchyId) {
 		Session session = sessionFactory.getCurrentSession();
 		AddressHierarchy ah = (AddressHierarchy) session.load(AddressHierarchy.class, addressHierarchyId);
 		return ah;
 	}
 	
-	public void saveAddressHierarchy(AddressHierarchy ah) {
+	public void saveAddressHierarchyEntry(AddressHierarchy ah) {
 		Session session = sessionFactory.getCurrentSession();
 		session.save(ah);
 		session.flush();
@@ -68,21 +68,21 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	/**
 	 * Adds an address hierarchy Location
 	 * 
-	 * @see org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO#addLocation(int,
+	 * @see org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO#addAddressHierarchyEntry(int,
 	 *      java.lang.String, int)
 	 */
-	public AddressHierarchy addLocation(int parentId, String name, int typeId) {
+	public AddressHierarchy addAddressHierarchyEntry(int parentId, String name, int typeId) {
 		AddressHierarchy ah = null;
 		if (parentId != -1) {
 			Session session = sessionFactory.getCurrentSession();
 			ah = new AddressHierarchy();
 			ah.setLocationName(name);
 			if (typeId != -1) {
-				ah.setHierarchyType(getHierarchyType(typeId));
+				ah.setHierarchyType(getAddressHierarchyType(typeId));
 			} else {
-				ah.setHierarchyType(getAddressHierarchy(parentId).getHierarchyType().getChildType());
+				ah.setHierarchyType(getAddressHierarchyEntry(parentId).getHierarchyType().getChildType());
 			}
-			ah.setParent(getAddressHierarchy(parentId));
+			ah.setParent(getAddressHierarchyEntry(parentId));
 			session.save(ah);
 		}
 		
@@ -96,7 +96,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 * @param newName
 	 */
 	@SuppressWarnings("unchecked")
-	public AddressHierarchy editLocationName(Integer locationId, String newName) {
+	public AddressHierarchy editAddressHierarchyEntryName(Integer locationId, String newName) {
 		// begin transaction
 		Session session = sessionFactory.getCurrentSession();
 		
@@ -116,12 +116,8 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		return ah;
 	}
 	
-	public AddressHierarchy getLocation(int addressHierarchyId) {
-		return getAddressHierarchy(addressHierarchyId);
-	}
-	
 	@SuppressWarnings("unchecked")
-	public AddressHierarchy getLocationFromUserGenId(String userGeneratedId) {
+	public AddressHierarchy getAddressHierarchyEntryByUserGenId(String userGeneratedId) {
 		AddressHierarchy ah = null;
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchy.class);
@@ -147,7 +143,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		
 		AddressHierarchyType topLevelType = null;
 		
-		try { 
+		try {
 			topLevelType = (AddressHierarchyType) criteria.uniqueResult();
 		}
 		catch (Exception e) {
@@ -157,7 +153,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		return topLevelType;
 	}
 	
-	public AddressHierarchyType getHierarchyType(int typeId) {
+	public AddressHierarchyType getAddressHierarchyType(int typeId) {
 		Session session = sessionFactory.getCurrentSession();
 		AddressHierarchyType type = (AddressHierarchyType) session.load(AddressHierarchyType.class, typeId);
 		
