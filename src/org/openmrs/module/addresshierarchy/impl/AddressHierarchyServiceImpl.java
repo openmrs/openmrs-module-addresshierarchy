@@ -47,13 +47,17 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		List<AddressHierarchyType> types = new ArrayList<AddressHierarchyType>();
 		
 		// first, get the top level type
-		types.add(getTopLevelAddressHierarchyType());
+		AddressHierarchyType topLevel = getTopLevelAddressHierarchyType();
 		
-		// now fetch the children in order
-		while (types.get(types.size() - 1).getChildType() != null) {
-			types.add(types.get(types.size() - 1).getChildType());
+		if (topLevel != null) {
+			// add the top level to this list
+			types.add(topLevel);
+			
+			// now fetch the children in order
+			while (getChildAddressHierarchyType(types.get(types.size() - 1)) != null) {
+				types.add(getChildAddressHierarchyType(types.get(types.size() - 1)));
+			}
 		}
-		
 		return types;
 	}
 	
@@ -63,6 +67,14 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	public AddressHierarchyType getAddressHierarchyType(int typeId) {
 		return dao.getAddressHierarchyType(typeId);
+	}
+	
+    public AddressHierarchyType getChildAddressHierarchyType(AddressHierarchyType type) {
+	    return dao.getAddressHierarchyTypeByParent(type);
+    }
+	
+	public void saveAddressHierarchyType(AddressHierarchyType type) {
+		dao.saveAddressHierarchyType(type);
 	}
 	
 	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah) {
@@ -157,5 +169,4 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	public AddressHierarchy editLocationName(Integer parentLocationId, String newName) {
 		return editAddressHierarchyEntryName(parentLocationId, newName);
 	}
-	
 }

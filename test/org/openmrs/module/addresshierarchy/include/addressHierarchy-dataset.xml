@@ -4,11 +4,11 @@
 
 <!-- define some address hierarchy types -->
 <!-- note that we aren't putting these in order because we want to test that they get ordered properly -->
-<address_hierarchy_type address_hierarchy_type_id="1" child_type_id="4" name="Country" address_field="COUNTRY" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy_type address_hierarchy_type_id="2" parent_type_id="4" child_type_id="5" name="County" address_field="COUNTY_DISTRICT" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_type address_hierarchy_type_id="1" name="Country" address_field="COUNTRY" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_type address_hierarchy_type_id="2" parent_type_id="4" name="County" address_field="COUNTY_DISTRICT" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
 <address_hierarchy_type address_hierarchy_type_id="3" parent_type_id="5" name="Neighborhood" address_field="REGION" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41446-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy_type address_hierarchy_type_id="4" parent_type_id="1" child_type_id="2" name="State" address_field="STATE_PROVINCE" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy_type address_hierarchy_type_id="5" parent_type_id="4" child_type_id="3" name="City" address_field="CITY_VILLAGE" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_type address_hierarchy_type_id="4" parent_type_id="1" name="State" address_field="STATE_PROVINCE" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_type address_hierarchy_type_id="5" parent_type_id="2" name="City" address_field="CITY_VILLAGE" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="12e41146-e162-11df-9195-001e378eb67f"/>
 
 
 <!-- define a basic hierarchy -->  

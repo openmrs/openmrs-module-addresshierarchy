@@ -117,4 +117,12 @@ public class AddressHierarchy extends BaseOpenmrsMetadata {
     public void setName(String name) {
     	this.locationName = name;
     }
+    
+	public AddressHierarchyType getAddressHierarchyType() {
+		return hierarchyType;
+	}
+	
+	public void setAddressHierarchyType(AddressHierarchyType hierarchyType) {
+		this.hierarchyType = hierarchyType;
+	}
 }

@@ -14,8 +14,6 @@ public class AddressHierarchyType extends BaseOpenmrsMetadata {
 	
 	private AddressHierarchyType parentType;
 	
-	private AddressHierarchyType childType;
-	
 	private AddressField addressField;
 	
 	/**
@@ -29,14 +27,6 @@ public class AddressHierarchyType extends BaseOpenmrsMetadata {
 	/**
 	 * Getters and Setters
 	 */
-	
-	public AddressHierarchyType getChildType() {
-		return childType;
-	}
-	
-	public void setChildType(AddressHierarchyType childType) {
-		this.childType = childType;
-	}
 	
 	public AddressHierarchyType getParentType() {
 		return parentType;

@@ -25,16 +25,31 @@ public interface AddressHierarchyService {
 	public AddressHierarchy editAddressHierarchyEntryName(Integer parentLocationId, String newName);
 	
 	/**
-	 * Gets all address hierarchy types, ordered from the top of hierarchy to the bottom
+	 * Gets all AddressHierarchyTypes, ordered from the top of hierarchy to the bottom
 	 */
 	public List<AddressHierarchyType> getAddressHierarchyTypes();
 	
 	/**
-	 * Gets the address hierarchy type that represents the top level of the hierarchy
+	 * Gets the AddressHierarchyType that represents the top level of the hierarchy
 	 */
 	public AddressHierarchyType getTopLevelAddressHierarchyType();
 	
+	/**
+	 * Gets an Address Hierarchy Type by id
+	 */
 	public AddressHierarchyType getAddressHierarchyType(int typeId);
+	
+	/**
+	 * Finds the child AddressHierarchyType of the given AddressHierarchyType
+	 */
+	public AddressHierarchyType getChildAddressHierarchyType(AddressHierarchyType type);
+	
+	/**
+	 * Saves an AddressHierarchyType
+	 */
+	public void saveAddressHierarchyType(AddressHierarchyType type);
+	
+	
 	
 	// TODO: figure out if I need to rename any of these
 	

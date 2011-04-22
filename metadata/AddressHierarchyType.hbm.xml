@@ -15,9 +15,6 @@
 		<many-to-one name="parentType" class="AddressHierarchyType"
 			column="parent_type_id" cascade="all" />
 
-		<many-to-one name="childType" class="AddressHierarchyType"
-			column="child_type_id" cascade="all" />
-
 		<property name="name" type="string" column="name" not-null="true"
 			length="255" />
 

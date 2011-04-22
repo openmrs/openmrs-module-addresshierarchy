@@ -68,7 +68,7 @@ public class AddressHierarchyImportUtil {
 		        			}
 		        			
 		        			// save the new entry
-		        			ahService.saveAddressHierarchy(entry);
+		        			ahService.saveAddressHierarchyEntry(entry);
 		        		}
 		        	}
 	        	}

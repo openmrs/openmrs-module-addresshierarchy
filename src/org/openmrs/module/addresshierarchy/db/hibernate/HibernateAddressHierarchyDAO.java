@@ -13,6 +13,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.openmrs.api.db.DAOException;
 import org.openmrs.module.addresshierarchy.AddressHierarchy;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
@@ -80,7 +81,9 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 			if (typeId != -1) {
 				ah.setHierarchyType(getAddressHierarchyType(typeId));
 			} else {
-				ah.setHierarchyType(getAddressHierarchyEntry(parentId).getHierarchyType().getChildType());
+				// if it hasn't been specified, the AddressHierarchyType, we need to get the parent AddressHierarchy entry,
+				// find it's AddressHierarchyType, and then find the child AddressHierarchyType
+				ah.setHierarchyType(getAddressHierarchyTypeByParent(getAddressHierarchyEntry(parentId).getHierarchyType()));
 			}
 			ah.setParent(getAddressHierarchyEntry(parentId));
 			session.save(ah);
@@ -156,8 +159,33 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	public AddressHierarchyType getAddressHierarchyType(int typeId) {
 		Session session = sessionFactory.getCurrentSession();
 		AddressHierarchyType type = (AddressHierarchyType) session.load(AddressHierarchyType.class, typeId);
-		
 		return type;
+	}
+	
+    public AddressHierarchyType getAddressHierarchyTypeByParent(AddressHierarchyType parentType) {
+    	Session session = sessionFactory.getCurrentSession();
+    	Criteria criteria = session.createCriteria(AddressHierarchyType.class);
+    	criteria.add(Restrictions.eq("parentType", parentType));
+    	
+    	AddressHierarchyType childType = null;
+		
+		try {
+			childType = (AddressHierarchyType) criteria.uniqueResult();
+		}
+		catch (Exception e) {
+			throw new AddressHierarchyModuleException("Unable to fetch child address hierarchy type", e);
+		}
+		
+		return childType;
+    }
+	
+	public void saveAddressHierarchyType(AddressHierarchyType type) {
+		try {
+			sessionFactory.getCurrentSession().saveOrUpdate(type);
+		}
+		catch (Throwable t) {
+			throw new DAOException(t);
+		}
 	}
 	
 	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah) {
@@ -280,18 +308,10 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		session.save(cell);
 		session.save(umudugudu);
 		
-		country.setChildType(province);
 		province.setParentType(country);
-		province.setChildType(district);
-		
 		district.setParentType(province);
-		district.setChildType(sector);
-		
 		sector.setParentType(district);
-		sector.setChildType(cell);
-		
 		cell.setParentType(sector);
-		cell.setChildType(umudugudu);
 		umudugudu.setParentType(cell);
 		
 	}
@@ -402,5 +422,4 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		
 		return allAddresses;
 	}
-	
 }

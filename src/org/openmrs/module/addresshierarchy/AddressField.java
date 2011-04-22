@@ -1,5 +1,7 @@
 package org.openmrs.module.addresshierarchy;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * This is a list of all the valid address fields on PersonAddress Note that the names of some of
  * the fields changed between Openmrs 1.7 and 1.8. The follow fields refer to the identical field in
@@ -27,4 +29,14 @@ public enum AddressField {
 		return name;
 	}
 	
+	public static final AddressField getByName(String name) {
+		
+		for (AddressField field : AddressField.values()) {
+			if (StringUtils.equals(name, field.getName())) {
+				return field;
+			}
+		}
+		
+		return null;
+	}
 }
