@@ -161,7 +161,7 @@
 		</sql>
 	</diff>
 	
-		<diff>
+	<diff>
 		<version>1.7</version>
 		<author>Mark Goodrich</author>
 		<date>Apr 22 2011</date>
@@ -187,6 +187,18 @@
 			`retire_reason` varchar(255) default NULL,
 			ADD COLUMN `uuid` char(38)
 			NOT NULL;
+		</sql>
+	</diff>
+	
+	<diff>
+		<version>1.8</version>
+		<author>Mark Goodrich</author>
+		<date>Apr 25 2011</date>
+		<description>
+			Remove child_type_id from address_hierarchy_type table
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_type DROP COLUMN child_type_id;
 		</sql>
 	</diff>
 	
