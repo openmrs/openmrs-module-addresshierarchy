@@ -38,16 +38,16 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		
 		// verify that a few data points exist	
 		Assert.assertEquals(ahService.searchHierarchy("BOTHA-BOTHE", -1).get(0).getName(),"BOTHA-BOTHE");
-		Assert.assertEquals(ahService.searchHierarchy("BOTHA-BOTHE", -1).get(0).getHierarchyType().getName(),"District");
+		Assert.assertEquals(ahService.searchHierarchy("BOTHA-BOTHE", -1).get(0).getType().getName(),"District");
 
 		Assert.assertEquals(ahService.searchHierarchy("LITHABANENG", -1).get(0).getName(),"LITHABANENG");
-		Assert.assertEquals(ahService.searchHierarchy("LITHABANENG", -1).get(0).getHierarchyType().getName(),"Constituency");
+		Assert.assertEquals(ahService.searchHierarchy("LITHABANENG", -1).get(0).getType().getName(),"Constituency");
 
 		Assert.assertEquals(ahService.searchHierarchy("Maseru Municipality", -1).get(0).getName(),"Maseru Municipality");
-		Assert.assertEquals(ahService.searchHierarchy("Maseru Municipality", -1).get(0).getHierarchyType().getName(),"Community Council");
+		Assert.assertEquals(ahService.searchHierarchy("Maseru Municipality", -1).get(0).getType().getName(),"Community Council");
 		
 		Assert.assertEquals(ahService.searchHierarchy("Thaba-Kholo", -1).get(0).getName(),"Thaba-Kholo");
-		Assert.assertEquals(ahService.searchHierarchy("Thaba-Kholo", -1).get(0).getHierarchyType().getName(),"Village");
+		Assert.assertEquals(ahService.searchHierarchy("Thaba-Kholo", -1).get(0).getType().getName(),"Village");
 
 		
 	}

@@ -5,9 +5,9 @@
 
 <hibernate-mapping package="org.openmrs.module.addresshierarchy">
 
-	<class name="AddressHierarchy" table="address_hierarchy">
+	<class name="AddressHierarchyEntry" table="address_hierarchy_entry">
 
-		<id name="addressHierarchyId" type="int" column="address_hierarchy_id"
+		<id name="addressHierarchyEntryId" type="int" column="address_hierarchy_entry_id"
 			unsaved-value="0">
 			<generator class="native" />
 		</id>
@@ -15,10 +15,10 @@
 		<property name="locationName" type="string" column="name"
 			not-null="true" length="255" />
 
-		<many-to-one name="hierarchyType" class="AddressHierarchyType"
+		<many-to-one name="type" class="AddressHierarchyType"
 			column="type_id" lazy="false" />
 
-		<many-to-one name="parent" class="AddressHierarchy"
+		<many-to-one name="parent" class="AddressHierarchyEntry"
 			column="parent_id" />
 
 		<property name="userGeneratedId" type="string" column="user_generated_id" />

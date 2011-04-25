@@ -14,7 +14,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.DAOException;
-import org.openmrs.module.addresshierarchy.AddressHierarchy;
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
@@ -44,7 +44,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	public int getAddressHierarchyEntryCount() {
 		int x = 0;
 		Session session = sessionFactory.getCurrentSession();
-		Criteria c = session.createCriteria(AddressHierarchy.class);
+		Criteria c = session.createCriteria(AddressHierarchyEntry.class);
 		List<Integer> rows = c.setProjection((Projections.rowCount())).list();
 		if (rows.size() > 0) {
 			x = rows.get(0).intValue();
@@ -53,13 +53,13 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		
 	}
 	
-	public AddressHierarchy getAddressHierarchyEntry(int addressHierarchyId) {
+	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyId) {
 		Session session = sessionFactory.getCurrentSession();
-		AddressHierarchy ah = (AddressHierarchy) session.load(AddressHierarchy.class, addressHierarchyId);
+		AddressHierarchyEntry ah = (AddressHierarchyEntry) session.load(AddressHierarchyEntry.class, addressHierarchyId);
 		return ah;
 	}
 	
-	public void saveAddressHierarchyEntry(AddressHierarchy ah) {
+	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah) {
 		Session session = sessionFactory.getCurrentSession();
 		session.save(ah);
 		session.flush();
@@ -72,18 +72,18 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 * @see org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO#addAddressHierarchyEntry(int,
 	 *      java.lang.String, int)
 	 */
-	public AddressHierarchy addAddressHierarchyEntry(int parentId, String name, int typeId) {
-		AddressHierarchy ah = null;
+	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId) {
+		AddressHierarchyEntry ah = null;
 		if (parentId != -1) {
 			Session session = sessionFactory.getCurrentSession();
-			ah = new AddressHierarchy();
+			ah = new AddressHierarchyEntry();
 			ah.setLocationName(name);
 			if (typeId != -1) {
-				ah.setHierarchyType(getAddressHierarchyType(typeId));
+				ah.setType(getAddressHierarchyType(typeId));
 			} else {
 				// if it hasn't been specified, the AddressHierarchyType, we need to get the parent AddressHierarchy entry,
 				// find it's AddressHierarchyType, and then find the child AddressHierarchyType
-				ah.setHierarchyType(getAddressHierarchyTypeByParent(getAddressHierarchyEntry(parentId).getHierarchyType()));
+				ah.setType(getAddressHierarchyTypeByParent(getAddressHierarchyEntry(parentId).getType()));
 			}
 			ah.setParent(getAddressHierarchyEntry(parentId));
 			session.save(ah);
@@ -99,15 +99,15 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 * @param newName
 	 */
 	@SuppressWarnings("unchecked")
-	public AddressHierarchy editAddressHierarchyEntryName(Integer locationId, String newName) {
+	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer locationId, String newName) {
 		// begin transaction
 		Session session = sessionFactory.getCurrentSession();
 		
 		// get the location by id
-		Criteria c = session.createCriteria(AddressHierarchy.class);
+		Criteria c = session.createCriteria(AddressHierarchyEntry.class);
 		c.add(Restrictions.idEq(locationId));
-		List<AddressHierarchy> hierarchyList = c.list();
-		AddressHierarchy ah = null;
+		List<AddressHierarchyEntry> hierarchyList = c.list();
+		AddressHierarchyEntry ah = null;
 		
 		// change the name if we have an ah
 		if (hierarchyList != null && hierarchyList.size() > 0) {
@@ -120,12 +120,12 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public AddressHierarchy getAddressHierarchyEntryByUserGenId(String userGeneratedId) {
-		AddressHierarchy ah = null;
+	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId) {
+		AddressHierarchyEntry ah = null;
 		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(AddressHierarchy.class);
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		
-		List<AddressHierarchy> list = criteria.add(Restrictions.eq("userGeneratedId", userGeneratedId)).list();
+		List<AddressHierarchyEntry> list = criteria.add(Restrictions.eq("userGeneratedId", userGeneratedId)).list();
 		if (list != null && list.size() > 0) {
 			ah = list.get(0);
 		}
@@ -188,8 +188,8 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		}
 	}
 	
-	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah) {
-		List<AddressHierarchy> leafList = new ArrayList<AddressHierarchy>();
+	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah) {
+		List<AddressHierarchyEntry> leafList = new ArrayList<AddressHierarchyEntry>();
 		getLowestLevel(ah, leafList);
 		return leafList;
 	}
@@ -197,10 +197,10 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	/**
 	 * Recursively finds leaf nodes of ah
 	 */
-	private List<AddressHierarchy> getLowestLevel(AddressHierarchy ah, List<AddressHierarchy> leafList) {
-		List<AddressHierarchy> children = getNextComponent(ah.getAddressHierarchyId());
+	private List<AddressHierarchyEntry> getLowestLevel(AddressHierarchyEntry ah, List<AddressHierarchyEntry> leafList) {
+		List<AddressHierarchyEntry> children = getNextComponent(ah.getAddressHierarchyEntryId());
 		if (children.size() > 0) {
-			for (AddressHierarchy addressHierarchy : children) {
+			for (AddressHierarchyEntry addressHierarchy : children) {
 				getLowestLevel(addressHierarchy, leafList);
 			}
 		} else {
@@ -220,10 +220,10 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 *      java.lang.String, java.lang.Integer)
 	 */
 	@SuppressWarnings("unchecked")
-	public List<AddressHierarchy> getNextComponent(Integer locationId) {
+	public List<AddressHierarchyEntry> getNextComponent(Integer locationId) {
 		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(AddressHierarchy.class);
-		List<AddressHierarchy> list = criteria.createCriteria("parent").add(
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
+		List<AddressHierarchyEntry> list = criteria.createCriteria("parent").add(
 		    Restrictions.eq("addressHierarchyId", locationId)).list();
 		return list;
 	}
@@ -233,20 +233,20 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 * specifying a type id
 	 */
 	@SuppressWarnings("unchecked")
-	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId, Boolean exact) {
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId, Boolean exact) {
 		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(AddressHierarchy.class);
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		criteria.add(Restrictions.like("locationName", searchString, exact ? MatchMode.EXACT : MatchMode.ANYWHERE));
-		List<AddressHierarchy> hierarchyList;
+		List<AddressHierarchyEntry> hierarchyList;
 		if (locationTypeId != -1) {
-			criteria.createCriteria("hierarchyType").add(Restrictions.eq("typeId", locationTypeId));
+			criteria.createCriteria("type").add(Restrictions.eq("typeId", locationTypeId));
 		}
 		
 		hierarchyList = criteria.list();
 		return hierarchyList;
 	}
 	
-	public void associateCoordinates(AddressHierarchy ah, double latitude, double longitude) {
+	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude) {
 		ah.setLatitude(latitude);
 		ah.setLongitude(longitude);
 		Session session = sessionFactory.getCurrentSession();
@@ -254,10 +254,10 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	}
 	
 	@SuppressWarnings( { "unchecked" })
-	public List<AddressHierarchy> getTopOfHierarchyList() {
+	public List<AddressHierarchyEntry> getTopOfHierarchyList() {
 		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(AddressHierarchy.class);
-		List list = criteria.add(Restrictions.isNull("parent")).createCriteria("hierarchyType").add(
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
+		List list = criteria.add(Restrictions.isNull("parent")).createCriteria("type").add(
 		    Restrictions.isNull("parentType")).list();
 		
 		return list;

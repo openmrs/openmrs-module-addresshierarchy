@@ -3,8 +3,7 @@ package org.openmrs.module.addresshierarchy;
 import org.openmrs.BaseOpenmrsMetadata;
 
 /**
- * The Class AddressHierarchyType is linked to the table address_hierarchy_type table mapped in
- * AddressHierarchyType.hbm.xml.
+ * Represents an Address Hierarchy type (ie., like "Country", or "State", or "City")
  */
 public class AddressHierarchyType extends BaseOpenmrsMetadata {
 	

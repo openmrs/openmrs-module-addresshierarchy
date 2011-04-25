@@ -63,7 +63,7 @@
 	<!-- /Internationalization -->
 	
 	<mappingFiles>
-		AddressHierarchy.hbm.xml
+		AddressHierarchyEntry.hbm.xml
 		AddressHierarchyType.hbm.xml
 	</mappingFiles>
 	

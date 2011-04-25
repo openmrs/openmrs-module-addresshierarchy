@@ -11,7 +11,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.addresshierarchy.AddressHierarchy;
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
@@ -58,9 +58,9 @@ public class AddressHierarchyImportUtil {
 		        		if (ahService.searchHierarchy(locations[i], types.get(i).getId(), true).size() == 0) {
 		        			
 		        			// create the new entry and set its name and location
-		        			AddressHierarchy entry = new AddressHierarchy();
+		        			AddressHierarchyEntry entry = new AddressHierarchyEntry();
 		        			entry.setName(locations[i]);
-		        			entry.setHierarchyType(types.get(i));
+		        			entry.setType(types.get(i));
 		        			
 		        			// link to parent if we aren't at the first level
 		        			if (i > 0) {

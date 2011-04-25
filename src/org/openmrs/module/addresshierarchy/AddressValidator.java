@@ -17,7 +17,7 @@ public class AddressValidator {
 	public boolean isAddressStructured(PersonAddress pa){
 		
 		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
-		List<AddressHierarchy> hierarchyList = ahs.getTopOfHierarchyList();
+		List<AddressHierarchyEntry> hierarchyList = ahs.getTopOfHierarchyList();
 		boolean structured = false;
 		String country = pa.getCountry();
 		
@@ -48,7 +48,7 @@ public class AddressValidator {
 	public String getInvalidReason(PersonAddress pa){
 		
 		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
-		List<AddressHierarchy> hierarchyList = ahs.getTopOfHierarchyList();
+		List<AddressHierarchyEntry> hierarchyList = ahs.getTopOfHierarchyList();
 		boolean structured = false;
 		boolean badCountry = true;
 		boolean badProvince = true;
@@ -106,12 +106,12 @@ public class AddressValidator {
 	 * @param partToCompare
 	 * @param locations
 	 */
-	private int getMatchingLocation(String partToCompare, List<AddressHierarchy> locations){
+	private int getMatchingLocation(String partToCompare, List<AddressHierarchyEntry> locations){
 		int matchingLocationId = -1;
 		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
-		for(AddressHierarchy ah : locations){
+		for(AddressHierarchyEntry ah : locations){
 			if(ah.getLocationName().equalsIgnoreCase(partToCompare)){
-				matchingLocationId = ah.getAddressHierarchyId();
+				matchingLocationId = ah.getAddressHierarchyEntryId();
 				return matchingLocationId;
 			}
 		}

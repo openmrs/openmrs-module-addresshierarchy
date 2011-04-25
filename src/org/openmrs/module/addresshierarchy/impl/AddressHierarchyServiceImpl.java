@@ -3,7 +3,7 @@ package org.openmrs.module.addresshierarchy.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openmrs.module.addresshierarchy.AddressHierarchy;
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
@@ -23,23 +23,23 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return dao.getAddressHierarchyEntryCount();
 	}
 	
-	public AddressHierarchy getAddressHierarchyEntry(int addressHierarchyId) {
+	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyId) {
 		return dao.getAddressHierarchyEntry(addressHierarchyId);
 	}
 	
-	public AddressHierarchy getAddressHierarchyEntryByUserGenId(String userGeneratedId) {
+	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId) {
 		return dao.getAddressHierarchyEntryByUserGenId(userGeneratedId);
 	}
 	
-	public void saveAddressHierarchyEntry(AddressHierarchy entry) {
+	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry) {
 		dao.saveAddressHierarchyEntry(entry);
 	}
 	
-	public AddressHierarchy addAddressHierarchyEntry(int parentId, String name, int typeId) {
+	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId) {
 		return dao.addAddressHierarchyEntry(parentId, name, typeId);
 	}
 	
-	public AddressHierarchy editAddressHierarchyEntryName(Integer parentLocationId, String newName) {
+	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer parentLocationId, String newName) {
 		return dao.editAddressHierarchyEntryName(parentLocationId, newName);
 	}
 	
@@ -77,23 +77,23 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		dao.saveAddressHierarchyType(type);
 	}
 	
-	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah) {
+	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah) {
 		return dao.getLeafNodes(ah);
 	}
 	
-	public List<AddressHierarchy> getNextComponent(Integer locationId) {
+	public List<AddressHierarchyEntry> getNextComponent(Integer locationId) {
 		return dao.getNextComponent(locationId);
 	}
 	
-	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId) {
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId) {
 		return searchHierarchy(searchString, locationTypeId, false);
 	}
 	
-	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId, Boolean exact) {
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId, Boolean exact) {
 		return dao.searchHierarchy(searchString, locationTypeId, exact);
 	}
 	
-	public void associateCoordinates(AddressHierarchy ah, double latitude, double longitude) {
+	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude) {
 		dao.associateCoordinates(ah, latitude, longitude);
 	}
 	
@@ -101,7 +101,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		dao.truncateHierarchyTables();
 	}
 	
-	public List<AddressHierarchy> getTopOfHierarchyList() {
+	public List<AddressHierarchyEntry> getTopOfHierarchyList() {
 		return dao.getTopOfHierarchyList();
 	}
 	
@@ -141,22 +141,22 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Deprecated
-	public void saveAddressHierarchy(AddressHierarchy ah) {
+	public void saveAddressHierarchy(AddressHierarchyEntry ah) {
 		saveAddressHierarchyEntry(ah);
 	}
 	
 	@Deprecated
-	public AddressHierarchy getLocationFromUserGenId(String userGeneratedId) {
+	public AddressHierarchyEntry getLocationFromUserGenId(String userGeneratedId) {
 		return getAddressHierarchyEntryByUserGenId(userGeneratedId);
 	}
 	
 	@Deprecated
-	public AddressHierarchy addLocation(int parentId, String name, int typeId) {
+	public AddressHierarchyEntry addLocation(int parentId, String name, int typeId) {
 		return addAddressHierarchyEntry(parentId, name, typeId);
 	}
 	
 	@Deprecated
-	public AddressHierarchy getAddressHierarchy(int addressHierarchyId) {
+	public AddressHierarchyEntry getAddressHierarchy(int addressHierarchyId) {
 		return getAddressHierarchyEntry(addressHierarchyId);
 	}
 	
@@ -166,7 +166,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Deprecated
-	public AddressHierarchy editLocationName(Integer parentLocationId, String newName) {
+	public AddressHierarchyEntry editLocationName(Integer parentLocationId, String newName) {
 		return editAddressHierarchyEntryName(parentLocationId, newName);
 	}
 }

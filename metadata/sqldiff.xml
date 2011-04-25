@@ -202,6 +202,32 @@
 		</sql>
 	</diff>
 	
+	<diff>
+		<version>1.9</version>
+		<author>Mark Goodrich</author>
+		<date>Apr 25 2011</date>
+		<description>
+			Rename address_hiearchy table
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy RENAME address_hierarchy_entry;
+		</sql>
+	</diff>
+	
+	<diff>
+		<version>2.0</version>
+		<author>Mark Goodrich</author>
+		<date>Apr 25 2011</date>
+		<description>
+			Change name of id on address hierarchy type to be consistent with new table name
+			Note that we should add this foreign key constraint back in, but for some reason I can't get it to work:
+			ALTER TABLE address_hierarchy_entry ADD CONSTRAINT `parent_location_id` FOREIGN KEY (`address_hierarchy_entry_id`) REFERENCES `address_hierarchy_entry` (`address_hierarchy_entry_id`);
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_entry DROP FOREIGN KEY parent_location_id;
+		    ALTER TABLE address_hierarchy_entry CHANGE COLUMN `address_hierarchy_id` `address_hierarchy_entry_id` int(11) NOT NULL AUTO_INCREMENT;
+		</sql>
+	</diff>
 	
 	
 </sqldiff>

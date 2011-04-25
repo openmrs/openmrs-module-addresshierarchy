@@ -3,18 +3,17 @@ package org.openmrs.module.addresshierarchy;
 import org.openmrs.BaseOpenmrsMetadata;
 
 /**
- * The Class AddressHierarchy is linked to the table address_hierarchy table mapped in
- * AddressHierarchy.hbm.xml.
+ * Represents a single entry in the Address Hierarchy (ie., like "United States", or "Massachusetts", or "Boston")
  */
-public class AddressHierarchy extends BaseOpenmrsMetadata {
+public class AddressHierarchyEntry extends BaseOpenmrsMetadata {
 	
-	private Integer addressHierarchyId;
+	private Integer addressHierarchyEntryId;
 	
 	private String locationName;
 	
-	private AddressHierarchyType hierarchyType;
+	private AddressHierarchyType type;
 	
-	private AddressHierarchy parent;
+	private AddressHierarchyEntry parent;
 	
 	private String userGeneratedId;
 	
@@ -67,12 +66,12 @@ public class AddressHierarchy extends BaseOpenmrsMetadata {
 		this.elevation = elevation;
 	}
 	
-	public AddressHierarchyType getHierarchyType() {
-		return hierarchyType;
+	public AddressHierarchyType getType() {
+		return type;
 	}
 	
-	public void setHierarchyType(AddressHierarchyType hierarchyType) {
-		this.hierarchyType = hierarchyType;
+	public void setType(AddressHierarchyType type) {
+		this.type = type;
 	}
 	
 	public String getUserGeneratedId() {
@@ -83,19 +82,19 @@ public class AddressHierarchy extends BaseOpenmrsMetadata {
 		this.userGeneratedId = userGeneratedId;
 	}
 	
-	public Integer getAddressHierarchyId() {
-		return addressHierarchyId;
+	public Integer getAddressHierarchyEntryId() {
+		return addressHierarchyEntryId;
 	}
 	
-	public void setAddressHierarchyId(Integer addressHierarchyId) {
-		this.addressHierarchyId = addressHierarchyId;
+	public void setAddressHierarchyEntryId(Integer addressHierarchyEntryId) {
+		this.addressHierarchyEntryId = addressHierarchyEntryId;
 	}
 	
-	public AddressHierarchy getParent() {
+	public AddressHierarchyEntry getParent() {
 		return parent;
 	}
 	
-	public void setParent(AddressHierarchy parent) {
+	public void setParent(AddressHierarchyEntry parent) {
 		this.parent = parent;
 	}
 
@@ -103,11 +102,11 @@ public class AddressHierarchy extends BaseOpenmrsMetadata {
 	 * Getters and Setters to map fields to alternative names
 	 */
     public Integer getId() {
-    	return this.addressHierarchyId;
+    	return this.addressHierarchyEntryId;
     }
     
     public void setId(Integer id) {
-	    this.addressHierarchyId = id;	    
+	    this.addressHierarchyEntryId = id;	    
     }
 	
     public String getName() {
@@ -119,10 +118,10 @@ public class AddressHierarchy extends BaseOpenmrsMetadata {
     }
     
 	public AddressHierarchyType getAddressHierarchyType() {
-		return hierarchyType;
+		return type;
 	}
 	
-	public void setAddressHierarchyType(AddressHierarchyType hierarchyType) {
-		this.hierarchyType = hierarchyType;
+	public void setAddressHierarchyType(AddressHierarchyType type) {
+		this.type = type;
 	}
 }

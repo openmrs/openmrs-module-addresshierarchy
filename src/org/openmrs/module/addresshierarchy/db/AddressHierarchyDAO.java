@@ -2,7 +2,7 @@ package org.openmrs.module.addresshierarchy.db;
 
 import java.util.List;
 
-import org.openmrs.module.addresshierarchy.AddressHierarchy;
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 
 /**
@@ -16,15 +16,15 @@ public interface AddressHierarchyDAO {
 	
 	public int getAddressHierarchyEntryCount();
 	
-	public AddressHierarchy getAddressHierarchyEntry(int addressHierarchyId);
+	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyId);
 	
-	public void saveAddressHierarchyEntry(AddressHierarchy ah);
+	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah);
 	
-	public AddressHierarchy addAddressHierarchyEntry(int parentId, String name, int typeId);
+	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId);
 	
-	public AddressHierarchy editAddressHierarchyEntryName(Integer parentLocationId, String newName);
+	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer parentLocationId, String newName);
 	
-	public AddressHierarchy getAddressHierarchyEntryByUserGenId(String userGeneratedId);
+	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId);
 	
 	public List<AddressHierarchyType> getAddressHierarchyTypes();
 	
@@ -36,17 +36,17 @@ public interface AddressHierarchyDAO {
 	
 	public void saveAddressHierarchyType(AddressHierarchyType type);
 	
-	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah);
+	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
 	
-	public List<AddressHierarchy> getNextComponent(Integer locationId);
+	public List<AddressHierarchyEntry> getNextComponent(Integer locationId);
 	
-	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId, Boolean exact);
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId, Boolean exact);
 	
-	public void associateCoordinates(AddressHierarchy ah, double latitude, double longitude);
+	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
 	
 	public void truncateHierarchyTables();
 	
-	public List<AddressHierarchy> getTopOfHierarchyList();
+	public List<AddressHierarchyEntry> getTopOfHierarchyList();
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to

@@ -12,19 +12,19 @@
 
 
 <!-- define a basic hierarchy -->  
-<address_hierarchy address_hierarchy_id="1" name="United States" type_id="1" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="22e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="2" name="Massachusetts" type_id="4" parent_id="1" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="32e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="3" name="Maine" type_id="4" parent_id="1" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="42e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="4" name="Plymouth" type_id="2" parent_id="2" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="52e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="5" name="Middlesex" type_id="2" parent_id="2" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="62e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="6" name="Plymouth" type_id="5" parent_id="4" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="72e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="7" name="Scituate" type_id="5" parent_id="4" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="82e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="8" name="Cohasset" type_id="5" parent_id="4" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="92e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="9" name="Hingham" type_id="5" parent_id="4" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a2e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="10" name="Boston" type_id="5" parent_id="5" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a4e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="11" name="Newton" type_id="5" parent_id="5" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a5e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="12" name="Jamaica Plain" type_id="3" parent_id="9" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a6e41146-e162-11df-9195-001e378eb67f"/>
-<address_hierarchy address_hierarchy_id="13" name="Beacon Hill" type_id="3" parent_id="9" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a2e71146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="1" name="United States" type_id="1" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="22e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="2" name="Massachusetts" type_id="4" parent_id="1" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="32e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="3" name="Maine" type_id="4" parent_id="1" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="42e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="4" name="Plymouth" type_id="2" parent_id="2" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="52e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="5" name="Middlesex" type_id="2" parent_id="2" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="62e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="6" name="Plymouth" type_id="5" parent_id="4" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="72e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="7" name="Scituate" type_id="5" parent_id="4" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="82e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="8" name="Cohasset" type_id="5" parent_id="4" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="92e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="9" name="Hingham" type_id="5" parent_id="4" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a2e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="10" name="Boston" type_id="5" parent_id="5" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a4e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="11" name="Newton" type_id="5" parent_id="5" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a5e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="12" name="Jamaica Plain" type_id="3" parent_id="9" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a6e41146-e162-11df-9195-001e378eb67f"/>
+<address_hierarchy_entry address_hierarchy_entry_id="13" name="Beacon Hill" type_id="3" parent_id="9" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a2e71146-e162-11df-9195-001e378eb67f"/>
 
 
 

@@ -14,15 +14,15 @@ public interface AddressHierarchyService {
 	
 	public int getAddressHierarchyEntryCount();
 	
-	public AddressHierarchy getAddressHierarchyEntry(int addressHierarchyEntryId);
+	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyEntryId);
 	
-	public AddressHierarchy getAddressHierarchyEntryByUserGenId(String userGeneratedId);
+	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId);
 	
-	public void saveAddressHierarchyEntry(AddressHierarchy entry);
+	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry);
 	
-	public AddressHierarchy addAddressHierarchyEntry(int parentId, String name, int typeId);
+	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId);
 	
-	public AddressHierarchy editAddressHierarchyEntryName(Integer parentLocationId, String newName);
+	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer parentLocationId, String newName);
 	
 	/**
 	 * Gets all AddressHierarchyTypes, ordered from the top of hierarchy to the bottom
@@ -53,19 +53,19 @@ public interface AddressHierarchyService {
 	
 	// TODO: figure out if I need to rename any of these
 	
-	public List<AddressHierarchy> getLeafNodes(AddressHierarchy ah);
+	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
 	
-	public List<AddressHierarchy> getNextComponent(Integer locationId);
+	public List<AddressHierarchyEntry> getNextComponent(Integer locationId);
 	
-	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId);
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId);
 	
-	public List<AddressHierarchy> searchHierarchy(String searchString, int locationTypeId, Boolean exact);
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId, Boolean exact);
 	
-	public void associateCoordinates(AddressHierarchy ah, double latitude, double longitude);
+	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
 	
 	public void truncateHierarchyTables();
 	
-	public List<AddressHierarchy> getTopOfHierarchyList();
+	public List<AddressHierarchyEntry> getTopOfHierarchyList();
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to
@@ -92,19 +92,19 @@ public interface AddressHierarchyService {
 	public int getAddressHierarchyCount();
 	
 	@Deprecated
-	public AddressHierarchy getAddressHierarchy(int addressHierarchyId);
+	public AddressHierarchyEntry getAddressHierarchy(int addressHierarchyId);
 	
 	@Deprecated
-	public void saveAddressHierarchy(AddressHierarchy ah);
+	public void saveAddressHierarchy(AddressHierarchyEntry ah);
 	
 	@Deprecated
-	public AddressHierarchy addLocation(int parentId, String name, int typeId);
+	public AddressHierarchyEntry addLocation(int parentId, String name, int typeId);
 	
 	@Deprecated
-	public AddressHierarchy editLocationName(Integer parentLocationId, String newName);
+	public AddressHierarchyEntry editLocationName(Integer parentLocationId, String newName);
 	
 	@Deprecated
-	public AddressHierarchy getLocationFromUserGenId(String userGeneratedId);
+	public AddressHierarchyEntry getLocationFromUserGenId(String userGeneratedId);
 	
 	@Deprecated
 	public AddressHierarchyType getHierarchyType(int typeId);;
