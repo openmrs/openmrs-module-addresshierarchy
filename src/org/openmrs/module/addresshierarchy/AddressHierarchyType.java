@@ -23,6 +23,16 @@ public class AddressHierarchyType extends BaseOpenmrsMetadata {
 		return name;
 	}
 	
+	public boolean equals(Object obj) {
+		if (this.getId() == null)
+			return false;
+		if (obj instanceof AddressHierarchyType) {
+			AddressHierarchyType c = (AddressHierarchyType) obj;
+			return (this.getId().equals(c.getId()));
+		}
+		return false;
+	}
+	
 	/**
 	 * Getters and Setters
 	 */
@@ -66,4 +76,5 @@ public class AddressHierarchyType extends BaseOpenmrsMetadata {
     public void setId(Integer id) {
 	   this.typeId = id;
     }
+
 }

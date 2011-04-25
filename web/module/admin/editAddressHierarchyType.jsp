@@ -10,6 +10,14 @@
 
 <h2><spring:message code="addresshierarchy.admin.title" /></h2>
 
+<!--  DISPLAY ANY ERROR MESSAGES -->
+<c:if test="${fn:length(errors.allErrors) > 0}">
+	<c:forEach var="error" items="${errors.allErrors}">
+		<span class="error"><spring:message code="${error.code}"/></span><br/><br/>
+	</c:forEach>
+	<br/>
+</c:if>
+
 <br/>
 <br/>
 
@@ -18,14 +26,10 @@
 
 
 <form id="editAddressHierarchyType" action="updateAddressHierarchyType.form" method="post">
+<input type="hidden" name="typeId" value="${type.id}" />
 
 <!--  DISPLAY ANY ERROR MESSAGES -->
-<c:if test="${fn:length(type.allErrors) > 0}">
-	<c:forEach var="error" items="${type.allErrors}">
-		<span class="error"><spring:message code="${error.code}"/></span><br/><br/>
-	</c:forEach>
-	<br/>
-</c:if>
+
 
 <table cellspacing="0" cellpadding="0" class="box">
 
@@ -37,25 +41,11 @@
 <tr>
 	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.parent" />:</nobr></td>
 	<td>
-		<select name="parentType">
-			<option value=""></option>
-			<c:forEach var="t" items="${types}">
-				<option value="${t.id}" <c:if test="${type.parentType == t}">selected</c:if> >${t.name}</option>
-			</c:forEach>
-		</select>
+		<c:if test="${type.parentType != null}">
+			${type.parentType.name}
+		</c:if>
 	</td>
-</tr>
-
-<tr>
-	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.parent" />:</nobr></td>
-	<td>
-		<select name="childType">
-			<option value=""></option>
-			<c:forEach var="t" items="${types}">
-				<option value="${t.id}" <c:if test="${type.parentType == t}">selected</c:if> >${t.name}</option>
-			</c:forEach>
-		</select>
-	</td>
+	<td width="60%">&nbsp;</td>
 </tr>
 
 <tr>
@@ -68,16 +58,27 @@
 			</c:forEach>
 		</select>
 	</td>
+	<td>&nbsp;</td>
 </tr>
+
+<tr>
+	<td>
+		<button type="submit">
+			<spring:message code="addresshierarchy.admin.save" text="Save"/>
+		</button>
+		<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/listAddressHierarchyTypes.form">
+			<button type="button">
+				<spring:message code="addresshierarchy.admin.cancel" text="Cancel"/>
+			</button>
+		</a>		
+	</td>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+</tr>
+
 
 </table>
 
-<button type="submit">
-	<spring:message code="addresshierarchy.admin.save" text="Save"/>
-</button>
-<button type="reset">
-	<spring:message code="addresshierarchy.admin.cancel" text="Cancel"/>
-</button>
 
 </form>
 

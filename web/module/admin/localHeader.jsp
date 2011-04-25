@@ -4,10 +4,10 @@
 		code="admin.title.short" /></a></li>
 	
 		<li
-			<c:if test='<%= request.getRequestURI().contains("manageFlags") %>'>class="active"</c:if>>
+			<c:if test='<%= request.getRequestURI().contains("manageTypes") %>'>class="active"</c:if>>
 		<a
-			href="${pageContext.request.contextPath}/module/patientflags/manageFlags.form"><spring:message
-			code="patientflags.manageFlags" /></a></li>
+			href="${pageContext.request.contextPath}/module/addresshierarchy/admin/listAddressHierarchyTypes.form"><spring:message
+			code="addresshierarchy.admin.manageTypes" /></a></li>
 
 		<li
 			<c:if test='<%= request.getRequestURI().contains("manageTags") %>'>class="active"</c:if>>

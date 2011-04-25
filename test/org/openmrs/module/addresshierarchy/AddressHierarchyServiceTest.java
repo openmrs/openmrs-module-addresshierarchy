@@ -26,7 +26,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
-	@Verifies(value = "should get hierarchy type by id", method = "getHierarchyType(int id)")
+	@Verifies(value = "should get hierarchy type by id", method = "getAddressHierarchyType(int id)")
 	public void getHierarchyType_shouldHierarchyTypeById() throws Exception {
 		AddressHierarchyType type = Context.getService(AddressHierarchyService.class).getAddressHierarchyType(1);
 		
@@ -36,7 +36,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
-	@Verifies(value = "should get top level hierarchy type", method = "getHierarchyType(int id)")
+	@Verifies(value = "should get top level hierarchy type", method = "getTopLevelAddressHierarchyType(int id)")
 	public void getTopLevelAddressHierarchyType_shouldGetTopLevelAddressHierarchyType() throws Exception {
 		AddressHierarchyType type = Context.getService(AddressHierarchyService.class).getTopLevelAddressHierarchyType();
 		
@@ -46,12 +46,40 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
-	@Verifies(value = "should get all address hierarchy type", method = "getAddressHierarchyTypes()")
+	@Verifies(value = "should get bottom level hierarchy type", method = "getBottomLevelHierarchyType(int id)")
+	public void getBottomLevelAddressHierarchyType_shouldGetBottomLevelAddressHierarchyType() throws Exception {
+		AddressHierarchyType type = Context.getService(AddressHierarchyService.class).getBottomLevelAddressHierarchyType();
+		
+		Assert.assertEquals("Neighborhood", type.getName());
+		Assert.assertEquals("region", type.getAddressField().getName());
+		
+	}
+	
+	@Test
+	@Verifies(value = "should get all address hierarchy types", method = "getAddressHierarchyTypes()")
 	public void getAddressHierarchyTypes_shouldGetAllAddressHierarchyTypes() throws Exception {
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
 		List<AddressHierarchyType> types = ahService.getAddressHierarchyTypes();
+		
+		Assert.assertEquals(5, types.size());
+			
+		// make sure that the list returned contains all the types
+		Assert.assertTrue(types.contains(ahService.getAddressHierarchyType(1)));
+		Assert.assertTrue(types.contains(ahService.getAddressHierarchyType(4)));
+		Assert.assertTrue(types.contains(ahService.getAddressHierarchyType(2)));
+		Assert.assertTrue(types.contains(ahService.getAddressHierarchyType(5)));
+		Assert.assertTrue(types.contains(ahService.getAddressHierarchyType(3)));
+	}
+	
+	@Test
+	@Verifies(value = "should get all address hierarchy types in order", method = "getOrderedAddressHierarchyTypes()")
+	public void getOrderedAddressHierarchyTypes_shouldGetAllAddressHierarchyTypesInOrder() throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		List<AddressHierarchyType> types = ahService.getOrderedAddressHierarchyTypes();
 		
 		Assert.assertEquals(5, types.size());
 			

@@ -31,6 +31,19 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata {
 	}
 	
 	/**
+	 * Equals
+	 */
+	public boolean equals(Object obj) {
+		if (this.getId() == null)
+			return false;
+		if (obj instanceof AddressHierarchyEntry) {
+			AddressHierarchyEntry c = (AddressHierarchyEntry) obj;
+			return (this.getId().equals(c.getId()));
+		}
+		return false;
+	}
+	
+	/**
 	 * Getters and Setters
 	 */
 	

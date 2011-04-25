@@ -188,6 +188,16 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		}
 	}
 	
+
+    public void deleteAddressHierarchyType(AddressHierarchyType type) {
+    	try {
+			sessionFactory.getCurrentSession().delete(type);
+		}
+		catch (Throwable t) {
+			throw new DAOException(t);
+		}
+    }
+	
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah) {
 		List<AddressHierarchyEntry> leafList = new ArrayList<AddressHierarchyEntry>();
 		getLowestLevel(ah, leafList);
@@ -422,4 +432,5 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		
 		return allAddresses;
 	}
+
 }

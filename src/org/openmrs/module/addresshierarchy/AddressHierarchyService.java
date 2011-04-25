@@ -27,12 +27,22 @@ public interface AddressHierarchyService {
 	/**
 	 * Gets all AddressHierarchyTypes, ordered from the top of hierarchy to the bottom
 	 */
+	public List<AddressHierarchyType> getOrderedAddressHierarchyTypes();
+	
+	/**
+	 * Gets all AddressHierarchyTypes
+	 */
 	public List<AddressHierarchyType> getAddressHierarchyTypes();
 	
 	/**
 	 * Gets the AddressHierarchyType that represents the top level of the hierarchy
 	 */
 	public AddressHierarchyType getTopLevelAddressHierarchyType();
+	
+	/**
+	 * Gets the AddressHierarchyType that represents the lowest level of the hierarchy
+	 */
+	public AddressHierarchyType getBottomLevelAddressHierarchyType();
 	
 	/**
 	 * Gets an Address Hierarchy Type by id
@@ -49,6 +59,10 @@ public interface AddressHierarchyService {
 	 */
 	public void saveAddressHierarchyType(AddressHierarchyType type);
 	
+	/**
+	 * Deletes an AddressHierarchy Type
+	 */
+	public void deleteAddressHierarchyType(AddressHierarchyType type);
 	
 	
 	// TODO: figure out if I need to rename any of these

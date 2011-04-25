@@ -13,7 +13,7 @@
 		</id>
 
 		<many-to-one name="parentType" class="AddressHierarchyType"
-			column="parent_type_id" cascade="all" />
+			column="parent_type_id" />
 
 		<property name="name" type="string" column="name" not-null="true"
 			length="255" />

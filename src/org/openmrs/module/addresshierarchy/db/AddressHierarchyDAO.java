@@ -36,6 +36,8 @@ public interface AddressHierarchyDAO {
 	
 	public void saveAddressHierarchyType(AddressHierarchyType type);
 	
+	public void deleteAddressHierarchyType(AddressHierarchyType type);
+	
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
 	
 	public List<AddressHierarchyEntry> getNextComponent(Integer locationId);

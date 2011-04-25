@@ -34,7 +34,7 @@ public class AddressHierarchyImportUtil {
 		String line;
 		
 		// get an ordered list of the address hierarchy types
-		List<AddressHierarchyType> types = ahService.getAddressHierarchyTypes();
+		List<AddressHierarchyType> types = ahService.getOrderedAddressHierarchyTypes();
 		
 		// if we aren't starting at the top level of the hierarchy, remove all the levels before the one we wish to start at
 		if (startingLevel != null) {
