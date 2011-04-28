@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.openmrs.module.Extension;
+import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.web.extension.AdministrationSectionExt;
 
 /**
@@ -40,6 +41,11 @@ public class AdminList extends AdministrationSectionExt {
 	 */
 	public String getTitle() {
 		return "addresshierarchy.title";
+	}
+	
+	/** Defines the privilege required to the see the Administration section for the module */
+	public String getRequiredPrivilege() {
+		return AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY;
 	}
 	
 	/**

@@ -28,8 +28,8 @@
 	
 	<!-- Required Privileges -->
 	<privilege>
-		<name>Manage Hierarchy</name>
-		<description>Allows user to access Form Entry pages/functions</description>
+		<name>Manage Address Hierarchy</name>
+		<description>Allows user to access/modify the defined address hierarchy</description>
 	</privilege>
 	 <!-- /Required Privileges -->
 

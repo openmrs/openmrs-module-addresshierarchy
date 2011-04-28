@@ -2,6 +2,8 @@ package org.openmrs.module.addresshierarchy.service;
 
 import java.util.List;
 
+import org.openmrs.annotation.Authorized;
+import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +22,13 @@ public interface AddressHierarchyService {
 	
 	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId);
 	
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry);
 	
 	/**
 	 * Removes all address hierarchy entries--use with care!
 	 */
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void deleteAllAddressHierarchyEntries();
 	
 	/**
@@ -60,11 +64,13 @@ public interface AddressHierarchyService {
 	/**
 	 * Saves an AddressHierarchyType
 	 */
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void saveAddressHierarchyType(AddressHierarchyType type);
 	
 	/**
 	 * Deletes an AddressHierarchy Type
 	 */
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void deleteAddressHierarchyType(AddressHierarchyType type);
 	
 	
@@ -80,6 +86,7 @@ public interface AddressHierarchyService {
 	
 	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
 	
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void truncateHierarchyTables();
 	
 	public List<AddressHierarchyEntry> getTopOfHierarchyList();
@@ -101,9 +108,11 @@ public interface AddressHierarchyService {
 	public List<Object[]> getAllAddresses(int page);
 	
 	@Deprecated
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId);
 	
 	@Deprecated
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer parentLocationId, String newName);
 	
 	/**
@@ -118,12 +127,15 @@ public interface AddressHierarchyService {
 	public AddressHierarchyEntry getAddressHierarchy(int addressHierarchyId);
 	
 	@Deprecated
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void saveAddressHierarchy(AddressHierarchyEntry ah);
 	
 	@Deprecated
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public AddressHierarchyEntry addLocation(int parentId, String name, int typeId);
 	
 	@Deprecated
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public AddressHierarchyEntry editLocationName(Integer locationId, String newName);
 	
 	@Deprecated
