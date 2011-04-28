@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 public class AddressValidator {
 

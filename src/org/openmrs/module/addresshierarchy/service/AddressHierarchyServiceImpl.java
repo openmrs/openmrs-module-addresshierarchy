@@ -1,4 +1,4 @@
-package org.openmrs.module.addresshierarchy.impl;
+package org.openmrs.module.addresshierarchy.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
-import org.openmrs.module.addresshierarchy.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;

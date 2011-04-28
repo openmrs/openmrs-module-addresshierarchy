@@ -6,11 +6,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.AddressField;
-import org.openmrs.module.addresshierarchy.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.propertyeditor.AddressFieldEditor;
 import org.openmrs.module.addresshierarchy.propertyeditor.AddressHierarchyTypeEditor;
+import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.validator.AddressHierarchyTypeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

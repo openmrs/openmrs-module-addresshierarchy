@@ -40,11 +40,11 @@
 	<bean parent="serviceContext">
 		<property name="moduleService">
 	   		<list>
-				<value>org.openmrs.module.addresshierarchy.AddressHierarchyService</value> 
+				<value>org.openmrs.module.addresshierarchy.service.AddressHierarchyService</value> 
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<bean class="org.openmrs.module.addresshierarchy.impl.AddressHierarchyServiceImpl">
+						<bean class="org.openmrs.module.addresshierarchy.service.AddressHierarchyServiceImpl">
 							<property name="addressHierarchyDAO">
 								<bean class="org.openmrs.module.addresshierarchy.db.hibernate.HibernateAddressHierarchyDAO">
 									<property name="sessionFactory"><ref bean="sessionFactory"/></property>	

@@ -1,7 +1,9 @@
-package org.openmrs.module.addresshierarchy;
+package org.openmrs.module.addresshierarchy.service;
 
 import java.util.List;
 
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
+import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
