@@ -14,10 +14,13 @@ import org.apache.commons.lang.StringUtils;
  */
 public enum AddressField {
 	
+	// TODO: some sort of unit test to make sure that all these mappings work
+	// TODO: need to worry about being module specific
+	
 	ADDRESS_1("address1"), ADDRESS_2("address2"), ADDRESS_3("address3"), NEIGHBORHOOD_CELL("neighborhoodCell"), 
 	ADDRESS_4("address4"), TOWNSHIP_DIVISION("townshipDivision"), ADDRESS_5("address5"), SUBREGION("subregion"), 
 	ADDRESS_6("address6"), REGION("region"), CITY_VILLAGE("cityVillage"), COUNTY_DISTRICT("countyDistrict"), 
-	STATE_PROVINCE("stateProvince"), COUNTRY("country");
+	STATE_PROVINCE("stateProvince"), COUNTRY("country"), POSTAL_CODE("postalCode");
 	
 	String name;
 	

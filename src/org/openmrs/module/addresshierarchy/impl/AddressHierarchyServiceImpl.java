@@ -9,6 +9,7 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.AddressHierarchyType;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
+import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
-	  protected static final Log log = LogFactory.getLog(AddressHierarchyServiceImpl.class);
+	protected static final Log log = LogFactory.getLog(AddressHierarchyServiceImpl.class);
 	
 	private AddressHierarchyDAO dao;
 	
@@ -45,13 +46,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional
-	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId) {
-		return dao.addAddressHierarchyEntry(parentId, name, typeId);
-	}
-	
-	@Transactional
-	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer parentLocationId, String newName) {
-		return dao.editAddressHierarchyEntryName(parentLocationId, newName);
+	public void deleteAllAddressHierarchyEntries() {
+		dao.deleteAllAddressHierarchyEntries();
 	}
 	
 	@Transactional(readOnly = true)
@@ -236,6 +232,50 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional(readOnly = true)
 	public AddressHierarchyEntry editLocationName(Integer parentLocationId, String newName) {
 		return editAddressHierarchyEntryName(parentLocationId, newName);
+	}
+	
+	@Deprecated
+	@Transactional
+	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId) {
+		
+		AddressHierarchyEntry parent = getAddressHierarchyEntry(parentId);
+		
+		if (parent == null) {
+			throw new AddressHierarchyModuleException("Invalid entry id for parent entry");
+		}
+		
+		AddressHierarchyType type = getAddressHierarchyType(typeId);
+		
+		if (type == null) {
+			// if no type has been specified, use the type of the parent
+			type = parent.getType();
+		}
+		
+		AddressHierarchyEntry entry = new AddressHierarchyEntry();
+		entry.setName(name);
+		entry.setParent(parent);
+		entry.setType(type);
+		
+		dao.saveAddressHierarchyEntry(entry);
+		
+		return entry;
+	}
+	
+	@Deprecated
+	@Transactional
+	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer locationId, String newName) {
+		
+		AddressHierarchyEntry entry = getAddressHierarchyEntry(locationId);
+		
+		if (entry == null) {
+			throw new AddressHierarchyModuleException("Invalid address entry id");
+		}
+		
+		entry.setName(newName);
+		
+		saveAddressHierarchyEntry(entry);
+		
+		return entry;
 	}
 
 }

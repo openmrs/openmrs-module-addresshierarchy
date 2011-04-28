@@ -74,8 +74,11 @@ public class AddressHierarchyImportUtil {
 	        	}
 	        }
         }
-        catch (IOException e) {
+        catch (IOException e) { 
 	        throw new AddressHierarchyModuleException("Error accessing address hierarchy import stream ", e);
+        }
+        catch (IndexOutOfBoundsException e) {
+        	throw new AddressHierarchyModuleException("Error importing address hierarchy entries. Have you defined your address hierarchy types?",e);
         }
 	}
 	

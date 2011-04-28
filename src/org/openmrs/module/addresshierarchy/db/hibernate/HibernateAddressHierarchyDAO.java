@@ -66,59 +66,6 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		session.clear();
 	}
 	
-	/**
-	 * Adds an address hierarchy Location
-	 * 
-	 * @see org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO#addAddressHierarchyEntry(int,
-	 *      java.lang.String, int)
-	 */
-	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId) {
-		AddressHierarchyEntry ah = null;
-		if (parentId != -1) {
-			Session session = sessionFactory.getCurrentSession();
-			ah = new AddressHierarchyEntry();
-			ah.setLocationName(name);
-			if (typeId != -1) {
-				ah.setType(getAddressHierarchyType(typeId));
-			} else {
-				// if it hasn't been specified, the AddressHierarchyType, we need to get the parent AddressHierarchy entry,
-				// find it's AddressHierarchyType, and then find the child AddressHierarchyType
-				ah.setType(getAddressHierarchyTypeByParent(getAddressHierarchyEntry(parentId).getType()));
-			}
-			ah.setParent(getAddressHierarchyEntry(parentId));
-			session.save(ah);
-		}
-		
-		return ah;
-	}
-	
-	/**
-	 * Changes the locations name to <code>newName</code>
-	 * 
-	 * @param locationId
-	 * @param newName
-	 */
-	@SuppressWarnings("unchecked")
-	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer locationId, String newName) {
-		// begin transaction
-		Session session = sessionFactory.getCurrentSession();
-		
-		// get the location by id
-		Criteria c = session.createCriteria(AddressHierarchyEntry.class);
-		c.add(Restrictions.idEq(locationId));
-		List<AddressHierarchyEntry> hierarchyList = c.list();
-		AddressHierarchyEntry ah = null;
-		
-		// change the name if we have an ah
-		if (hierarchyList != null && hierarchyList.size() > 0) {
-			ah = hierarchyList.get(0);
-			ah.setLocationName(newName);
-		}
-		
-		// close the transaction
-		return ah;
-	}
-	
 	@SuppressWarnings("unchecked")
 	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId) {
 		AddressHierarchyEntry ah = null;
@@ -130,6 +77,13 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 			ah = list.get(0);
 		}
 		return ah;
+	}
+	
+	public void deleteAllAddressHierarchyEntries() {
+		Session session = sessionFactory.getCurrentSession();
+		session.createSQLQuery("SET foreign_key_checks = 0").executeUpdate();
+		session.createSQLQuery("DELETE FROM address_hierarchy_entry").executeUpdate();
+		session.createSQLQuery("SET foreign_key_checks = 1").executeUpdate();
 	}
 	
 	@SuppressWarnings("unchecked")

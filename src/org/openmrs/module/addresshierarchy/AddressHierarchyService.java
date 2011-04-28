@@ -20,9 +20,10 @@ public interface AddressHierarchyService {
 	
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry);
 	
-	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId);
-	
-	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer parentLocationId, String newName);
+	/**
+	 * Removes all address hierarchy entries--use with care!
+	 */
+	public void deleteAllAddressHierarchyEntries();
 	
 	/**
 	 * Gets all AddressHierarchyTypes, ordered from the top of hierarchy to the bottom
@@ -97,6 +98,12 @@ public interface AddressHierarchyService {
 	@Deprecated
 	public List<Object[]> getAllAddresses(int page);
 	
+	@Deprecated
+	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId);
+	
+	@Deprecated
+	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer parentLocationId, String newName);
+	
 	/**
 	 * I've renamed the following methods to make them a little more clear, but kept the old methods
 	 * for backwards compatibility
@@ -115,7 +122,7 @@ public interface AddressHierarchyService {
 	public AddressHierarchyEntry addLocation(int parentId, String name, int typeId);
 	
 	@Deprecated
-	public AddressHierarchyEntry editLocationName(Integer parentLocationId, String newName);
+	public AddressHierarchyEntry editLocationName(Integer locationId, String newName);
 	
 	@Deprecated
 	public AddressHierarchyEntry getLocationFromUserGenId(String userGeneratedId);

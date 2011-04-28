@@ -10,6 +10,9 @@
 
 <h2><spring:message code="addresshierarchy.admin.title" /></h2>
 
+<br/>
+<br/>
+
 <!--  DISPLAY ANY ERROR MESSAGES -->
 <c:if test="${fn:length(errors.allErrors) > 0}">
 	<c:forEach var="error" items="${errors.allErrors}">
@@ -18,24 +21,19 @@
 	<br/>
 </c:if>
 
-<br/>
-<br/>
 
-<!--  display the address hierarchy types -->
 <div><b class="boxHeader"><spring:message code="addresshierarchy.admin.editType" /></b>
 
 
 <form id="editAddressHierarchyType" action="updateAddressHierarchyType.form" method="post">
 <input type="hidden" name="typeId" value="${type.id}" />
 
-<!--  DISPLAY ANY ERROR MESSAGES -->
-
-
 <table cellspacing="0" cellpadding="0" class="box">
 
 <tr>
 	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.name" />:</nobr></td>
 	<td><input type="text" size="10" name="name" value="${type.name}"/></td>
+	<td width="60%">&nbsp;</td>
 </tr>
 
 <tr>
@@ -45,7 +43,7 @@
 			${type.parentType.name}
 		</c:if>
 	</td>
-	<td width="60%">&nbsp;</td>
+	<td>&nbsp;</td>
 </tr>
 
 <tr>

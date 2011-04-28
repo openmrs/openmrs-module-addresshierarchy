@@ -20,11 +20,9 @@ public interface AddressHierarchyDAO {
 	
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah);
 	
-	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId);
-	
-	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer parentLocationId, String newName);
-	
 	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId);
+	
+	public void deleteAllAddressHierarchyEntries();
 	
 	public List<AddressHierarchyType> getAddressHierarchyTypes();
 	
