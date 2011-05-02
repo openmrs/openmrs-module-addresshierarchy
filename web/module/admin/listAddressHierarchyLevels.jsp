@@ -21,17 +21,15 @@
 <b class="boxHeader"><spring:message code="addresshierarchy.admin.levels" /></b>
 <table cellpadding="2" cellspacing="0" class="box">
 	<tr>
-		<th><spring:message code="addresshierarchy.admin.name" /></th>
-		<th><spring:message code="addresshierarchy.admin.parent" /></th>
 		<th><spring:message code="addresshierarchy.admin.addressField" /></th>
+		<th><spring:message code="addresshierarchy.admin.parent" /></th>
 		<th>&nbsp;</th>
 		<th width="40%">&nbsp;</th>
 	</tr>
 	<c:forEach items="${levels}" var="level" varStatus="i">
 		<tr>
-			<td>${level.name}</td>
-			<td>${level.parent != null ? level.parent.name : ''}</td>
-			<td>${level.addressField.name}</td>
+			<td>${nameMappings[level.addressField.name]}</td>
+			<td><spring:message code="${level.parent != null ? nameMappings[level.parent.addressField.name] : ''}"/></td>
 			<td>
 				<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form?levelId=${level.id}">
 				   <spring:message code="addresshierarchy.admin.edit" />
@@ -49,7 +47,7 @@
 		</tr>
 	</c:forEach>
 	<tr>
-		<td colspan="5">
+		<td colspan="4">
 			<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form">
 				<spring:message code="addresshierarchy.admin.addLevel" />
 			</a>

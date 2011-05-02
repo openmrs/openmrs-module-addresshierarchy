@@ -1,10 +1,12 @@
 package org.openmrs.module.addresshierarchy.web.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.openmrs.api.context.Context;
+import org.openmrs.layout.web.address.AddressSupport;
 import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
@@ -43,6 +45,16 @@ public class AddressHierarchyLevelController {
 		binder.registerCustomEditor(AddressField.class, new AddressFieldEditor()); 
 	}
 	
+	@ModelAttribute("addressFields")
+	public AddressField [] getAddressFields() {
+		return AddressField.values();
+	}
+	
+	@ModelAttribute("nameMappings")
+	public Map<String,String> getAddressNameMappings() {
+		return AddressSupport.getInstance().getDefaultLayoutTemplate().getNameMappings();
+	}
+	
 	@ModelAttribute("levels")
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
 		return Context.getService(AddressHierarchyService.class).getAddressHierarchyLevels();
@@ -68,11 +80,6 @@ public class AddressHierarchyLevelController {
     	}
     	
     	return level;
-	}
-	
-	@ModelAttribute("addressFields")
-	public AddressField [] getAddressFields() {
-		return AddressField.values();
 	}
 	
     @RequestMapping("/module/addresshierarchy/admin/listAddressHierarchyLevels.form")

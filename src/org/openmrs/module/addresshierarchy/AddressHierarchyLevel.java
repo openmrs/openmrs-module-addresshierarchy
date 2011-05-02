@@ -9,8 +9,6 @@ public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 	
 	private Integer levelId;
 	
-	private String name;
-	
 	private AddressHierarchyLevel parent;
 	
 	private AddressField addressField;
@@ -19,8 +17,7 @@ public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 	 * To string
 	 */
 	public String toString() {
-		String name = getName() + " " + getLevelId();
-		return name;
+		return getAddressField().getName() + " " + getLevelId();
 	}
 	
 	public boolean equals(Object obj) {
@@ -44,17 +41,9 @@ public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 	public void setParent(AddressHierarchyLevel parent) {
 		this.parent = parent;
 	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
+
 	public void setLevelId(Integer levelId) {
 		this.levelId = levelId;
-	}
-	
-	public String getName() {
-		return this.name;
 	}
 	
 	public Integer getLevelId() {

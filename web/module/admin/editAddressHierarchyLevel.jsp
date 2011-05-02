@@ -34,16 +34,10 @@
 <table cellspacing="0" cellpadding="0" class="box">
 
 <tr>
-	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.name" />:</nobr></td>
-	<td><input type="text" size="10" name="name" value="${type.name}"/></td>
-	<td width="60%">&nbsp;</td>
-</tr>
-
-<tr>
 	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.parent" />:</nobr></td>
 	<td>
 		<c:if test="${level.parent != null}">
-			${level.parent.name}
+			${nameMappings[level.parent.addressField.name]}
 		</c:if>
 	</td>
 	<td>&nbsp;</td>
@@ -55,7 +49,11 @@
 		<select name="addressField">
 			<option value=""></option>
 			<c:forEach var="field" items="${addressFields}">
-				<option value="${field.name}" <c:if test="${level.addressField == field}">selected</c:if> >${field.name}</option>
+				<c:if test="${nameMappings[field.name] != null}">
+					<option value="${field.name}" <c:if test="${level.addressField == field}">selected</c:if> >
+						<spring:message code="${nameMappings[field.name]}"/>
+					</option>
+				</c:if>
 			</c:forEach>
 		</select>
 	</td>
