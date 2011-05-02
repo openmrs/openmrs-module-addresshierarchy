@@ -229,5 +229,41 @@
 		</sql>
 	</diff>
 	
+	<diff>
+		<version>2.1</version>
+		<author>Mark Goodrich</author>
+		<date>Apr 29 2011</date>
+		<description>
+			Rename address_hiearchy_type table
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_type RENAME address_hierarchy_level;
+		</sql>
+	</diff>
+	
+	<diff>
+		<version>2.2</version>
+		<author>Mark Goodrich</author>
+		<date>Apr 29 2011</date>
+		<description>
+			Change the name of the address_hierarchy_type_id and parent_type_id to be consistent
+		</description>
+		<sql>
+		    ALTER TABLE address_hierarchy_level CHANGE COLUMN `address_hierarchy_type_id` `address_hierarchy_level_id` int(11) NOT NULL AUTO_INCREMENT;
+		    ALTER TABLE address_hierarchy_level CHANGE COLUMN `parent_type_id` `parent_level_id` int(11);
+		</sql>
+	</diff>
+	
+	<diff>
+		<version>2.2.1</version>
+		<author>Mark Goodrich</author>
+		<date>Apr 29 2011</date>
+		<description>
+			Change the name of the type_id to level_id to be consistent
+		</description>
+		<sql>
+		    ALTER TABLE address_hierarchy_entry CHANGE COLUMN `type_id` `level_id` int(11);
+		</sql>
+	</diff>
 	
 </sqldiff>

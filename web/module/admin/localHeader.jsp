@@ -4,10 +4,10 @@
 		code="admin.title.short" /></a></li>
 	
 		<li
-			<c:if test='<%= request.getRequestURI().contains("manageTypes") %>'>class="active"</c:if>>
+			<c:if test='<%= request.getRequestURI().contains("manageLevels") %>'>class="active"</c:if>>
 		<a
-			href="${pageContext.request.contextPath}/module/addresshierarchy/admin/listAddressHierarchyTypes.form"><spring:message
-			code="addresshierarchy.admin.manageTypes" /></a></li>
+			href="${pageContext.request.contextPath}/module/addresshierarchy/admin/listAddressHierarchyLevels.form"><spring:message
+			code="addresshierarchy.admin.manageLevels" /></a></li>
 
 		<li
 			<c:if test='<%= request.getRequestURI().contains("uploadAddressHierarchy") %>'>class="active"</c:if>>

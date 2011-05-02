@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
-import org.openmrs.module.addresshierarchy.AddressHierarchyType;
+import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,52 +50,52 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<AddressHierarchyType> getOrderedAddressHierarchyTypes() {
+	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
 		
 		// TODO: integrate this with the new method we may create to make sure that the hierarchy is well-formed?
 		
-		List<AddressHierarchyType> types = new ArrayList<AddressHierarchyType>();
+		List<AddressHierarchyLevel> levels = new ArrayList<AddressHierarchyLevel>();
 		
-		// first, get the top level type
-		AddressHierarchyType topLevel = getTopLevelAddressHierarchyType();
+		// first, get the top level level
+		AddressHierarchyLevel topLevel = getTopAddressHierarchyLevel();
 		
 		if (topLevel != null) {
 			// add the top level to this list
-			types.add(topLevel);
+			levels.add(topLevel);
 			
 			// now fetch the children in order
-			while (getChildAddressHierarchyType(types.get(types.size() - 1)) != null) {
-				types.add(getChildAddressHierarchyType(types.get(types.size() - 1)));
+			while (getChildAddressHierarchyLevel(levels.get(levels.size() - 1)) != null) {
+				levels.add(getChildAddressHierarchyLevel(levels.get(levels.size() - 1)));
 			}
 		}
 		
-		// make sure we've reached all the types this way
-		if (types.size() < getAddressHierarchyTypes().size()) {
-			log.warn("Address Hierarchy Types are not in strict hierarchical format. There may be orphaned or widowed types.");
+		// make sure we've reached all the levels this way
+		if (levels.size() < getAddressHierarchyLevels().size()) {
+			log.warn("Address Hierarchy Levels are not in strict hierarchical format. There may be orphaned or widowed levels.");
 		}
 		
-		return types;
+		return levels;
 	}
 	
 	@Transactional(readOnly = true)
-	public List<AddressHierarchyType> getAddressHierarchyTypes() {
-		return dao.getAddressHierarchyTypes();
+	public List<AddressHierarchyLevel> getAddressHierarchyLevels() {
+		return dao.getAddressHierarchyLevels();
 	}
 	
 	@Transactional(readOnly = true)
-	public AddressHierarchyType getTopLevelAddressHierarchyType() {
-		return dao.getTopLevelAddressHierarchyType();
+	public AddressHierarchyLevel getTopAddressHierarchyLevel() {
+		return dao.getTopAddressHierarchyLevel();
 	}
 	
 	@Transactional(readOnly = true)
-    public AddressHierarchyType getBottomLevelAddressHierarchyType() {
+    public AddressHierarchyLevel getBottomAddressHierarchyLevel() {
 		
 		// get the ordered list
-		List<AddressHierarchyType> types = getOrderedAddressHierarchyTypes();
+		List<AddressHierarchyLevel> levels = getOrderedAddressHierarchyLevels();
 		
 		// return the last member in the list
-		if (types != null && types.size() > 0) {
-			return types.get(types.size() - 1);
+		if (levels != null && levels.size() > 0) {
+			return levels.get(levels.size() - 1);
 		}
 		else {
 			return null;
@@ -103,23 +103,23 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
     }
 	
 	@Transactional(readOnly = true)
-	public AddressHierarchyType getAddressHierarchyType(int typeId) {
-		return dao.getAddressHierarchyType(typeId);
+	public AddressHierarchyLevel getAddressHierarchyLevel(int levelId) {
+		return dao.getAddressHierarchyLevel(levelId);
 	}
 	
 	@Transactional(readOnly = true)
-    public AddressHierarchyType getChildAddressHierarchyType(AddressHierarchyType type) {
-	    return dao.getAddressHierarchyTypeByParent(type);
+    public AddressHierarchyLevel getChildAddressHierarchyLevel(AddressHierarchyLevel level) {
+	    return dao.getAddressHierarchyLevelByParent(level);
     }
 	
 	@Transactional
-	public void saveAddressHierarchyType(AddressHierarchyType type) {
-		dao.saveAddressHierarchyType(type);
+	public void saveAddressHierarchyLevel(AddressHierarchyLevel level) {
+		dao.saveAddressHierarchyLevel(level);
 	}
 	
 	@Transactional
-    public void deleteAddressHierarchyType(AddressHierarchyType type) {
-    	dao.deleteAddressHierarchyType(type);  
+    public void deleteAddressHierarchyLevel(AddressHierarchyLevel level) {
+    	dao.deleteAddressHierarchyLevel(level);  
     }
 	
 	@Transactional(readOnly = true)
@@ -133,13 +133,13 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId) {
-		return searchHierarchy(searchString, locationTypeId, false);
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId) {
+		return searchHierarchy(searchString, levelId, false);
 	}
 	
 	@Transactional(readOnly = true)
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId, Boolean exact) {
-		return dao.searchHierarchy(searchString, locationTypeId, exact);
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact) {
+		return dao.searchHierarchy(searchString, levelId, exact);
 	}
 	
 	@Transactional
@@ -211,8 +211,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Deprecated
 	@Transactional
-	public AddressHierarchyEntry addLocation(int parentId, String name, int typeId) {
-		return addAddressHierarchyEntry(parentId, name, typeId);
+	public AddressHierarchyEntry addLocation(int parentId, String name, int levelId) {
+		return addAddressHierarchyEntry(parentId, name, levelId);
 	}
 	
 	@Deprecated
@@ -223,8 +223,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Deprecated
 	@Transactional(readOnly = true)
-	public AddressHierarchyType getHierarchyType(int typeId) {
-		return getAddressHierarchyType(typeId);
+	public AddressHierarchyLevel getHierarchyType(int levelId) {
+		return getAddressHierarchyLevel(levelId);
 	}
 	
 	@Deprecated
@@ -235,7 +235,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Deprecated
 	@Transactional
-	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId) {
+	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int levelId) {
 		
 		AddressHierarchyEntry parent = getAddressHierarchyEntry(parentId);
 		
@@ -243,17 +243,17 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			throw new AddressHierarchyModuleException("Invalid entry id for parent entry");
 		}
 		
-		AddressHierarchyType type = getAddressHierarchyType(typeId);
+		AddressHierarchyLevel level = getAddressHierarchyLevel(levelId);
 		
-		if (type == null) {
-			// if no type has been specified, use the type of the parent
-			type = parent.getType();
+		if (level == null) {
+			// if no level has been specified, use the level of the parent
+			level = parent.getLevel();
 		}
 		
 		AddressHierarchyEntry entry = new AddressHierarchyEntry();
 		entry.setName(name);
 		entry.setParent(parent);
-		entry.setType(type);
+		entry.setLevel(level);
 		
 		dao.saveAddressHierarchyEntry(entry);
 		

@@ -15,8 +15,8 @@
 		<property name="locationName" type="string" column="name"
 			not-null="true" length="255" />
 
-		<many-to-one name="type" class="AddressHierarchyType"
-			column="type_id" lazy="false" />
+		<many-to-one name="level" class="AddressHierarchyLevel"
+			column="level_id" lazy="false" />
 
 		<many-to-one name="parent" class="AddressHierarchyEntry"
 			column="parent_id" />

@@ -3,11 +3,11 @@ package org.openmrs.module.addresshierarchy.db;
 import java.util.List;
 
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
-import org.openmrs.module.addresshierarchy.AddressHierarchyType;
+import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 
 /**
  * The Interface AddressHierarchyDAO which is implemented in HibernateAddressHierarchyDAO which
- * links to the tables address_hierarchy, address_hierarchy_type and person_address. This class does
+ * links to the tables address_hierarchy_entry, address_hierarchy_level and person_address. This class does
  * the functions of storing and retrieving addresses.
  */
 public interface AddressHierarchyDAO {
@@ -24,23 +24,23 @@ public interface AddressHierarchyDAO {
 	
 	public void deleteAllAddressHierarchyEntries();
 	
-	public List<AddressHierarchyType> getAddressHierarchyTypes();
+	public List<AddressHierarchyLevel> getAddressHierarchyLevels();
 	
-	public AddressHierarchyType getTopLevelAddressHierarchyType();
+	public AddressHierarchyLevel getTopAddressHierarchyLevel();
 	
-	public AddressHierarchyType getAddressHierarchyType(int typeId);
+	public AddressHierarchyLevel getAddressHierarchyLevel(int levelId);
 	
-	public AddressHierarchyType getAddressHierarchyTypeByParent(AddressHierarchyType parentType);
+	public AddressHierarchyLevel getAddressHierarchyLevelByParent(AddressHierarchyLevel parent);
 	
-	public void saveAddressHierarchyType(AddressHierarchyType type);
+	public void saveAddressHierarchyLevel(AddressHierarchyLevel level);
 	
-	public void deleteAddressHierarchyType(AddressHierarchyType type);
+	public void deleteAddressHierarchyLevel(AddressHierarchyLevel level);
 	
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
 	
-	public List<AddressHierarchyEntry> getNextComponent(Integer locationId);
+	public List<AddressHierarchyEntry> getNextComponent(Integer levelId);
 	
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId, Boolean exact);
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact);
 	
 	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
 	

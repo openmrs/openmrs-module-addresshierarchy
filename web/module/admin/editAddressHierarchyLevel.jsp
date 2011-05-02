@@ -1,7 +1,7 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 
 <openmrs:require privilege="Manage Address Hierarchy" otherwise="/login.htm"
-	redirect="/module/addresshierarchy/admin/editAddressHierarchyType.form" />
+	redirect="/module/addresshierarchy/admin/editAddressHierarchyLevel.form" />
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="localHeader.jsp"%>
@@ -25,10 +25,10 @@
 </c:if>
 
 
-<div><b class="boxHeader"><spring:message code="addresshierarchy.admin.editType" /></b>
+<div><b class="boxHeader"><spring:message code="addresshierarchy.admin.editLevel" /></b>
 
 
-<form id="editAddressHierarchyType" action="updateAddressHierarchyType.form" method="post">
+<form id="editAddressHierarchyLevel" action="updateAddressHierarchyLevel.form" method="post">
 <input type="hidden" name="typeId" value="${type.id}" />
 
 <table cellspacing="0" cellpadding="0" class="box">
@@ -42,8 +42,8 @@
 <tr>
 	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.parent" />:</nobr></td>
 	<td>
-		<c:if test="${type.parentType != null}">
-			${type.parentType.name}
+		<c:if test="${level.parent != null}">
+			${level.parent.name}
 		</c:if>
 	</td>
 	<td>&nbsp;</td>
@@ -55,7 +55,7 @@
 		<select name="addressField">
 			<option value=""></option>
 			<c:forEach var="field" items="${addressFields}">
-				<option value="${field.name}" <c:if test="${type.addressField == field}">selected</c:if> >${field.name}</option>
+				<option value="${field.name}" <c:if test="${level.addressField == field}">selected</c:if> >${field.name}</option>
 			</c:forEach>
 		</select>
 	</td>
@@ -67,7 +67,7 @@
 		<button type="submit">
 			<spring:message code="addresshierarchy.admin.save" text="Save"/>
 		</button>
-		<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/listAddressHierarchyTypes.form">
+		<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/listAddressHierarchyLevels.form">
 			<button type="button">
 				<spring:message code="addresshierarchy.admin.cancel" text="Cancel"/>
 			</button>

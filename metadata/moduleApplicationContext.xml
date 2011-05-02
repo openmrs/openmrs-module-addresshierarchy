@@ -17,26 +17,6 @@
 	<!-- for annotation mapping --> 
 	<context:component-scan base-package="@MODULE_PACKAGE@" />
 	
-	<!--  
-	<bean id="ahMultipartResolver" class ="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
-	-->
-	
-	<!--  
-    <bean id="addresshierarchyUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-    	<property name="order"><value>4</value></property>
-        <property name="mappings">
-            <props>
-            	<prop key="module/addresshierarchy/unstructuredAddress.form">unstructuredAddressController</prop>
-                <prop key="module/addresshierarchy/patientAddress.form">addressController</prop>
-            	<prop key="module/addresshierarchy/locations.form">hierarchyController</prop>
-            	<prop key="module/addresshierarchy/ah*.form">hierarchyMultiActionController</prop>
-  				<prop key="**/addressLayout.portlet">ahAddressLayoutPortletController</prop>
-	    	</props>
-		</property>
-    </bean>
-	
-	-->
-	
 	<bean parent="serviceContext">
 		<property name="moduleService">
 	   		<list>
@@ -62,21 +42,18 @@
 		   </list>
 		</property>
     </bean>
-	
-	
-	
-    <!-- Controllers -->
-	
-	<!-- 
-	<bean name="hierarchyMultiActionController" class = "org.openmrs.module.addresshierarchy.web.controller.AddressHierarchyMultiActionController" />
+    
+    <!-- take over handling the main address hierarchy portlet -->
+    <bean id="addresshierarchyUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+    	<property name="order"><value>4</value></property>
+        <property name="mappings">
+            <props>
+  				<prop key="**/addressLayout.portlet">ahAddressLayoutPortletController</prop>
+	    	</props>
+		</property>
+    </bean>
 	
 	<bean id="ahAddressLayoutPortletController" class="org.openmrs.module.addresshierarchy.web.controller.AddressLayoutPortletController" />
-
-	<bean id="hierarchyController" class="org.openmrs.module.addresshierarchy.web.controller.HierarchyController" />
-
-	<bean id="addressController" class="org.openmrs.module.addresshierarchy.web.controller.AddressController" />
-			
-	<bean id="unstructuredAddressController" class="org.openmrs.module.addresshierarchy.web.controller.UnstructuredAddressController" />
-	-->	
+	
 	
 </beans>

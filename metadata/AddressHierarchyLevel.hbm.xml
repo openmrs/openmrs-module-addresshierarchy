@@ -5,15 +5,15 @@
 
 <hibernate-mapping package="org.openmrs.module.addresshierarchy">
 
-	<class name="AddressHierarchyType" table="address_hierarchy_type">
+	<class name="AddressHierarchyLevel" table="address_hierarchy_level">
 
-		<id name="typeId" type="int" column="address_hierarchy_type_id"
+		<id name="levelId" type="int" column="address_hierarchy_level_id"
 			unsaved-value="0">
 			<generator class="native" />
 		</id>
 
-		<many-to-one name="parentType" class="AddressHierarchyType"
-			column="parent_type_id" />
+		<many-to-one name="parent" class="AddressHierarchyLevel"
+			column="parent_level_id" />
 
 		<property name="name" type="string" column="name" not-null="true"
 			length="255" />

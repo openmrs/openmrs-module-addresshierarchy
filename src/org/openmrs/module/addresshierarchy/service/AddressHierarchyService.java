@@ -5,7 +5,7 @@ import java.util.List;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
-import org.openmrs.module.addresshierarchy.AddressHierarchyType;
+import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -32,46 +32,46 @@ public interface AddressHierarchyService {
 	public void deleteAllAddressHierarchyEntries();
 	
 	/**
-	 * Gets all AddressHierarchyTypes, ordered from the top of hierarchy to the bottom
+	 * Gets all AddressHierarchyLevels, ordered from the top of hierarchy to the bottom
 	 */
-	public List<AddressHierarchyType> getOrderedAddressHierarchyTypes();
+	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels();
 	
 	/**
-	 * Gets all AddressHierarchyTypes
+	 * Gets all AddressHierarchyLevels
 	 */
-	public List<AddressHierarchyType> getAddressHierarchyTypes();
+	public List<AddressHierarchyLevel> getAddressHierarchyLevels();
 	
 	/**
-	 * Gets the AddressHierarchyType that represents the top level of the hierarchy
+	 * Gets the AddressHierarchyLevel that represents the top level of the hierarchy
 	 */
-	public AddressHierarchyType getTopLevelAddressHierarchyType();
+	public AddressHierarchyLevel getTopAddressHierarchyLevel();
 	
 	/**
-	 * Gets the AddressHierarchyType that represents the lowest level of the hierarchy
+	 * Gets the AddressHierarchyLevel that represents the lowest level of the hierarchy
 	 */
-	public AddressHierarchyType getBottomLevelAddressHierarchyType();
+	public AddressHierarchyLevel getBottomAddressHierarchyLevel();
 	
 	/**
-	 * Gets an Address Hierarchy Type by id
+	 * Gets an AddressHierarchyLevel by id
 	 */
-	public AddressHierarchyType getAddressHierarchyType(int typeId);
+	public AddressHierarchyLevel getAddressHierarchyLevel(int levelId);
 	
 	/**
-	 * Finds the child AddressHierarchyType of the given AddressHierarchyType
+	 * Finds the child AddressHierarchyLevel of the given AddressHierarchyLevel
 	 */
-	public AddressHierarchyType getChildAddressHierarchyType(AddressHierarchyType type);
+	public AddressHierarchyLevel getChildAddressHierarchyLevel(AddressHierarchyLevel level);
 	
 	/**
-	 * Saves an AddressHierarchyType
+	 * Saves an AddressHierarchyLevel
 	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
-	public void saveAddressHierarchyType(AddressHierarchyType type);
+	public void saveAddressHierarchyLevel(AddressHierarchyLevel level);
 	
 	/**
-	 * Deletes an AddressHierarchy Type
+	 * Deletes an AddressHierarchy Level
 	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
-	public void deleteAddressHierarchyType(AddressHierarchyType type);
+	public void deleteAddressHierarchyLevel(AddressHierarchyLevel level);
 	
 	
 	// TODO: figure out if I need to rename any of these
@@ -80,9 +80,9 @@ public interface AddressHierarchyService {
 	
 	public List<AddressHierarchyEntry> getNextComponent(Integer locationId);
 	
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId);
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId);
 	
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId, Boolean exact);
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact);
 	
 	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
 	
@@ -109,7 +109,7 @@ public interface AddressHierarchyService {
 	
 	@Deprecated
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
-	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int typeId);
+	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int levelId);
 	
 	@Deprecated
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
@@ -132,7 +132,7 @@ public interface AddressHierarchyService {
 	
 	@Deprecated
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
-	public AddressHierarchyEntry addLocation(int parentId, String name, int typeId);
+	public AddressHierarchyEntry addLocation(int parentId, String name, int levelId);
 	
 	@Deprecated
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
@@ -142,6 +142,6 @@ public interface AddressHierarchyService {
 	public AddressHierarchyEntry getLocationFromUserGenId(String userGeneratedId);
 	
 	@Deprecated
-	public AddressHierarchyType getHierarchyType(int typeId);;
+	public AddressHierarchyLevel getHierarchyType(int levelId);;
 	
 }

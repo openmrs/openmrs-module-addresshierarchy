@@ -1,34 +1,34 @@
 package org.openmrs.module.addresshierarchy.validator;
 
-import org.openmrs.module.addresshierarchy.AddressHierarchyType;
+import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 @Component
-public class AddressHierarchyTypeValidator implements Validator {
+public class AddressHierarchyLevelValidator implements Validator {
 
 	@SuppressWarnings("unchecked")
 	public boolean supports(Class c) {
-		return AddressHierarchyType.class.isAssignableFrom(c);
+		return AddressHierarchyLevel.class.isAssignableFrom(c);
 	}
 
 	
     public void validate(Object obj, Errors errors) {
-	    AddressHierarchyType type = (AddressHierarchyType) obj;	    
+	    AddressHierarchyLevel level = (AddressHierarchyLevel) obj;	    
 	    
 	    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "addresshierarchy.admin.validation.name.blank");
 	    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "addressField", "addresshierarchy.admin.validation.addressField.blank");
 	 
-	    // a type can't have itself as a parent
-	    if (type.getParentType() == type) {
-	    	errors.rejectValue("parentType", "addresshierarchy.admin.validation.parentType.ownParent");
+	    // a level can't have itself as a parent
+	    if (level.getParent() == level) {
+	    	errors.rejectValue("parent", "addresshierarchy.admin.validation.parent.ownParent");
 	    }
 	    
-	    // confirm that the selected address field and parent aren't associated with another type
-	    // TODO: this has been commented out because when editing an address hierarchy type, all changes are committed, even if the validation
-	    // fails; I believe this is because of the call to getAddressHierarchyTypes... hibernate probably commits any changes that have been
+	    // confirm that the selected address field and parent aren't associated with another level
+	    // TODO: this has been commented out because when editing an address hierarchy level, all changes are committed, even if the validation
+	    // fails; I believe this is because of the call to getAddressHierarchyLevels... hibernate probably commits any changes that have been
 	    // made to the domain object; I need to find a way to do this validation without hibernate flushing it's cache
 	 /**   for (AddressHierarchyType compareType : Context.getService(AddressHierarchyService.class).getAddressHierarchyTypes()) {
 	    	

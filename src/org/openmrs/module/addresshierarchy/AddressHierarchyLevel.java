@@ -3,15 +3,15 @@ package org.openmrs.module.addresshierarchy;
 import org.openmrs.BaseOpenmrsMetadata;
 
 /**
- * Represents an Address Hierarchy type (ie., like "Country", or "State", or "City")
+ * Represents an Address Hierarchy level (ie., like "Country", or "State", or "City")
  */
-public class AddressHierarchyType extends BaseOpenmrsMetadata {
+public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 	
-	private Integer typeId;
+	private Integer levelId;
 	
 	private String name;
 	
-	private AddressHierarchyType parentType;
+	private AddressHierarchyLevel parent;
 	
 	private AddressField addressField;
 	
@@ -19,15 +19,15 @@ public class AddressHierarchyType extends BaseOpenmrsMetadata {
 	 * To string
 	 */
 	public String toString() {
-		String name = getName() + " " + getTypeId();
+		String name = getName() + " " + getLevelId();
 		return name;
 	}
 	
 	public boolean equals(Object obj) {
 		if (this.getId() == null)
 			return false;
-		if (obj instanceof AddressHierarchyType) {
-			AddressHierarchyType c = (AddressHierarchyType) obj;
+		if (obj instanceof AddressHierarchyLevel) {
+			AddressHierarchyLevel c = (AddressHierarchyLevel) obj;
 			return (this.getId().equals(c.getId()));
 		}
 		return false;
@@ -37,28 +37,28 @@ public class AddressHierarchyType extends BaseOpenmrsMetadata {
 	 * Getters and Setters
 	 */
 	
-	public AddressHierarchyType getParentType() {
-		return parentType;
+	public AddressHierarchyLevel getParent() {
+		return parent;
 	}
 	
-	public void setParentType(AddressHierarchyType parentType) {
-		this.parentType = parentType;
+	public void setParent(AddressHierarchyLevel parent) {
+		this.parent = parent;
 	}
 	
 	public void setName(String name) {
 		this.name = name;
 	}
 	
-	public void setTypeId(Integer location_attribute_type_id) {
-		this.typeId = location_attribute_type_id;
+	public void setLevelId(Integer levelId) {
+		this.levelId = levelId;
 	}
 	
 	public String getName() {
 		return this.name;
 	}
 	
-	public Integer getTypeId() {
-		return this.typeId;
+	public Integer getLevelId() {
+		return this.levelId;
 	}
 
 	public void setAddressField(AddressField addressField) {
@@ -70,11 +70,11 @@ public class AddressHierarchyType extends BaseOpenmrsMetadata {
     }
 
     public Integer getId() {
-	    return this.typeId;
+	    return this.levelId;
     }
 
     public void setId(Integer id) {
-	   this.typeId = id;
+	   this.levelId = id;
     }
 
 }

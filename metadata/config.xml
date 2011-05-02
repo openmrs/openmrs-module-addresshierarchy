@@ -64,7 +64,7 @@
 	
 	<mappingFiles>
 		AddressHierarchyEntry.hbm.xml
-		AddressHierarchyType.hbm.xml
+		AddressHierarchyLevel.hbm.xml
 	</mappingFiles>
 	
 </module>

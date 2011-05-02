@@ -15,7 +15,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
-import org.openmrs.module.addresshierarchy.AddressHierarchyType;
+import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 
@@ -53,9 +53,9 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		
 	}
 	
-	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyId) {
+	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyEntryId) {
 		Session session = sessionFactory.getCurrentSession();
-		AddressHierarchyEntry ah = (AddressHierarchyEntry) session.load(AddressHierarchyEntry.class, addressHierarchyId);
+		AddressHierarchyEntry ah = (AddressHierarchyEntry) session.load(AddressHierarchyEntry.class, addressHierarchyEntryId);
 		return ah;
 	}
 	
@@ -87,55 +87,55 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<AddressHierarchyType> getAddressHierarchyTypes() {
+	public List<AddressHierarchyLevel> getAddressHierarchyLevels() {
 		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(AddressHierarchyType.class);
+		Criteria criteria = session.createCriteria(AddressHierarchyLevel.class);
 		return criteria.list();
 	}
 	
-	public AddressHierarchyType getTopLevelAddressHierarchyType() {
+	public AddressHierarchyLevel getTopAddressHierarchyLevel() {
 		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(AddressHierarchyType.class);
-		criteria.add(Restrictions.isNull("parentType"));
+		Criteria criteria = session.createCriteria(AddressHierarchyLevel.class);
+		criteria.add(Restrictions.isNull("parent"));
 		
-		AddressHierarchyType topLevelType = null;
+		AddressHierarchyLevel topLevel = null;
 		
 		try {
-			topLevelType = (AddressHierarchyType) criteria.uniqueResult();
+			topLevel = (AddressHierarchyLevel) criteria.uniqueResult();
 		}
 		catch (Exception e) {
 			throw new AddressHierarchyModuleException("Unable to fetch top level address hierarchy type", e);
 		}
 		
-		return topLevelType;
+		return topLevel;
 	}
 	
-	public AddressHierarchyType getAddressHierarchyType(int typeId) {
+	public AddressHierarchyLevel getAddressHierarchyLevel(int levelId) {
 		Session session = sessionFactory.getCurrentSession();
-		AddressHierarchyType type = (AddressHierarchyType) session.load(AddressHierarchyType.class, typeId);
+		AddressHierarchyLevel type = (AddressHierarchyLevel) session.load(AddressHierarchyLevel.class, levelId);
 		return type;
 	}
 	
-    public AddressHierarchyType getAddressHierarchyTypeByParent(AddressHierarchyType parentType) {
+    public AddressHierarchyLevel getAddressHierarchyLevelByParent(AddressHierarchyLevel parent) {
     	Session session = sessionFactory.getCurrentSession();
-    	Criteria criteria = session.createCriteria(AddressHierarchyType.class);
-    	criteria.add(Restrictions.eq("parentType", parentType));
+    	Criteria criteria = session.createCriteria(AddressHierarchyLevel.class);
+    	criteria.add(Restrictions.eq("parent", parent));
     	
-    	AddressHierarchyType childType = null;
+    	AddressHierarchyLevel child = null;
 		
 		try {
-			childType = (AddressHierarchyType) criteria.uniqueResult();
+			child = (AddressHierarchyLevel) criteria.uniqueResult();
 		}
 		catch (Exception e) {
 			throw new AddressHierarchyModuleException("Unable to fetch child address hierarchy type", e);
 		}
 		
-		return childType;
+		return child;
     }
 	
-	public void saveAddressHierarchyType(AddressHierarchyType type) {
+	public void saveAddressHierarchyLevel(AddressHierarchyLevel level) {
 		try {
-			sessionFactory.getCurrentSession().saveOrUpdate(type);
+			sessionFactory.getCurrentSession().saveOrUpdate(level);
 		}
 		catch (Throwable t) {
 			throw new DAOException(t);
@@ -143,15 +143,18 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	}
 	
 
-    public void deleteAddressHierarchyType(AddressHierarchyType type) {
+    public void deleteAddressHierarchyLevel(AddressHierarchyLevel level) {
     	try {
-			sessionFactory.getCurrentSession().delete(type);
+			sessionFactory.getCurrentSession().delete(level);
 		}
 		catch (Throwable t) {
 			throw new DAOException(t);
 		}
     }
 	
+    
+    // TODO: triage these and see what will still need
+    
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah) {
 		List<AddressHierarchyEntry> leafList = new ArrayList<AddressHierarchyEntry>();
 		getLowestLevel(ah, leafList);
@@ -188,7 +191,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		List<AddressHierarchyEntry> list = criteria.createCriteria("parent").add(
-		    Restrictions.eq("addressHierarchyId", locationId)).list();
+		    Restrictions.eq("addressHierarchyEntryId", locationId)).list();
 		return list;
 	}
 	
@@ -197,13 +200,13 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 * specifying a type id
 	 */
 	@SuppressWarnings("unchecked")
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int locationTypeId, Boolean exact) {
+	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact) {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		criteria.add(Restrictions.like("locationName", searchString, exact ? MatchMode.EXACT : MatchMode.ANYWHERE));
 		List<AddressHierarchyEntry> hierarchyList;
-		if (locationTypeId != -1) {
-			criteria.createCriteria("type").add(Restrictions.eq("typeId", locationTypeId));
+		if (levelId != -1) {
+			criteria.createCriteria("level").add(Restrictions.eq("levelId", levelId));
 		}
 		
 		hierarchyList = criteria.list();
@@ -222,7 +225,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		List list = criteria.add(Restrictions.isNull("parent")).createCriteria("type").add(
-		    Restrictions.isNull("parentType")).list();
+		    Restrictions.isNull("parent")).list();
 		
 		return list;
 	}
@@ -246,22 +249,22 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		
 		Session session = sessionFactory.getCurrentSession();
 		
-		AddressHierarchyType country = new AddressHierarchyType();
+		AddressHierarchyLevel country = new AddressHierarchyLevel();
 		country.setName("Country");
 		
-		AddressHierarchyType province = new AddressHierarchyType();
+		AddressHierarchyLevel province = new AddressHierarchyLevel();
 		province.setName("Province");
 		
-		AddressHierarchyType district = new AddressHierarchyType();
+		AddressHierarchyLevel district = new AddressHierarchyLevel();
 		district.setName("District");
 		
-		AddressHierarchyType sector = new AddressHierarchyType();
+		AddressHierarchyLevel sector = new AddressHierarchyLevel();
 		sector.setName("Sector");
 		
-		AddressHierarchyType cell = new AddressHierarchyType();
+		AddressHierarchyLevel cell = new AddressHierarchyLevel();
 		cell.setName("Cell");
 		
-		AddressHierarchyType umudugudu = new AddressHierarchyType();
+		AddressHierarchyLevel umudugudu = new AddressHierarchyLevel();
 		umudugudu.setName("Umudugudu");
 		
 		session.save(country);
@@ -272,17 +275,17 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		session.save(cell);
 		session.save(umudugudu);
 		
-		province.setParentType(country);
-		district.setParentType(province);
-		sector.setParentType(district);
-		cell.setParentType(sector);
-		umudugudu.setParentType(cell);
+		province.setParent(country);
+		district.setParent(province);
+		sector.setParent(district);
+		cell.setParent(sector);
+		umudugudu.setParent(cell);
 		
 	}
 	
 	// TODO: remove "page" parameter?
 	// TODO: deprecate this whole method, or redo it so that it doesn't rely on custom query/hierarchy level\
-	// TODO: or, just change the SQL statement so that it dynamically maps based on the AddressHierarchyType field
+	// TODO: or, just change the SQL statement so that it dynamically maps based on the AddressHierarchyLevel field
 	
 	@SuppressWarnings("unchecked")
 	@Deprecated

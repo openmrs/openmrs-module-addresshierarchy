@@ -27,8 +27,7 @@ public class UploadAddressHierarchyController {
 		return new ModelAndView("/module/addresshierarchy/admin/uploadAddressHierarchy", map);
 	}
 	
-	@SuppressWarnings("unchecked")
-    @RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST)
 	public ModelAndView processAddressHierarchyUploadForm(@RequestParam("file") MultipartFile file,
 	                                                      @RequestParam("delimiter") String delimiter, 
 	                                                      @RequestParam(value = "overwrite", required = false) Boolean overwrite,
@@ -44,9 +43,9 @@ public class UploadAddressHierarchyController {
 			messages.add("addresshierarchy.admin.validation.noFile");
 		}
 		if (messages.size() > 0) {
-			map.put("messages", messages);
-			map.put("delimiter", delimiter);
-			map.put("overwrite", overwrite);
+			map.addAttribute("messages", messages);
+			map.addAttribute("delimiter", delimiter);
+			map.addAttribute("overwrite", overwrite);
 			return new ModelAndView("/module/addresshierarchy/admin/uploadAddressHierarchy", map);
 		}
 		
@@ -63,15 +62,15 @@ public class UploadAddressHierarchyController {
         catch (Exception e) {
 	        log.error("Unable to import address hierarchy file", e);
 	        messages.add("addresshierarchy.admin.uploadFailure");
-	        map.put("messages", messages);
-			map.put("delimiter", delimiter);
-			map.put("overwrite", overwrite);
+	        map.addAttribute("messages", messages);
+			map.addAttribute("delimiter", delimiter);
+			map.addAttribute("overwrite", overwrite);
 			return new ModelAndView("/module/addresshierarchy/admin/uploadAddressHierarchy", map);
         }
         
         // add a success message
         messages.add("addresshierarchy.admin.uploadSuccess");
-		map.put("messages", messages);
+		map.addAttribute("messages", messages);
         
 		return new ModelAndView("/module/addresshierarchy/admin/uploadAddressHierarchy", map);
 	}

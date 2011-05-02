@@ -27,28 +27,28 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 	}
 	
 	@Test
-	@Verifies(value = "should get hierarchy type by id", method = "getHierarchyType(int id)")
+	@Verifies(value = "should import csv file", method = "importAddressHierarchyFile()")
 	public void importCsvFile_shouldImportCsvFile() throws Exception {
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		AddressHierarchyType district = ahService.getAddressHierarchyType(2);
+		AddressHierarchyLevel district = ahService.getAddressHierarchyLevel(2);
 		
 		InputStream file = getClass().getClassLoader().getResourceAsStream(CSV_FILE_TO_IMPORT);
 		AddressHierarchyImportUtil.importAddressHierarchyFile(file, "\\|", district);
 		
 		// verify that a few data points exist	
 		Assert.assertEquals(ahService.searchHierarchy("BOTHA-BOTHE", -1).get(0).getName(),"BOTHA-BOTHE");
-		Assert.assertEquals(ahService.searchHierarchy("BOTHA-BOTHE", -1).get(0).getType().getName(),"District");
+		Assert.assertEquals(ahService.searchHierarchy("BOTHA-BOTHE", -1).get(0).getLevel().getName(),"District");
 
 		Assert.assertEquals(ahService.searchHierarchy("LITHABANENG", -1).get(0).getName(),"LITHABANENG");
-		Assert.assertEquals(ahService.searchHierarchy("LITHABANENG", -1).get(0).getType().getName(),"Constituency");
+		Assert.assertEquals(ahService.searchHierarchy("LITHABANENG", -1).get(0).getLevel().getName(),"Constituency");
 
 		Assert.assertEquals(ahService.searchHierarchy("Maseru Municipality", -1).get(0).getName(),"Maseru Municipality");
-		Assert.assertEquals(ahService.searchHierarchy("Maseru Municipality", -1).get(0).getType().getName(),"Community Council");
+		Assert.assertEquals(ahService.searchHierarchy("Maseru Municipality", -1).get(0).getLevel().getName(),"Community Council");
 		
 		Assert.assertEquals(ahService.searchHierarchy("Thaba-Kholo", -1).get(0).getName(),"Thaba-Kholo");
-		Assert.assertEquals(ahService.searchHierarchy("Thaba-Kholo", -1).get(0).getType().getName(),"Village");
+		Assert.assertEquals(ahService.searchHierarchy("Thaba-Kholo", -1).get(0).getLevel().getName(),"Village");
 
 		
 	}

@@ -11,7 +11,7 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata {
 	
 	private String locationName;
 	
-	private AddressHierarchyType type;
+	private AddressHierarchyLevel level;
 	
 	private AddressHierarchyEntry parent;
 	
@@ -79,12 +79,12 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata {
 		this.elevation = elevation;
 	}
 	
-	public AddressHierarchyType getType() {
-		return type;
+	public AddressHierarchyLevel getLevel() {
+		return level;
 	}
 	
-	public void setType(AddressHierarchyType type) {
-		this.type = type;
+	public void setLevel(AddressHierarchyLevel level) {
+		this.level = level;
 	}
 	
 	public String getUserGeneratedId() {
@@ -130,11 +130,11 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata {
     	this.locationName = name;
     }
     
-	public AddressHierarchyType getAddressHierarchyType() {
-		return type;
+	public AddressHierarchyLevel getAddressHierarchyLevel() {
+		return level;
 	}
 	
-	public void setAddressHierarchyType(AddressHierarchyType type) {
-		this.type = type;
+	public void setAddressHierarchyLevel(AddressHierarchyLevel level) {
+		this.level = level;
 	}
 }

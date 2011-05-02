@@ -12,7 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
-import org.openmrs.module.addresshierarchy.AddressHierarchyType;
+import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
@@ -25,7 +25,7 @@ public class AddressHierarchyImportUtil {
 	 * Takes a file of delimited addresses and creates and address hierarchy out of it
 	 * Starting level determines what level of the hierarchy to start at when doing the input
 	 */
-	public static final void importAddressHierarchyFile(InputStream stream, String delimiter, AddressHierarchyType startingLevel) {
+	public static final void importAddressHierarchyFile(InputStream stream, String delimiter, AddressHierarchyLevel startingLevel) {
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
@@ -33,12 +33,12 @@ public class AddressHierarchyImportUtil {
 		
 		String line;
 		
-		// get an ordered list of the address hierarchy types
-		List<AddressHierarchyType> types = ahService.getOrderedAddressHierarchyTypes();
+		// get an ordered list of the address hierarchy levels
+		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
 		
 		// if we aren't starting at the top level of the hierarchy, remove all the levels before the one we wish to start at
 		if (startingLevel != null) {
-			Iterator<AddressHierarchyType> i = types.iterator();
+			Iterator<AddressHierarchyLevel> i = levels.iterator();
 			while (i.next() != startingLevel) {
 				i.remove();
 			}
@@ -54,17 +54,17 @@ public class AddressHierarchyImportUtil {
 		        	// now cycle through all the locations on this line
 		        	for (int i = 0; i < locations.length; i++) {
 		   
-		        		// we only need to create a new entry if the location doesn't exist for the specific type
-		        		if (ahService.searchHierarchy(locations[i], types.get(i).getId(), true).size() == 0) {
+		        		// we only need to create a new entry if the location doesn't exist for the specific level
+		        		if (ahService.searchHierarchy(locations[i], levels.get(i).getId(), true).size() == 0) {
 		        			
 		        			// create the new entry and set its name and location
 		        			AddressHierarchyEntry entry = new AddressHierarchyEntry();
 		        			entry.setName(locations[i]);
-		        			entry.setType(types.get(i));
+		        			entry.setLevel(levels.get(i));
 		        			
 		        			// link to parent if we aren't at the first level
 		        			if (i > 0) {
-		        				entry.setParent(ahService.searchHierarchy(locations[i-1], types.get(i-1).getId(), true).get(0));
+		        				entry.setParent(ahService.searchHierarchy(locations[i-1], levels.get(i-1).getId(), true).get(0));
 		        			}
 		        			
 		        			// save the new entry
@@ -78,7 +78,7 @@ public class AddressHierarchyImportUtil {
 	        throw new AddressHierarchyModuleException("Error accessing address hierarchy import stream ", e);
         }
         catch (IndexOutOfBoundsException e) {
-        	throw new AddressHierarchyModuleException("Error importing address hierarchy entries. Have you defined your address hierarchy types?",e);
+        	throw new AddressHierarchyModuleException("Error importing address hierarchy entries. Have you defined your address hierarchy levels?",e);
         }
 	}
 	
@@ -89,7 +89,7 @@ public class AddressHierarchyImportUtil {
 	/**
 	 * Takes a CSV file of addresses and creates and address hierarchy out of it
 	 */
-	public static final void importCsvFile(InputStream stream, AddressHierarchyType startingLevel) {
+	public static final void importCsvFile(InputStream stream, AddressHierarchyLevel startingLevel) {
 		importAddressHierarchyFile(stream, ",", startingLevel);
 	}
 	

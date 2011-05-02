@@ -53,7 +53,7 @@ public class AdminList extends AdministrationSectionExt {
 	 */
 	public Map<String, String> getLinks() {
 		Map<String, String> map = new TreeMap<String, String>();
-		map.put("/module/addresshierarchy/admin/listAddressHierarchyTypes.form", "addresshierarchy.admin.manageTypes");
+		map.put("/module/addresshierarchy/admin/listAddressHierarchyLevels.form", "addresshierarchy.admin.manageLevels");
 		map.put("/module/addresshierarchy/admin/uploadAddressHierarchy.form", "addresshierarchy.admin.uploadAddressHierarchy");
 		//map.put("module/addresshierarchy/editHierarchy.htm", "addresshierarchy.edit");
 		//map.put("module/addresshierarchy/unstructuredAddresses.htm", "Find Unstructured Addresses");
