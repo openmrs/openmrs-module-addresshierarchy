@@ -18,9 +18,11 @@ public interface AddressHierarchyDAO {
 	
 	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyId);
 	
-	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah);
-	
 	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId);
+	
+	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry);
+	
+	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah);
 	
 	public void deleteAllAddressHierarchyEntries();
 	
@@ -37,8 +39,6 @@ public interface AddressHierarchyDAO {
 	public void deleteAddressHierarchyLevel(AddressHierarchyLevel level);
 	
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
-	
-	public List<AddressHierarchyEntry> getNextComponent(Integer levelId);
 	
 	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact);
 	

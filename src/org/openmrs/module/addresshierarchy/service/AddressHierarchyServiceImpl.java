@@ -39,6 +39,22 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return dao.getAddressHierarchyEntryByUserGenId(userGeneratedId);
 	}
 	
+	@Transactional(readOnly = true)
+	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry) {
+		return dao.getChildAddressHierarchyEntries(entry);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(Integer entryId) {
+		AddressHierarchyEntry entry = getAddressHierarchyEntry(entryId);
+		
+		if (entry == null) {
+			throw new AddressHierarchyModuleException("Invalid Address Hierarchy Entry Id " + entryId);
+		}
+		
+		return getChildAddressHierarchyEntries(entry);
+	}
+	
 	@Transactional
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry) {
 		dao.saveAddressHierarchyEntry(entry);
@@ -128,11 +144,6 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<AddressHierarchyEntry> getNextComponent(Integer locationId) {
-		return dao.getNextComponent(locationId);
-	}
-	
-	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId) {
 		return searchHierarchy(searchString, levelId, false);
 	}
@@ -195,6 +206,12 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional(readOnly = true)
 	public int getAddressHierarchyCount() {
 		return getAddressHierarchyEntryCount();
+	}
+	
+	@Deprecated
+	@Transactional(readOnly = true)
+	public List<AddressHierarchyEntry> getNextComponent(Integer locationId) {
+		return getChildAddressHierarchyEntries(locationId);
 	}
 	
 	@Deprecated

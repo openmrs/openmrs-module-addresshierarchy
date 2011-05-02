@@ -22,6 +22,10 @@ public interface AddressHierarchyService {
 	
 	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId);
 	
+	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry);
+	
+	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(Integer entryId);
+	
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry);
 	
@@ -68,7 +72,7 @@ public interface AddressHierarchyService {
 	public void saveAddressHierarchyLevel(AddressHierarchyLevel level);
 	
 	/**
-	 * Deletes an AddressHierarchy Level
+	 * Deletes an AddressHierarchyLevel
 	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void deleteAddressHierarchyLevel(AddressHierarchyLevel level);
@@ -77,8 +81,6 @@ public interface AddressHierarchyService {
 	// TODO: figure out if I need to rename any of these
 	
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
-	
-	public List<AddressHierarchyEntry> getNextComponent(Integer locationId);
 	
 	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId);
 	
@@ -122,6 +124,9 @@ public interface AddressHierarchyService {
 	
 	@Deprecated
 	public int getAddressHierarchyCount();
+	
+	@Deprecated
+	public List<AddressHierarchyEntry> getNextComponent(Integer locationId);
 	
 	@Deprecated
 	public AddressHierarchyEntry getAddressHierarchy(int addressHierarchyId);

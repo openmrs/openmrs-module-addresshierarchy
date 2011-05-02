@@ -59,13 +59,6 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		return ah;
 	}
 	
-	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah) {
-		Session session = sessionFactory.getCurrentSession();
-		session.save(ah);
-		session.flush();
-		session.clear();
-	}
-	
 	@SuppressWarnings("unchecked")
 	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId) {
 		AddressHierarchyEntry ah = null;
@@ -77,6 +70,22 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 			ah = list.get(0);
 		}
 		return ah;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry) {
+		Session session = sessionFactory.getCurrentSession();
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
+		List<AddressHierarchyEntry> list = criteria.createCriteria("parent").add(
+		    Restrictions.eq("addressHierarchyEntryId", entry.getId())).list();
+		return list;
+	}
+	
+	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah) {
+		Session session = sessionFactory.getCurrentSession();
+		session.save(ah);
+		session.flush();
+		session.clear();
 	}
 	
 	public void deleteAllAddressHierarchyEntries() {
@@ -165,7 +174,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 * Recursively finds leaf nodes of ah
 	 */
 	private List<AddressHierarchyEntry> getLowestLevel(AddressHierarchyEntry ah, List<AddressHierarchyEntry> leafList) {
-		List<AddressHierarchyEntry> children = getNextComponent(ah.getAddressHierarchyEntryId());
+		List<AddressHierarchyEntry> children = getChildAddressHierarchyEntries(ah);
 		if (children.size() > 0) {
 			for (AddressHierarchyEntry addressHierarchy : children) {
 				getLowestLevel(addressHierarchy, leafList);
@@ -176,24 +185,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		return children;
 	}
 	
-	/**
-	 * Method used to get the child locations.
-	 * 
-	 * @param parent_type_Id the parent_type_ id
-	 * @param location_Name the location_ name
-	 * @param parent_Id the parent_ id
-	 * @return the next component in an array
-	 * @see org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO#getNextComponent(java.lang.Integer,
-	 *      java.lang.String, java.lang.Integer)
-	 */
-	@SuppressWarnings("unchecked")
-	public List<AddressHierarchyEntry> getNextComponent(Integer locationId) {
-		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
-		List<AddressHierarchyEntry> list = criteria.createCriteria("parent").add(
-		    Restrictions.eq("addressHierarchyEntryId", locationId)).list();
-		return list;
-	}
+
 	
 	/**
 	 * Searches for locations like the <code>searchString</code> Can restrict to a certain type by

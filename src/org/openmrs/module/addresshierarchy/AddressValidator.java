@@ -15,7 +15,8 @@ public class AddressValidator {
 	// TODO: need make this generic--confirm that is it being used?
 	// TODO: this also can be derived from the AddressHiearchyType "mapping" ?
 	// TODO: will have to use the reflection utility function I plan to create to fetch address component by reflection
-	public boolean isAddressStructured(PersonAddress pa){
+	@SuppressWarnings("deprecation")
+    public boolean isAddressStructured(PersonAddress pa){
 		
 		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
 		List<AddressHierarchyEntry> hierarchyList = ahs.getTopOfHierarchyList();
@@ -46,7 +47,8 @@ public class AddressValidator {
 	// TODO: need make this generic
 	// TODO: this also can be derived from the AddressHiearchyType "mapping" ?
 	// TODO: will have to use the reflection utility function I plan to create to fetch address component by reflection
-	public String getInvalidReason(PersonAddress pa){
+	@SuppressWarnings("deprecation")
+    public String getInvalidReason(PersonAddress pa){
 		
 		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
 		List<AddressHierarchyEntry> hierarchyList = ahs.getTopOfHierarchyList();
