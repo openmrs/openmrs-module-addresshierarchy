@@ -22,6 +22,10 @@ public interface AddressHierarchyService {
 	
 	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId);
 	
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level);
+	
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(Integer levelId);
+	
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry);
 	
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(Integer entryId);

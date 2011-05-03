@@ -20,6 +20,8 @@ public interface AddressHierarchyDAO {
 	
 	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId);
 	
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(Integer levelId);
+	
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry);
 	
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah);
@@ -47,6 +49,9 @@ public interface AddressHierarchyDAO {
 	public void truncateHierarchyTables();
 	
 	public List<AddressHierarchyEntry> getTopOfHierarchyList();
+	
+	
+	// TODO: we can probably pull these out entirely
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to

@@ -266,4 +266,16 @@
 		</sql>
 	</diff>
 	
+	<diff>
+		<version>2.3</version>
+		<author>Mark Goodrich</author>
+		<date>May 2 2011</date>
+		<description>
+			Modify Address Hierarchy Level so name can be null
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_level CHANGE COLUMN `name` `name` varchar(160);
+		</sql>
+	</diff>
+	
 </sqldiff>

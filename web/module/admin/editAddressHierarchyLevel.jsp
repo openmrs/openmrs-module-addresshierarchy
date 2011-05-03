@@ -37,10 +37,10 @@
 	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.parent" />:</nobr></td>
 	<td>
 		<c:if test="${level.parent != null}">
-			${nameMappings[level.parent.addressField.name]}
+			<spring:message code="${nameMappings[level.parent.addressField.name]}"/>
 		</c:if>
 	</td>
-	<td>&nbsp;</td>
+	<td width="60%">&nbsp;</td>
 </tr>
 
 <tr>

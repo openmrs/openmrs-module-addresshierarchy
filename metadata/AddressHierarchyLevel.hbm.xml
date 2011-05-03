@@ -15,8 +15,7 @@
 		<many-to-one name="parent" class="AddressHierarchyLevel"
 			column="parent_level_id" />
 
-		<property name="name" type="string" column="name" not-null="true"
-			length="255" />
+		<property name="name" type="string" column="name" length="255" />
 
 		<property name="addressField" column="address_field" length="50"
 			not-null="true">

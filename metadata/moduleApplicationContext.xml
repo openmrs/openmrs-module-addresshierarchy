@@ -53,7 +53,7 @@
 		</property>
     </bean>
 	
-	<bean id="ahAddressLayoutPortletController" class="org.openmrs.module.addresshierarchy.web.controller.AddressLayoutPortletController" />
+	<bean id="ahAddressLayoutPortletController" class="org.openmrs.module.addresshierarchy.web.controller.portlet.AddressLayoutPortletController" />
 	
 	
 </beans>

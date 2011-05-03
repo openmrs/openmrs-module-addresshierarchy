@@ -5,11 +5,11 @@ import org.openmrs.BaseOpenmrsMetadata;
 /**
  * Represents a single entry in the Address Hierarchy (ie., like "United States", or "Massachusetts", or "Boston")
  */
-public class AddressHierarchyEntry extends BaseOpenmrsMetadata {
+public class AddressHierarchyEntry extends BaseOpenmrsMetadata implements Comparable<AddressHierarchyEntry> {
 	
 	private Integer addressHierarchyEntryId;
 	
-	private String locationName;
+	private String name;
 	
 	private AddressHierarchyLevel level;
 	
@@ -27,8 +27,16 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata {
 	 * To string
 	 */
 	public String toString() {
-		return locationName;
+		return name;
 	}
+	
+	/**
+	 * Comparator
+	 */
+
+    public int compareTo(AddressHierarchyEntry other) {
+	    return this.name.compareTo(other.getName());
+    }
 	
 	/**
 	 * Equals
@@ -48,11 +56,11 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata {
 	 */
 	
 	public String getLocationName() {
-		return locationName;
+		return name;
 	}
 	
 	public void setLocationName(String locationName) {
-		this.locationName = locationName;
+		this.name = locationName;
 	}
 	
 	public Double getLatitude() {
@@ -123,11 +131,11 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata {
     }
 	
     public String getName() {
-    	return this.locationName;
+    	return this.name;
     }
     
     public void setName(String name) {
-    	this.locationName = name;
+    	this.name = name;
     }
     
 	public AddressHierarchyLevel getAddressHierarchyLevel() {

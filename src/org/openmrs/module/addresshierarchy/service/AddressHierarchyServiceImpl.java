@@ -40,6 +40,16 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level) {
+		return getAddressHierarchyEntriesByLevel(level.getId());
+	}
+	
+	@Transactional(readOnly = true)
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(Integer levelId) {
+		return dao.getAddressHierarchyEntriesByLevel(levelId);
+	}
+	
+	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry) {
 		return dao.getChildAddressHierarchyEntries(entry);
 	}

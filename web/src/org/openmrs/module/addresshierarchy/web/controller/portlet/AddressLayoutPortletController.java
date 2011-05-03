@@ -1,4 +1,4 @@
-package org.openmrs.module.addresshierarchy.web.controller;
+package org.openmrs.module.addresshierarchy.web.controller.portlet;
 
 import java.io.IOException;
 import java.util.Map;

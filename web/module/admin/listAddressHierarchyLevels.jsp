@@ -28,7 +28,7 @@
 	</tr>
 	<c:forEach items="${levels}" var="level" varStatus="i">
 		<tr>
-			<td>${nameMappings[level.addressField.name]}</td>
+			<td><spring:message code="${nameMappings[level.addressField.name]}"/></td>
 			<td><spring:message code="${level.parent != null ? nameMappings[level.parent.addressField.name] : ''}"/></td>
 			<td>
 				<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form?levelId=${level.id}">
