@@ -50,6 +50,11 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesAtTopLevel() {
+		return getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel());
+	}
+	
+	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry) {
 		return dao.getChildAddressHierarchyEntries(entry);
 	}
@@ -65,6 +70,28 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return getChildAddressHierarchyEntries(entry);
 	}
 	
+	@Transactional(readOnly = true)
+	public AddressHierarchyEntry getChildAddressHierarchyEntryByName(AddressHierarchyEntry entry, String name) {
+		List<AddressHierarchyEntry> entries;
+		
+		if (entry != null) {
+			entries = getChildAddressHierarchyEntries(entry);
+		}
+		else {
+			// by definition, if no address hierarchy entry specified, operate on the top level
+			entries = getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel());
+		}
+		
+		if (entries != null) {
+			for (AddressHierarchyEntry e : entries) {
+				if (e.getName().equals(name)) {
+					return e;
+				}
+			}
+		}
+		return null;
+	} 
+	
 	@Transactional
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry) {
 		dao.saveAddressHierarchyEntry(entry);
@@ -73,6 +100,26 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional
 	public void deleteAllAddressHierarchyEntries() {
 		dao.deleteAllAddressHierarchyEntries();
+	}
+	
+	@Transactional
+	public AddressHierarchyEntry searchAddressHierarchy(String searchString) {
+		
+		// TODO: do i need move some of this to the DAO to speed up performance
+		
+		AddressHierarchyEntry entry = null;
+		
+		// iterate through all the names in the search string
+		for (String name : searchString.split("\\|")) {
+			
+			entry = getChildAddressHierarchyEntryByName(entry, name);
+				
+			if (entry == null) {
+				return null;
+			}
+		}
+		
+		return entry;
 	}
 	
 	@Transactional(readOnly = true)
@@ -153,16 +200,6 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return dao.getLeafNodes(ah);
 	}
 	
-	@Transactional(readOnly = true)
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId) {
-		return searchHierarchy(searchString, levelId, false);
-	}
-	
-	@Transactional(readOnly = true)
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact) {
-		return dao.searchHierarchy(searchString, levelId, exact);
-	}
-	
 	@Transactional
 	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude) {
 		dao.associateCoordinates(ah, latitude, longitude);
@@ -177,7 +214,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	public List<AddressHierarchyEntry> getTopOfHierarchyList() {
 		return dao.getTopOfHierarchyList();
 	}
-	
+
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to
 	 * Rwanda Address Hierarchy module

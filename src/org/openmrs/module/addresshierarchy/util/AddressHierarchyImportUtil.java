@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,6 +28,7 @@ public class AddressHierarchyImportUtil {
 	 */
 	public static final void importAddressHierarchyFile(InputStream stream, String delimiter, AddressHierarchyLevel startingLevel) {
 		
+		// TODO: enforce that top level is unique, but others do not need to be?
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charset.forName("UTF-8")));
@@ -51,25 +53,30 @@ public class AddressHierarchyImportUtil {
 	        	String [] locations = line.split(delimiter);
 	        	
 	        	if (locations != null) {
+	        		
+	        		Stack<AddressHierarchyEntry> entryStack = new Stack<AddressHierarchyEntry>();
+	        		
 		        	// now cycle through all the locations on this line
 		        	for (int i = 0; i < locations.length; i++) {
 		   
-		        		// we only need to create a new entry if the location doesn't exist for the specific level
-		        		if (ahService.searchHierarchy(locations[i], levels.get(i).getId(), true).size() == 0) {
+		        		// fetch the entry associated with this location
+		        		AddressHierarchyEntry entry = ahService.getChildAddressHierarchyEntryByName(entryStack.isEmpty() ? null : entryStack.peek(), locations[i]);
+		        		
+		        		// create this entry if need be
+		        		if (entry == null) {
 		        			
-		        			// create the new entry and set its name and location
-		        			AddressHierarchyEntry entry = new AddressHierarchyEntry();
+		        			// create the new entry and set its name, location and parent
+		        			entry = new AddressHierarchyEntry();
 		        			entry.setName(locations[i]);
 		        			entry.setLevel(levels.get(i));
-		        			
-		        			// link to parent if we aren't at the first level
-		        			if (i > 0) {
-		        				entry.setParent(ahService.searchHierarchy(locations[i-1], levels.get(i-1).getId(), true).get(0));
-		        			}
+		        			entry.setParent(entryStack.isEmpty() ? null : entryStack.peek());
 		        			
 		        			// save the new entry
 		        			ahService.saveAddressHierarchyEntry(entry);
 		        		}
+		        		
+		        		// push this entry onto the stack on the stack
+	        			entryStack.push(entry);
 		        	}
 	        	}
 	        }

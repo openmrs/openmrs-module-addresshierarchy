@@ -24,6 +24,8 @@ public interface AddressHierarchyDAO {
 	
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry);
 	
+	//public AddressHierarchyEntry getChildAddressHierarchyEntry(AddressHierarchyEntry entry, String childName);
+	
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah);
 	
 	public void deleteAllAddressHierarchyEntries();

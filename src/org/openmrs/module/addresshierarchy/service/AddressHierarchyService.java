@@ -26,18 +26,29 @@ public interface AddressHierarchyService {
 	
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(Integer levelId);
 	
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesAtTopLevel();
+	
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry);
 	
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(Integer entryId);
+	
+	// TODO: add note about working at top level of the tree
+	public AddressHierarchyEntry getChildAddressHierarchyEntryByName(AddressHierarchyEntry entry, String name);
 	
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry);
 	
 	/**
-	 * Removes all address hierarchy entries--use with care!
+	 * Removes all AddressHierarchyEntries--use with care!
 	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void deleteAllAddressHierarchyEntries();
+	
+	/**
+	 * Searches the hierarchy based on a search string in the format
+	 * "UNITED STATES|MASSACHUSETTS|BOSTON"
+	 */
+	public AddressHierarchyEntry searchAddressHierarchy(String searchString);
 	
 	/**
 	 * Gets all AddressHierarchyLevels, ordered from the top of hierarchy to the bottom
@@ -85,10 +96,6 @@ public interface AddressHierarchyService {
 	// TODO: figure out if I need to rename any of these
 	
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
-	
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId);
-	
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact);
 	
 	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
 	

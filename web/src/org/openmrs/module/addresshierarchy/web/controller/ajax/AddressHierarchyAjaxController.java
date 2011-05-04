@@ -12,7 +12,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
-import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -39,34 +38,25 @@ public class AddressHierarchyAjaxController {
 	 */
 	@RequestMapping("/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form")
 	 public void getChildAddressHierarchyEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
-					                             @RequestParam(value = "parentEntry", required = false) String parentEntry,
-					                             @RequestParam("addressHierarchyLevel") Integer levelId) throws Exception {
+					                             @RequestParam(value = "searchString", required = false) String searchString) throws Exception {
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
 		List<AddressHierarchyEntry> childEntries = null;
-		
-		// if parent entry is null, this means we want all the entries at the specified level
-		if (StringUtils.isBlank(parentEntry)) {
-			childEntries = ahService.getAddressHierarchyEntriesByLevel(levelId);
-		}
-		// otherwise, find the parent entry and then its children
-		else {			
-			List<AddressHierarchyEntry> entries = ahService.searchHierarchy(parentEntry, levelId, true);
-			
-			// this should be an exact match, so throw an exception if we get multiple matches
-			if (entries.size() > 1) {
-				throw new AddressHierarchyModuleException("Parent entry string '" + parentEntry + "' has duplicate Address Hierarchy Entry matches");
-			}
-			
-			// fetch the child entries of this entries
-			if (entries.size() == 1) {
-				childEntries = ahService.getChildAddressHierarchyEntries(entries.get(0));
+	
+		if (StringUtils.isNotBlank(searchString)) {
+			// if we have a search string, find the entry referenced
+			AddressHierarchyEntry entry = ahService.searchAddressHierarchy(searchString);
+			// now find all its children
+			if (entry != null) {
+				childEntries = ahService.getChildAddressHierarchyEntries(entry);
 			}
 		}
-				
-		Collections.sort(childEntries);
-		
+		else {
+			// otherwise, if the search parameter is empty, we just want all the top level items
+			childEntries = ahService.getAddressHierarchyEntriesAtTopLevel();
+		}
+			
     	response.setContentType("application/json");
     	response.setCharacterEncoding("UTF-8");
     	PrintWriter out = response.getWriter();
@@ -74,13 +64,17 @@ public class AddressHierarchyAjaxController {
     	// start the JSON
     	out.println("[");
 
-		// add the elements: ie, { "name": "Boston" }
-		for (AddressHierarchyEntry e : childEntries) {
-			out.println("{ \"name\": \"" + e.getName() + "\" },");
-		}
+    	if (childEntries != null) {
+			Collections.sort(childEntries);
+    	
+			// add the elements: ie, { "name": "Boston" }
+			for (AddressHierarchyEntry e : childEntries) {
+				out.println("{ \"name\": \"" + e.getName() + "\" },");
+			}
+    	}
     	
     	// close the JSON
 		out.println("]");
-    	
 	}
+	
 }

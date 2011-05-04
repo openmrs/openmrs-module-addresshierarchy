@@ -4,6 +4,8 @@ import org.openmrs.BaseOpenmrsMetadata;
 
 /**
  * Represents a single entry in the Address Hierarchy (ie., like "United States", or "Massachusetts", or "Boston")
+ * 
+ * Must be unique on combined name and parent
  */
 public class AddressHierarchyEntry extends BaseOpenmrsMetadata implements Comparable<AddressHierarchyEntry> {
 	

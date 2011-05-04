@@ -143,19 +143,45 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
+	@Verifies(value = "should fetch child address hierarchy entry referenced by name", method = "getChildAddressHierarchyEntryByName(AddressHierarchyEntry)")
+	public void getChildAddressHierarchyEntryByName_shouldGetChildAddressHierarchyEntryByName() throws Exception {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		AddressHierarchyEntry scituateMa = ahService.getAddressHierarchyEntry(7);
+		AddressHierarchyEntry plymouthCounty = ahService.getAddressHierarchyEntry(4);
+		
+		Assert.assertEquals(scituateMa, ahService.getChildAddressHierarchyEntryByName(plymouthCounty, "Scituate"));
+		
+	}
+	
+	@Test
 	@Verifies(value = "should find all address hierarchy entries by level", method = "getAddressHierarchyEntriesByLevel(AddressHierarchyLevel)")
 	public void getAddressHierarchyEntriesByLevel_shouldFindAllAddressHierarchyEntriesByLevel() throws Exception {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
 		List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesByLevel(ahService.getAddressHierarchyLevel(5));
 		
-		Assert.assertEquals(6, entries.size());
+		Assert.assertEquals(7, entries.size());
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(6)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(7)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(8)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(9)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(10)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(11)));
+		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(15)));
+	}
+	
+	@Test
+	@Verifies(value = "should find all address hierarchy entries at top level", method = "getAddressHierarchyEntriesAtTopLevel()")
+	public void getAddressHierarchyEntriesAtTopLevel_shouldGetAddressHierarchyEntriesAtTopLevel() throws Exception {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesAtTopLevel();
+		
+		Assert.assertEquals(2, entries.size());
+		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(1)));
+		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(16)));
+		
 	}
 	
 	@Test
@@ -165,13 +191,14 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		
 		List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesByLevel(ahService.getAddressHierarchyLevel(5).getId());
 		
-		Assert.assertEquals(6, entries.size());
+		Assert.assertEquals(7, entries.size());
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(6)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(7)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(8)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(9)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(10)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(11)));
+		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(15)));
 	}
 	
 	@Test
@@ -179,29 +206,23 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	public void searchHierarchy_shouldFindAddressHierarchyEntryById() throws Exception {	
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		Assert.assertTrue(ahService.getAddressHierarchyEntry(3).getName().equals("Maine"));
-		Assert.assertTrue(ahService.getAddressHierarchyEntry(5).getName().equals("Middlesex"));
+		Assert.assertTrue(ahService.getAddressHierarchyEntry(3).getName().equals("Rhode Island"));
+		Assert.assertTrue(ahService.getAddressHierarchyEntry(5).getName().equals("Suffolk County"));
 		
 	}
+	
 	
 	@Test
 	@Verifies(value = "should find appropriate address hierarchy entries", method = "searchHierarchy(String, int)")
 	public void searchHierarchy_shouldFindAppropriateHierarchyEntries() throws Exception {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		// first try a few basic searches
-		Assert.assertTrue(ahService.searchHierarchy("Boston", -1).get(0).getName().equals("Boston"));
-		Assert.assertTrue(ahService.searchHierarchy("Scituate", -1).get(0).getName().equals("Scituate"));
+		// first try a basic search
+		Assert.assertTrue(ahService.searchAddressHierarchy("United States|Massachusetts|Suffolk County|Boston").getId() == 10);
 		
-		// now make sure there is no match if the address hierarchy level id is wrong
-		Assert.assertTrue(ahService.searchHierarchy("Boston", 4).size() == 0);
-		
-		// but make sure there is a match if the address hierarchy level id correct
-		Assert.assertTrue(ahService.searchHierarchy("Scituate", 5).get(0).getName().equals("Scituate"));
-		
-		// test that exact/non-exact flag works properly 
-		Assert.assertTrue(ahService.searchHierarchy("Bosto", -1, false).get(0).getName().equals("Boston"));
-		Assert.assertTrue(ahService.searchHierarchy("Bosto", -1, true).size() == 0);
+		// make sure it can distinguish between the two Scituates
+		Assert.assertTrue(ahService.searchAddressHierarchy("United States|Massachusetts|Plymouth County|Scituate").getId() == 7);
+		Assert.assertTrue(ahService.searchAddressHierarchy("United States|Rhode Island|Providence County|Scituate").getId() == 15);
 		
 	}
 	

@@ -1,6 +1,5 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 
-
 <!-- JQUERY FOR THIS PAGE -->
 <script type="text/javascript">
 
@@ -8,22 +7,43 @@
 
 	var addressHierarchyLevels = [ <c:forEach var="hierarchyLevel" items="${hierarchyLevels}">'${hierarchyLevel.addressField.name}',</c:forEach> ];
 
-	function updateOptions(parentEntry, addressHierarchyLevelId, nextElement) {
-
-		// first we need to empty the current field and all fields after it in the hierarchy
-		var del = false;
-		$j.each(addressHierarchyLevels, function(i, entry) {
-			if (nextElement.attr('id') == entry) { del = true; }
-			if (del) { $j('#' + entry).empty(); }
-		});
+	function updateOptions(element) {
 		
+		var searchString = '';
+
+		// we need to iterate through all the address hiearchy levels from top to bottom
+		// for all levels *above* the next element, we need to build a search string in the 
+		// format "UNITED STATES|MASSACHUSETTS|SUFFOLK";
+		// then the element and all levels below it need to be emptied;
+		var reachedLevelToUpdate = false;
+		
+		$j.each(addressHierarchyLevels, function (i, entry) {
+
+			if (element.attr('id') == entry) { 
+				reachedLevelToUpdate = true; 
+			}
+			if (reachedLevelToUpdate == false) {
+				// build the search string
+				searchString = searchString + $j('#' + entry).val() + "|";
+			}
+			else {
+				// empty the other entries
+				$j('#' + entry).empty(); 
+			}
+		});
+
+		// slice off the trailing "|"
+		if (searchString != null) {
+			searchString = searchString.slice(0,-1);
+		}
+			
 		// now do the actual JSON call and add the appropriate elements
 		$j.getJSON('${pageContext.request.contextPath}/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form',
-					{ 'parentEntry': parentEntry, 'addressHierarchyLevel': addressHierarchyLevelId },
+					{ 'searchString': searchString },
 					function (data) {
-						nextElement.append($j(document.createElement("option")).text("--"));
+						element.append($j(document.createElement("option")).text("--"));
 						$j.each(data, function(i, entry) {
-							nextElement.append($j(document.createElement("option")).attr("value", entry.name).text(entry.name));
+							element.append($j(document.createElement("option")).attr("value", entry.name).text(entry.name));
 						});
 					}
 				);
@@ -31,19 +51,18 @@
 	}
 
 	$j(document).ready(function(){
-
 		// create event handlers for the all the address selection lists
 		<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
 		$j('#${hierarchyLevel.addressField.name}').change(function() {
 			<c:if test="${i.count < fn:length(hierarchyLevels)}">
-				updateOptions($j(this).val(), ${hierarchyLevel.id}, $j('#${hierarchyLevels[i.count].addressField.name}'));
+				updateOptions($j('#${hierarchyLevels[i.count].addressField.name}'));
 			</c:if>
 		});
 		</c:forEach>
-		
+
+
 		// TODO: this is a quick hack implementation for testing purposes
-		updateOptions('', ${hierarchyLevels[0].id}, $j('#countyDistrict'));
-		
+		updateOptions($j('#countyDistrict'));
  	});
 </script>
 <!-- END JQUERY -->
