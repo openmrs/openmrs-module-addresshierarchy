@@ -156,6 +156,12 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
+	public int getAddressHierarchyLevelsCount() {
+		List<AddressHierarchyLevel> levels = getAddressHierarchyLevels();
+		return levels != null ? levels.size() : 0;
+	}
+	
+	@Transactional(readOnly = true)
 	public AddressHierarchyLevel getTopAddressHierarchyLevel() {
 		return dao.getTopAddressHierarchyLevel();
 	}

@@ -62,19 +62,19 @@ public class AddressHierarchyAjaxController {
     	PrintWriter out = response.getWriter();
 
     	// start the JSON
-    	out.println("[");
+    	out.print("[");
 
     	if (childEntries != null) {
 			Collections.sort(childEntries);
     	
 			// add the elements: ie, { "name": "Boston" }
 			for (AddressHierarchyEntry e : childEntries) {
-				out.println("{ \"name\": \"" + e.getName() + "\" },");
+				out.print("{ \"name\": \"" + e.getName() + "\" },");
 			}
     	}
     	
     	// close the JSON
-		out.println("]");
+		out.print("]");
 	}
 	
 }

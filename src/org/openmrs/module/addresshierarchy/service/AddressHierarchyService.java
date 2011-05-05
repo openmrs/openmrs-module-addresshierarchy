@@ -16,6 +16,7 @@ public interface AddressHierarchyService {
 	
 	// TODO: remove or deprecate unused methods
 	
+	// TODO: rename to "getAddressHierarchyEntriesCount" ??
 	public int getAddressHierarchyEntryCount();
 	
 	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyEntryId);
@@ -59,6 +60,11 @@ public interface AddressHierarchyService {
 	 * Gets all AddressHierarchyLevels
 	 */
 	public List<AddressHierarchyLevel> getAddressHierarchyLevels();
+	
+	/**
+	 * Gets a count of the number of AddressHierarchyLevels
+	 */
+	public int getAddressHierarchyLevelsCount();
 	
 	/**
 	 * Gets the AddressHierarchyLevel that represents the top level of the hierarchy
