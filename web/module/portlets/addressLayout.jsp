@@ -10,9 +10,9 @@
 
 	var addressHierarchyLevels = [ <c:forEach var="hierarchyLevel" items="${hierarchyLevels}">'${hierarchyLevel.addressField.name}',</c:forEach> ];
 	var pageContext = '${pageContext.request.contextPath}';
+	var other = "<spring:message code="addresshierarchy.other"/>";
 	
 	$j(document).ready(function(){
-
 		// initialize all the address field (if necessary)
 		<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
 			<spring:bind path="${hierarchyLevel.addressField.name}">
@@ -22,7 +22,6 @@
 				</c:if>
 				</spring:bind>
 		</c:forEach>
-	
  	});
 </script>
 <!-- END JQUERY -->
@@ -31,14 +30,19 @@
 <div class="address">
 	<table>
 		<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
-			<tr id="test">
+			<tr>
 				<td><spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/></td>
 				<td><spring:bind path="${hierarchyLevel.addressField.name}">
 					<select type="text" name="${status.expression}" class="${hierarchyLevel.addressField.name}" 
-						<c:if test="${i.count < fn:length(hierarchyLevels)}">
-							onChange="handleAddressFieldChange($j(this).closest('.address').find('.${hierarchyLevels[i.count].addressField.name}'));"
-						</c:if> />
+					<c:if test="${i.count < fn:length(hierarchyLevels)}">
+							onChange="handleAddressFieldChange($j(this), $j(this).closest('.address').find('.${hierarchyLevels[i.count].addressField.name}'));"
+					</c:if> 
+					<c:if test="${i.count == fn:length(hierarchyLevels)}">
+							onChange="handleAddressFieldChange($j(this), '');"
+					</c:if>
+					/>
 				</spring:bind></td>
+				<td><input type="text" style="display:none"/></td>
 			</tr>
 		</c:forEach>
 	</table>
