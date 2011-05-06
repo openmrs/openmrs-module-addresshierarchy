@@ -1,6 +1,7 @@
 var $j = jQuery;	
 
-function addressFieldChange(element) {
+
+function handleAddressFieldChange(element) {
 		
 	var searchString = '';
 
@@ -32,14 +33,20 @@ function addressFieldChange(element) {
 	updateOptions(element, searchString);
 }
 
-function updateOptions(element, searchString) {	
+function updateOptions(element, searchString, value) {	
+	// TODO: handle the "other" options
+	
 	// do the JSON call and add the appropriate elements
 	$j.getJSON(pageContext + '/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form',
 			{ 'searchString': searchString },
 			function (data) {
-				element.append($j(document.createElement("option")).text("--"));
+				element.append($j(document.createElement('option')).text('--'));
 				$j.each(data, function(i, entry) {
-					element.append($j(document.createElement("option")).attr("value", entry.name).text(entry.name));
+					var option = $j(document.createElement('option')).attr('value', entry.name).text(entry.name);
+					if (entry.name == value) {
+						option.attr('selected',true);
+					}
+					element.append(option);
 				});
 			}
 		);

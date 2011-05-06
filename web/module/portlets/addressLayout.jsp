@@ -12,9 +12,17 @@
 	var pageContext = '${pageContext.request.contextPath}';
 	
 	$j(document).ready(function(){
+
+		// initialize all the address field (if necessary)
+		<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
+			<spring:bind path="${hierarchyLevel.addressField.name}">
+				<c:if test="${not empty status.value || i.count == 1}">
+					updateOptions($j('select[name=${status.expression}]'), "${searchString}", "${status.value}");  // use double quotes here so as not conflict with ' in location names
+					<c:set var="searchString">${searchString}${fn:length(searchString) > 0 ? '|' : ''}${status.value}</c:set>
+				</c:if>
+				</spring:bind>
+		</c:forEach>
 	
-		// TODO: this is a quick hack implementation for testing purposes
-		addressFieldChange($j('.countyDistrict'));
  	});
 </script>
 <!-- END JQUERY -->
@@ -28,7 +36,7 @@
 				<td><spring:bind path="${hierarchyLevel.addressField.name}">
 					<select type="text" name="${status.expression}" class="${hierarchyLevel.addressField.name}" 
 						<c:if test="${i.count < fn:length(hierarchyLevels)}">
-							onChange="addressFieldChange($j(this).closest('.address').find('.${hierarchyLevels[i.count].addressField.name}'));"
+							onChange="handleAddressFieldChange($j(this).closest('.address').find('.${hierarchyLevels[i.count].addressField.name}'));"
 						</c:if> />
 				</spring:bind></td>
 			</tr>
