@@ -92,10 +92,12 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	}
 	
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah) {
-		Session session = sessionFactory.getCurrentSession();
-		session.save(ah);
-		session.flush();
-		session.clear();
+		try {
+			sessionFactory.getCurrentSession().saveOrUpdate(ah);
+		}
+		catch (Throwable t) {
+			throw new DAOException(t);
+		}
 	}
 	
 	public void deleteAllAddressHierarchyEntries() {

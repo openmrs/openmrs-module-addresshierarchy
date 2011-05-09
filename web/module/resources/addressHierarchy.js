@@ -1,5 +1,5 @@
-var $j = jQuery;	
 
+var $j = jQuery;	
 
 function handleAddressFieldChange(changedField, fieldToUpdate) {
 		

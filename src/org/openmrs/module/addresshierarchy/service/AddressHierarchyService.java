@@ -6,13 +6,11 @@ import org.openmrs.annotation.Authorized;
 import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The Interface AddressHierarchyService has the service methods for AddressHierarchy module.
  */
-@Transactional
-public interface AddressHierarchyService {
+public interface AddressHierarchyService{
 	
 	// TODO: remove or deprecate unused methods
 	
