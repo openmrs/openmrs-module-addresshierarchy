@@ -35,15 +35,20 @@
 
 
 	<!-- Required Global Properties -->
-	
-	<!-- Servlets -->
-	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name>--> 
-	<!--   <servlet>
-		<servlet-name>addressTree</servlet-name>
-		<servlet-class>@MODULE_PACKAGE@.web.servlet.AddressHierarchyServlet</servlet-class>
-	</servlet>  -->
-	
-	<!-- /Servlets -->
+	<globalProperty>
+		<property>addresshierarchy.allowFreetext</property>
+		<defaultValue>true</defaultValue>
+		<description>
+			Valid values: true/false. When overriding the address portlet, allow the entry of free text for address fields associated with the address hierarchy by providing an "Other" option
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>addresshierarchy.enableOverrideOfAddressPortlet</property>
+		<defaultValue>true</defaultValue>
+		<description>
+			Valid values: true/false. When enabled, the existing "edit" component of the address portlet is overridden by the new functionality provided by the address hierarchy module
+		</description>
+	</globalProperty>
 	
 	
 	<!-- Internationalization -->

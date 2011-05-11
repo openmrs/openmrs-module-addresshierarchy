@@ -80,11 +80,17 @@ function updateOptions(fieldToUpdate, searchString, value) {
 					}
 					fieldToUpdate.append(option);
 				});
-				fieldToUpdate.append($j(document.createElement('option')).attr('value', '--other--').text(other));
-				
-				// if we haven't found a match against the current value of the field, switch tto the "Other" case
+				if (allowFreetext == true) {
+					fieldToUpdate.append($j(document.createElement('option')).attr('value', '--other--').text(other));
+				}
+					
+				// if we haven't found a match against the current value of the field, switch to the "Other" case
+				// (note even if allowFreetext == false, we call handleSelectOther, because although we don't want to
+				// allow the creation of new freetext values, we want to display any legacy ones that may exist)
 				if (!foundCurrentValue && value !='') {		
-					fieldToUpdate.val('--other--')
+					if (allowFreetext == true) {
+						fieldToUpdate.val('--other--')
+					}
 					handleSelectOther(fieldToUpdate, false);
 				}
 				
@@ -112,7 +118,6 @@ function handleSelectOther(field, emptyTextInput) {
 			if (i > fieldLevelIndex) {
 				selectList.empty();
 				selectList.hide();
-				//selectList.append($j(document.createElement('option')).attr('value','--other--').text(other));
 			}
 			
 			// switch to using the text input instead of the select list

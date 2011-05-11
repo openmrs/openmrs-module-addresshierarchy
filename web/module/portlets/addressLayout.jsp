@@ -11,6 +11,7 @@
 	var addressHierarchyLevels = [ <c:forEach var="hierarchyLevel" items="${hierarchyLevels}">'${hierarchyLevel.addressField.name}',</c:forEach> ];
 	var pageContext = '${pageContext.request.contextPath}';
 	var other = "<spring:message code="addresshierarchy.other"/>";
+	var allowFreetext = ${allowFreetext};
 	
 	$j(document).ready(function(){
 

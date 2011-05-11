@@ -8,12 +8,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
+import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.springframework.web.servlet.ModelAndView;
 
 public class AddressLayoutPortletController extends org.openmrs.web.controller.layout.AddressLayoutPortletController {
+	
+	protected static final Log log = LogFactory.getLog(AddressLayoutPortletController.class);
 	
 	/** Overrides the handle request to use the custom address hierarchy jsp if in edit mode */
 	
@@ -21,25 +26,38 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
     @Override
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 	                                                                                           IOException {
+	
 		ModelAndView mav = super.handleRequest(request, response);
+		
+		String originalPortletPath = mav.getViewName();
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		// we only want to override with our custom page if size="full", we aren't in view mode, 
-		// and if we have defined address hierarchy levels
-		Map map = (Map) mav.getModelMap().get("model");	
-		if (map.containsKey("size") && ((String) map.get("size")).equals("full") &&
-				(!map.containsKey("layoutMode") || ((String) map.get("layoutMode")).equals("edit")) &&
-				ahService.getAddressHierarchyLevelsCount() > 0) {
-			
-			// set the path to the custom page
-			String portletPath = "/module/addresshierarchy/portlets/addressLayout";
-			mav.setViewName(portletPath);
-			
-			// get the ordered address hierarchy levels and add them to the map
-			List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
-			mav.getModelMap().addAttribute("hierarchyLevels", levels);
-			
+		// we only want to override with our custom page if 1) override is enabled, 2) size="full", 
+		// 3) we aren't in view mode, and 4) we have defined address hierarchy levels
+		try {
+			Map map = (Map) mav.getModelMap().get("model");	
+			if (AddressHierarchyUtil.getGlobalPropertyAsBoolean("addresshierarchy.enableOverrideOfAddressPortlet") == true &&
+					map.containsKey("size") && ((String) map.get("size")).equals("full") &&
+					(!map.containsKey("layoutMode") || ((String) map.get("layoutMode")).equals("edit")) &&
+					ahService.getAddressHierarchyLevelsCount() > 0) {
+				
+				// get the ordered address hierarchy levels and add them to the map
+				List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
+				mav.getModelMap().addAttribute("hierarchyLevels", levels);
+				
+				// add the global property that specifies whether we should allow freetext entries or not
+				mav.getModelMap().addAttribute("allowFreetext", AddressHierarchyUtil.getGlobalPropertyAsBoolean("addresshierarchy.allowFreetext"));
+				
+				// set the path to the custom page
+				String portletPath = "/module/addresshierarchy/portlets/addressLayout";
+				mav.setViewName(portletPath);
+			}
+		}
+		catch (Exception e) {
+			// if we run into an error, we only want to soft-fail and note that we were unable to override the portlet
+			log.error("Unable to override address portlet ", e);
+			mav.setViewName(originalPortletPath);
 		}
 		
 		return mav;
