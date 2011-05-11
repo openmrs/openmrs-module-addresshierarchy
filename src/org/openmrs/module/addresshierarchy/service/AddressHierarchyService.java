@@ -2,6 +2,7 @@ package org.openmrs.module.addresshierarchy.service;
 
 import java.util.List;
 
+import org.openmrs.PersonAddress;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
@@ -14,6 +15,15 @@ public interface AddressHierarchyService{
 	
 	// TODO: remove or deprecate unused methods
 	
+
+	/**
+	 * TODO: note the difference between null and no matches??
+	 */
+	public List<String> getPossibleAddressValues(PersonAddress address, String fieldName);
+	
+	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, String fieldName);
+	
+	
 	// TODO: rename to "getAddressHierarchyEntriesCount" ??
 	public int getAddressHierarchyEntryCount();
 	
@@ -24,6 +34,8 @@ public interface AddressHierarchyService{
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level);
 	
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(Integer levelId);
+	
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel level, String name);
 	
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesAtTopLevel();
 	
