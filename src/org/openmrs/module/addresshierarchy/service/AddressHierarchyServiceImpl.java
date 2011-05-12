@@ -33,8 +33,20 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	public List<String> getPossibleAddressValues(PersonAddress address, String fieldName) {	
 		
 		List<String> possibleAddressValues = new ArrayList<String>();
+		AddressHierarchyLevel targetLevel = null;
 		
-		List<AddressHierarchyEntry> entries = getPossibleAddressHierarchyEntries(address, fieldName);
+		for (AddressHierarchyLevel level : getOrderedAddressHierarchyLevels(false)) {
+			if (level.getAddressField() != null && level.getAddressField().getName().equals(fieldName)) {
+				targetLevel = level;
+			}
+		}
+		
+		if (targetLevel == null) {
+			log.error("Address field " + fieldName + " is either invalid or is not mapped to address hierarchy level.");
+			return null;
+		}
+		
+		List<AddressHierarchyEntry> entries = getPossibleAddressHierarchyEntries(address, targetLevel);
 		
 		if (entries == null) {
 			return null;
@@ -47,7 +59,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return possibleAddressValues;
 	}
 	
-	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, String fieldName) {
+	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel targetLevel) {
 		
 		// TODO: what about cases where there is already a value for fieldname?  Right now we just ignore it
 		
@@ -63,7 +75,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			else {
 				higherLevels.add(level);
 			}
-			if (level.getAddressField().getName().equals(fieldName)) {
+			if (level.equals(targetLevel)) {
 				lowerLevels.add(level);  // we want the target level in both the higher and lower level lists
 				reachedFieldLevel = true;
 			}
@@ -79,7 +91,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		// first handle the top level
 		AddressHierarchyLevel topLevel= higherLevels.remove(0);
-		String topLevelValue = topLevel.getAddressField() != null ? AddressHierarchyUtil.getAddressFieldValue(address, topLevel.getAddressField().getName()) : null;
+		String topLevelValue = topLevel.getAddressField() != null ? AddressHierarchyUtil.getAddressFieldValue(address, topLevel.getAddressField()) : null;
 		
 		// if we have a top level value, find the top-level entry that matches that value
 		if (StringUtils.isNotBlank(topLevelValue)) {
@@ -95,7 +107,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			List<AddressHierarchyEntry> possibleEntriesAtNextLevel = new ArrayList<AddressHierarchyEntry>();
 			
 			// find the value of the address field at the level we are dealing with
-			String levelValue = level.getAddressField() != null ? AddressHierarchyUtil.getAddressFieldValue(address, level.getAddressField().getName()) : null;
+			String levelValue = level.getAddressField() != null ? AddressHierarchyUtil.getAddressFieldValue(address, level.getAddressField()) : null;
 			
 			// loop through all the possible entries
 			for (AddressHierarchyEntry entry : possibleEntries) {
@@ -131,7 +143,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		while (i.hasNext()) {
 			AddressHierarchyLevel level = i.next();
 			
-			String levelValue = level.getAddressField() != null ? AddressHierarchyUtil.getAddressFieldValue(address, level.getAddressField().getName()) : null;
+			String levelValue = level.getAddressField() != null ? AddressHierarchyUtil.getAddressFieldValue(address, level.getAddressField()) : null;
 			
 			// we are looking for the first level with a value
 			if (StringUtils.isNotBlank(levelValue)) {
@@ -150,7 +162,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			
 			AddressHierarchyLevel level = i.next();
 			
-			String levelValue = level.getAddressField() != null ? AddressHierarchyUtil.getAddressFieldValue(address, level.getAddressField().getName()) : null;
+			String levelValue = level.getAddressField() != null ? AddressHierarchyUtil.getAddressFieldValue(address, level.getAddressField()) : null;
 			
 			List<AddressHierarchyEntry> possibleEntriesAtNextLevel = new ArrayList<AddressHierarchyEntry>();
 			
@@ -276,6 +288,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		dao.deleteAllAddressHierarchyEntries();
 	}
 	
+	
+	// TODO: can I get rid of this method?
 	@Transactional(readOnly = true)
 	public AddressHierarchyEntry searchAddressHierarchy(String searchString) {
 		
@@ -298,27 +312,30 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
+		return getOrderedAddressHierarchyLevels(true);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels(Boolean includeUnmapped) {
 		
 		// TODO: integrate this with the new method we may create to make sure that the hierarchy is well-formed?
 		
 		List<AddressHierarchyLevel> levels = new ArrayList<AddressHierarchyLevel>();
 		
 		// first, get the top level level
-		AddressHierarchyLevel topLevel = getTopAddressHierarchyLevel();
+		AddressHierarchyLevel level = getTopAddressHierarchyLevel();
 		
-		if (topLevel != null) {
+		if (level != null) {
 			// add the top level to this list
-			levels.add(topLevel);
+			levels.add(level);
 			
 			// now fetch the children in order
-			while (getChildAddressHierarchyLevel(levels.get(levels.size() - 1)) != null) {
-				levels.add(getChildAddressHierarchyLevel(levels.get(levels.size() - 1)));
+			while (getChildAddressHierarchyLevel(level) != null) {
+				level = getChildAddressHierarchyLevel(level);
+				if (level.getAddressField() != null || includeUnmapped == true) {	
+					levels.add(level);
+				}
 			}
-		}
-		
-		// make sure we've reached all the levels this way
-		if (levels.size() < getAddressHierarchyLevels().size()) {
-			log.warn("Address Hierarchy Levels are not in strict hierarchical format. There may be orphaned or widowed levels.");
 		}
 		
 		return levels;

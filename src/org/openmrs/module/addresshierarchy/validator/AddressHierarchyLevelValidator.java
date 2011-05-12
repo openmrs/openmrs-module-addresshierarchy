@@ -3,7 +3,6 @@ package org.openmrs.module.addresshierarchy.validator;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 @Component
@@ -18,7 +17,7 @@ public class AddressHierarchyLevelValidator implements Validator {
     public void validate(Object obj, Errors errors) {
 	    AddressHierarchyLevel level = (AddressHierarchyLevel) obj;	    
 	    
-	    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "addressField", "addresshierarchy.admin.validation.addressField.blank");
+	   // ValidationUtils.rejectIfEmptyOrWhitespace(errors, "addressField", "addresshierarchy.admin.validation.addressField.blank");
 	 
 	    // a level can't have itself as a parent
 	    if (level.getParent() == level) {

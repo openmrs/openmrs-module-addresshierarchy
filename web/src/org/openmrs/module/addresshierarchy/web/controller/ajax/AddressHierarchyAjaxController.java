@@ -10,9 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
+import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
+import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
+import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,33 +32,47 @@ public class AddressHierarchyAjaxController {
 	
 	
 	/**
-	 * Returns a list of Address Hierarchy Entry names in JSON format
+	 * Returns a list of child address hierarchy entries in JSON format
 	 * 
-	 * If a parent entry is specified, it returns the names of all the children of the specified entry
-	 * If no parent is specified, it returns the names for of all entries for the specified address hierarchy level
-	 * 
-	 * Note that a levelId is mandatory in either case specified in either case, since Address Hierarchy Entries may have the same name as long as they
-	 * are on different levels of the hierarchy
+	 * The parent entry is specified by a string in the format "UNITED STATES|MASSACHUSETTES|PLYMOUTH COUNTY"
 	 */
 	@RequestMapping("/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form")
 	 public void getChildAddressHierarchyEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
-					                             @RequestParam(value = "searchString", required = false) String searchString) throws Exception {
+					                             @RequestParam(value = "searchString", required = false) String searchString,
+					                             @RequestParam(value = "includeUnmapped", required = false) Boolean includeUnmapped) throws Exception {
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		if (includeUnmapped == null) {
+			includeUnmapped = false;
+		}
 		
 		List<AddressHierarchyEntry> childEntries = null;
 	
-		if (StringUtils.isNotBlank(searchString)) {
-			// if we have a search string, find the entry referenced
-			AddressHierarchyEntry entry = ahService.searchAddressHierarchy(searchString);
-			// now find all its children
-			if (entry != null) {
-				childEntries = ahService.getChildAddressHierarchyEntries(entry);
-			}
+		// if the search parameter is empty, we just want all the top level items
+		if (StringUtils.isBlank(searchString)) {
+			childEntries = ahService.getAddressHierarchyEntriesAtTopLevel();
 		}
 		else {
-			// otherwise, if the search parameter is empty, we just want all the top level items
-			childEntries = ahService.getAddressHierarchyEntriesAtTopLevel();
+			// other, create the appropriate PersonAddress object and then perform the search
+			PersonAddress address = new PersonAddress();
+			List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(includeUnmapped);
+			
+			int i = 0;
+			// iterate through all the names in the search string to form the PersonAddress object
+			for (String name : searchString.split("\\|")) {
+				if (StringUtils.isNotBlank(name)) {
+					if (levels.size() <= i-1) {  // make sure we haven't reached the bottom level, because this would make no sense
+						throw new AddressHierarchyModuleException("Address hierarchy levels have not been properly defined.");
+					}
+					else {
+						AddressHierarchyUtil.setAddressFieldValue(address, levels.get(i).getAddressField(), name);
+					}
+				}
+				i++;
+			}			
+			
+			// now do the actual search
+			childEntries = ahService.getPossibleAddressHierarchyEntries(address, levels.get(i));
 		}
 			
     	response.setContentType("application/json");

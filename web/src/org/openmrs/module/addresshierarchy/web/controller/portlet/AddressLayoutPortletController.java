@@ -43,7 +43,7 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
 					ahService.getAddressHierarchyLevelsCount() > 0) {
 				
 				// get the ordered address hierarchy levels and add them to the map
-				List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
+				List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);
 				mav.getModelMap().addAttribute("hierarchyLevels", levels);
 				
 				// add the global property that specifies whether we should allow freetext entries or not

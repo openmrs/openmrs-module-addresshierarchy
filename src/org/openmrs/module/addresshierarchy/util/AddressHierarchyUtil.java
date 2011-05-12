@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 
 
@@ -29,17 +30,29 @@ public class AddressHierarchyUtil {
 	}
 
 	/**
-	 * Given a person address object, this method uses reflection fetch the value of the field
-	 * specified by the string field name
+	 * Given a person address object, this method uses reflection fetch the value of the specified field
 	 */
-	public static final String getAddressFieldValue(PersonAddress address, String fieldName) {		
+	public static final String getAddressFieldValue(PersonAddress address, AddressField field) {		
 		try {
-	        Method getter = PersonAddress.class.getMethod("get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
+	        Method getter = PersonAddress.class.getMethod("get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
 	        return (String) getter.invoke(address);
 	        
         }
         catch (Exception e) {
-	        throw new AddressHierarchyModuleException("Unable to get address field " + fieldName + " off of PersonAddress", e);
+	        throw new AddressHierarchyModuleException("Unable to get address field " + field.getName() + " off of PersonAddress", e);
+        }
+	}
+	
+	/**
+	 * Given a person address object, this method uses reflection to set the value of the specified field
+	 */
+	public static final  void setAddressFieldValue(PersonAddress address, AddressField field, String value) {
+		try {
+			Method setter = PersonAddress.class.getMethod("set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1), String.class);
+			setter.invoke(address, value);
+		}
+		catch (Exception e) {
+	        throw new AddressHierarchyModuleException("Unable to set address field " + field.getName() + " on PersonAddress", e);
         }
 	}
 }

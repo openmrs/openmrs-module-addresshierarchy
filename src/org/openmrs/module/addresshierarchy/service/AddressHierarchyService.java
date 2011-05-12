@@ -21,8 +21,7 @@ public interface AddressHierarchyService{
 	 */
 	public List<String> getPossibleAddressValues(PersonAddress address, String fieldName);
 	
-	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, String fieldName);
-	
+	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel level);
 	
 	// TODO: rename to "getAddressHierarchyEntriesCount" ??
 	public int getAddressHierarchyEntryCount();
@@ -65,6 +64,13 @@ public interface AddressHierarchyService{
 	 * Gets all AddressHierarchyLevels, ordered from the top of hierarchy to the bottom
 	 */
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels();
+	
+	/**
+	 * Gets the AddressHiearchyLevels, ordered from the top the hierarchy to the bottom
+	 * "includeUnmapped" parameter specifies whether or not to include hierarchy levels that
+	 * aren't mapped to an underlying address field
+	 */
+	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels(Boolean includeUnmapped);
 	
 	/**
 	 * Gets all AddressHierarchyLevels

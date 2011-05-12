@@ -278,4 +278,16 @@
 		</sql>
 	</diff>
 	
+		<diff>
+		<version>2.4</version>
+		<author>Mark Goodrich</author>
+		<date>May 12 2011</date>
+		<description>
+			Allow address_field to be nullable
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_level CHANGE COLUMN `address_field` `address_field` varchar(50);
+		</sql>
+	</diff>
+	
 </sqldiff>

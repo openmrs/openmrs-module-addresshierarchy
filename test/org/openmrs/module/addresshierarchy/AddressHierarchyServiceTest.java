@@ -52,8 +52,8 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	public void getBottomAddressHierarchyLevel_shouldGetBottomAddressHierarchyLevel() throws Exception {
 		AddressHierarchyLevel level = Context.getService(AddressHierarchyService.class).getBottomAddressHierarchyLevel();
 		
-		Assert.assertEquals("Neighborhood", level.getName());
-		Assert.assertEquals("region", level.getAddressField().getName());
+		Assert.assertEquals("Street", level.getName());
+		Assert.assertEquals(null, level.getAddressField());
 		
 	}
 	
@@ -65,7 +65,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		
 		List<AddressHierarchyLevel> levels = ahService.getAddressHierarchyLevels();
 		
-		Assert.assertEquals(5, levels.size());
+		Assert.assertEquals(7, levels.size());
 			
 		// make sure that the list returned contains all the levels
 		Assert.assertTrue(levels.contains(ahService.getAddressHierarchyLevel(1)));
@@ -73,6 +73,8 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertTrue(levels.contains(ahService.getAddressHierarchyLevel(2)));
 		Assert.assertTrue(levels.contains(ahService.getAddressHierarchyLevel(5)));
 		Assert.assertTrue(levels.contains(ahService.getAddressHierarchyLevel(3)));
+		Assert.assertTrue(levels.contains(ahService.getAddressHierarchyLevel(6)));
+		Assert.assertTrue(levels.contains(ahService.getAddressHierarchyLevel(7)));
 	}
 	
 	@Test
@@ -83,6 +85,27 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		
 		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
 		
+		Assert.assertEquals(7, levels.size());
+			
+		// make sure that the list returns the levels in the proper order
+		Assert.assertTrue(levels.get(0) == (ahService.getAddressHierarchyLevel(1)));
+		Assert.assertTrue(levels.get(1) == (ahService.getAddressHierarchyLevel(7)));
+		Assert.assertTrue(levels.get(2) == (ahService.getAddressHierarchyLevel(4)));
+		Assert.assertTrue(levels.get(3) == (ahService.getAddressHierarchyLevel(2)));
+		Assert.assertTrue(levels.get(4) == (ahService.getAddressHierarchyLevel(5)));
+		Assert.assertTrue(levels.get(5) == (ahService.getAddressHierarchyLevel(3)));
+		Assert.assertTrue(levels.get(6) == (ahService.getAddressHierarchyLevel(6)));
+		
+	}
+	
+	@Test
+	@Verifies(value = "should get all address hierarchy levels in order ignoring unmapped levels", method = "getOrderedAddressHierarchyLevels(Boolean)")
+	public void getOrderedAddressHierarchyLevels_shouldGetAllAddressHierarchyLevelsInOrderIgnoringUnmappedLevels() throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);
+		
 		Assert.assertEquals(5, levels.size());
 			
 		// make sure that the list returns the levels in the proper order
@@ -91,8 +114,8 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertTrue(levels.get(2) == (ahService.getAddressHierarchyLevel(2)));
 		Assert.assertTrue(levels.get(3) == (ahService.getAddressHierarchyLevel(5)));
 		Assert.assertTrue(levels.get(4) == (ahService.getAddressHierarchyLevel(3)));
+		
 	}
-	
 	
 	@Test
 	@Verifies(value = "should fetch children address hierarchy entries", method = "getChildAddressHierarchyEntries(AddressHierarchyEngy entry)")
@@ -102,15 +125,14 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		// fetch the children of "United States"
 		List<AddressHierarchyEntry> entries = ahService.getChildAddressHierarchyEntries(ahService.getAddressHierarchyEntry(1));
 		
-		// make sure the result set has 2 entries, Maine and Massachusetts
-		Assert.assertEquals(2, entries.size());
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(2)));
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(3)));
+		// make sure the result set has 1 entry, New England
+		Assert.assertEquals(1, entries.size());
+		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(17)));
 		
-		// fetch the children of "Plymouth (Count)"
+		// fetch the children of "Plymouth (County)"
 		entries = ahService.getChildAddressHierarchyEntries(ahService.getAddressHierarchyEntry(4));
 		
-		// make sure the result set has 2 entries, Maine and Massachusetts
+		// make sure there are 4 entries, Scituate, Cohasseet, Hingham and Plymouth
 		Assert.assertEquals(4, entries.size());
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(6)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(7)));
@@ -127,14 +149,14 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		// fetch the children of "United States"
 		List<AddressHierarchyEntry> entries = ahService.getChildAddressHierarchyEntries(ahService.getAddressHierarchyEntry(1).getId());
 		
-		// make sure the result set has 2 entries, Maine and Massachusetts
-		Assert.assertEquals(2, entries.size());
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(2)));
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(3)));
+		// make sure the result set has 1 entry, New England
+		Assert.assertEquals(1, entries.size());
+		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(17)));
 		
 		// fetch the children of "Plymouth (County)"
 		entries = ahService.getChildAddressHierarchyEntries(ahService.getAddressHierarchyEntry(4).getId());
 		
+		// make sure there are 4 entries, Scituate, Cohasseet, Hingham and Plymouth
 		Assert.assertEquals(4, entries.size());
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(6)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(7)));
@@ -236,11 +258,11 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
 		// first try a basic search
-		Assert.assertTrue(ahService.searchAddressHierarchy("United States|Massachusetts|Suffolk County|Boston").getId() == 10);
+		Assert.assertTrue(ahService.searchAddressHierarchy("United States|New England|Massachusetts|Suffolk County|Boston").getId() == 10);
 		
 		// make sure it can distinguish between the two Scituates
-		Assert.assertTrue(ahService.searchAddressHierarchy("United States|Massachusetts|Plymouth County|Scituate").getId() == 7);
-		Assert.assertTrue(ahService.searchAddressHierarchy("United States|Rhode Island|Providence County|Scituate").getId() == 15);
+		Assert.assertTrue(ahService.searchAddressHierarchy("United States|New England|Massachusetts|Plymouth County|Scituate").getId() == 7);
+		Assert.assertTrue(ahService.searchAddressHierarchy("United States|New England|Rhode Island|Providence County|Scituate").getId() == 15);
 		
 	}
 	
@@ -295,7 +317,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		address.setStateProvince("Massachusetts");
 		address.setCountyDistrict("Suffolk County");
 		address.setCityVillage("Boston");
-		results = ahService.getPossibleAddressValues(address, "region");
+		results = ahService.getPossibleAddressValues(address, "neighborhoodCell");
 		Assert.assertEquals(2, results.size());
 		Assert.assertTrue(results.contains("Jamaica Plain"));
 		Assert.assertTrue(results.contains("Beacon Hill"));
@@ -334,7 +356,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		// try another tricky one
 		address = new PersonAddress();
 		address.setCountry("United States");
-		results = ahService.getPossibleAddressValues(address, "region");
+		results = ahService.getPossibleAddressValues(address, "neighborhoodCell");
 		Assert.assertEquals(2, results.size());
 		Assert.assertTrue(results.contains("Jamaica Plain"));
 		Assert.assertTrue(results.contains("Beacon Hill"));
