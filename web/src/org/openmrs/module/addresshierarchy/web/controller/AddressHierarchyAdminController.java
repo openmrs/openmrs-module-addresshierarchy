@@ -1,18 +1,24 @@
 package org.openmrs.module.addresshierarchy.web.controller;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.layout.web.address.AddressSupport;
 import org.openmrs.module.addresshierarchy.AddressField;
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.propertyeditor.AddressFieldEditor;
 import org.openmrs.module.addresshierarchy.propertyeditor.AddressHierarchyLevelEditor;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
+import org.openmrs.module.addresshierarchy.util.AddressHierarchyImportUtil;
 import org.openmrs.module.addresshierarchy.validator.AddressHierarchyLevelValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,17 +30,20 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
-public class AddressHierarchyLevelController {
+public class AddressHierarchyAdminController {
 
+	protected static final Log log = LogFactory.getLog(AddressHierarchyAdminController.class);
+	
 	/** Validator for this controller */
 	private AddressHierarchyLevelValidator validator;
 	
 	@Autowired
-	public AddressHierarchyLevelController(AddressHierarchyLevelValidator validator) {
+	public AddressHierarchyAdminController(AddressHierarchyLevelValidator validator) {
 		this.validator = validator;
 	}
 	
@@ -58,6 +67,29 @@ public class AddressHierarchyLevelController {
 	@ModelAttribute("levels")
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
 		return Context.getService(AddressHierarchyService.class).getAddressHierarchyLevels();
+	}
+	
+	@ModelAttribute("sampleEntries")
+	public List<List<String>> getSampleEntries(@ModelAttribute("levels") List<AddressHierarchyLevel> levels) {
+		
+		List<List<String>> sampleEntries = new ArrayList<List<String>>();
+		
+		for (AddressHierarchyLevel level : levels) {
+			List<String> sampleEntry = new ArrayList<String>();
+			List<AddressHierarchyEntry> entries = Context.getService(AddressHierarchyService.class).getAddressHierarchyEntriesByLevel(level);
+			if(entries != null && entries.size() > 0) {
+				sampleEntry.add(entries.get(0).getName());
+				sampleEntry.add(String.valueOf(entries.size()));
+			}
+			else {
+				sampleEntry.add("");
+				sampleEntry.add("0");
+			}
+			
+			sampleEntries.add(sampleEntry);
+		}
+		
+		return sampleEntries;
 	}
 	
 	@ModelAttribute("level")
@@ -122,11 +154,56 @@ public class AddressHierarchyLevelController {
     		throw new AddressHierarchyModuleException("Cannot delete Address Hierarchy Level; not bottom type in the hierarchy");
     	}
     	
+    	// TODO: also need to make sure there are no entries at this level!
+    	
     	// deletes the address hierarchy type
     	Context.getService(AddressHierarchyService.class).deleteAddressHierarchyLevel(level);
     	
     	return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form");
     }
-    
+ 
+    @RequestMapping("/module/addresshierarchy/admin/uploadAddressHierarchy.form")
+	public ModelAndView processAddressHierarchyUploadForm(@RequestParam("file") MultipartFile file,
+	                                                      @RequestParam("delimiter") String delimiter, 
+	                                                      @RequestParam(value = "overwrite", required = false) Boolean overwrite,
+	                                                      ModelMap map) {
+		
+		List<String> messages = new ArrayList<String>();
+				
+		// handle validation
+		if (delimiter == null || delimiter.isEmpty()) {
+			messages.add("addresshierarchy.admin.validation.noDelimiter");
+		}
+		if (file == null || file.isEmpty()) {
+			messages.add("addresshierarchy.admin.validation.noFile");
+		}
+		if (messages.size() > 0) {
+			map.addAttribute("messages", messages);
+			map.addAttribute("delimiter", delimiter);
+			map.addAttribute("overwrite", overwrite);
+			return new ModelAndView("/module/addresshierarchy/admin/listAddressHierarchyLevels", map);
+		}
+		
+		// do the actual update
+		try {
+			// delete old records if overwrite has been selected
+			if (overwrite != null && overwrite == true) {
+				Context.getService(AddressHierarchyService.class).deleteAllAddressHierarchyEntries();
+			}
+			
+			// do the actual import
+	        AddressHierarchyImportUtil.importAddressHierarchyFile(file.getInputStream(), delimiter);
+        }
+        catch (Exception e) {
+	        log.error("Unable to import address hierarchy file", e);
+	        messages.add("addresshierarchy.admin.uploadFailure");
+	        map.addAttribute("messages", messages);
+			map.addAttribute("delimiter", delimiter);
+			map.addAttribute("overwrite", overwrite);
+			return new ModelAndView("/module/addresshierarchy/admin/listAddressHierarchyLevels", map);
+        }
+        
+		return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form", map);
+	}
 }
 

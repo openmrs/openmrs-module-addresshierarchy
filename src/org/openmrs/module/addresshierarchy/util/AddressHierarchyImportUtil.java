@@ -58,10 +58,17 @@ public class AddressHierarchyImportUtil {
 	        		
 		        	// now cycle through all the locations on this line
 		        	for (int i = 0; i < locations.length; i++) {
-		   
+		        		
+		        		// create a new level if we need it
+	        			if (levels.size() == i) {
+	        				levels.add(ahService.addAddressHierarchyLevel());
+	        			}
+		        		
+		        		// fetch the entry associated with this location
+
 		        		// fetch the entry associated with this location
 		        		AddressHierarchyEntry entry = ahService.getChildAddressHierarchyEntryByName(entryStack.isEmpty() ? null : entryStack.peek(), locations[i]);
-		        		
+		        			
 		        		// create this entry if need be
 		        		if (entry == null) {
 		        			
@@ -83,9 +90,6 @@ public class AddressHierarchyImportUtil {
         }
         catch (IOException e) { 
 	        throw new AddressHierarchyModuleException("Error accessing address hierarchy import stream ", e);
-        }
-        catch (IndexOutOfBoundsException e) {
-        	throw new AddressHierarchyModuleException("Error importing address hierarchy entries. Have you defined your address hierarchy levels?",e);
         }
 	}
 	

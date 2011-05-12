@@ -29,16 +29,14 @@
 
 
 <form id="editAddressHierarchyLevel" action="updateAddressHierarchyLevel.form" method="post">
-<input type="hidden" name="typeId" value="${type.id}" />
+<input type="hidden" name="levelId" value="${level.id}"/>
 
 <table cellspacing="0" cellpadding="0" class="box">
 
 <tr>
-	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.parent" />:</nobr></td>
+	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.name" />:</nobr></td>
 	<td>
-		<c:if test="${level.parent != null}">
-			<spring:message code="${nameMappings[level.parent.addressField.name]}"/>
-		</c:if>
+		<input type="text" name="name" value="${level.name}"/>
 	</td>
 	<td width="60%">&nbsp;</td>
 </tr>
@@ -55,6 +53,7 @@
 					</option>
 				</c:if>
 			</c:forEach>
+			<option value="">(<spring:message code="addresshierarchy.admin.none"/>)</option>
 		</select>
 	</td>
 	<td>&nbsp;</td>

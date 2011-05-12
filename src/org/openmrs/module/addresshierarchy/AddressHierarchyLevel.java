@@ -17,7 +17,7 @@ public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 	 * To string
 	 */
 	public String toString() {
-		return getAddressField().getName() + " " + getLevelId();
+		return getName();
 	}
 	
 	public boolean equals(Object obj) {

@@ -1,6 +1,7 @@
 package org.openmrs.module.addresshierarchy;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,15 +15,12 @@ import org.openmrs.test.Verifies;
 
 public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTest {
 	
-	protected static final String XML_DATASET_PACKAGE_PATH = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-dataset.xml";
-	
 	protected static final String CSV_FILE_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleFile.csv";
 	
 	@Before
 	public void setupDatabase() throws Exception {
 		initializeInMemoryDatabase();
 		authenticate();
-		executeDataSet(XML_DATASET_PACKAGE_PATH);
 	}
 	
 	@Test
@@ -35,22 +33,18 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		AddressHierarchyImportUtil.importAddressHierarchyFile(file, "\\|");
 		
 		// verify that a few data points exist	
-		Assert.assertEquals(ahService.searchAddressHierarchy("BOTHA-BOTHE").getName(),"BOTHA-BOTHE");
-		Assert.assertEquals(ahService.searchAddressHierarchy("BOTHA-BOTHE").getLevel().getName(),"District");
-
-		Assert.assertEquals(ahService.searchAddressHierarchy("MASERU|LITHABANENG").getName(),"LITHABANENG");
-		Assert.assertEquals(ahService.searchAddressHierarchy("MASERU|LITHABANENG").getLevel().getName(),"Constituency");
-
-		Assert.assertEquals(ahService.searchAddressHierarchy("MASERU|LITHABANENG|Maseru Municipality").getName(),"Maseru Municipality");
-		Assert.assertEquals(ahService.searchAddressHierarchy("MASERU|LITHABANENG|Maseru Municipality").getLevel().getName(),"Community Council");
-		
-		Assert.assertEquals(ahService.searchAddressHierarchy("BOTHA-BOTHE|HOLOLO|Likila Council|Thaba-Kholo").getName(),"Thaba-Kholo");
-		Assert.assertEquals(ahService.searchAddressHierarchy("BOTHA-BOTHE|HOLOLO|Likila Council|Thaba-Kholo").getLevel().getName(),"Village");
+		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
+		Assert.assertEquals("BOTHA-BOTHE", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "BOTHA-BOTHE").get(0).getName());
+		Assert.assertEquals("LITHABANENG", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(1), "LITHABANENG").get(0).getName());
+		Assert.assertEquals("Maseru Municipality", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(2), "Maseru Municipality").get(0).getName());
+		Assert.assertEquals("Thaba-Kholo", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(3), "Thaba-Kholo").get(0).getName());
 		
 		// make sure that both samples with the same name have been created
-		AddressHierarchyEntry entry = ahService.searchAddressHierarchy("BOTHA-BOTHE|SAMPLE DUP");
-		Assert.assertEquals("First Sample", ahService.getChildAddressHierarchyEntries(entry).get(0).getName());
-		entry = ahService.searchAddressHierarchy("MASERU|SAMPLE DUP");
-		Assert.assertEquals("Second Sample", ahService.getChildAddressHierarchyEntries(entry).get(0).getName());
+		List<AddressHierarchyEntry> duplicateSample = ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(3), "Sample Dup");
+		Assert.assertEquals(2, duplicateSample.size());
+		Assert.assertTrue(duplicateSample.get(0).getParent().getName().equals("First Sample") || duplicateSample.get(0).getParent().getName().equals("Second Sample"));
+		Assert.assertTrue(duplicateSample.get(1).getParent().getName().equals("First Sample") || duplicateSample.get(1).getParent().getName().equals("Second Sample"));
+		Assert.assertTrue(!duplicateSample.get(0).getParent().getName().equals(duplicateSample.get(1).getParent().getName()));
+		
 	}
 }

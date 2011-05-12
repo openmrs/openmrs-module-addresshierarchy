@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PersonAddress;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
  * The Class AddressHierarchyServiceImpl default implementation of AddressHierarchyService.
  */
 public class AddressHierarchyServiceImpl implements AddressHierarchyService {
+	
+	// TODO: might want to move some calculations into the DAO to improve performance
 	
 	protected static final Log log = LogFactory.getLog(AddressHierarchyServiceImpl.class);
 	
@@ -194,9 +197,21 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return results;
 	}
 	
+	private AddressHierarchyEntry getChildAddressHierarchyEntryByLevelAndName(Object object, String topLevelValue) {
+	    // TODO Auto-generated method stub
+	    return null;
+    }
+
 	@Transactional(readOnly = true)
-	public int getAddressHierarchyEntryCount() {
+	public Integer getAddressHierarchyEntryCount() {
 		return dao.getAddressHierarchyEntryCount();
+	}
+	
+	@Transactional(readOnly = true)
+	public Integer getAddressHierarchyEntryCountByLevel(AddressHierarchyLevel level) {
+		// TODO: do this in the DAO to improve performance?
+		List<AddressHierarchyEntry> entries = getAddressHierarchyEntriesByLevel(level);
+		return entries != null ? entries.size() : 0;
 	}
 	
 	@Transactional(readOnly = true)
@@ -221,6 +236,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel level, String name) {
+		
+		// TODO: move this into the DAO if performance is bad?
 		List<AddressHierarchyEntry> entries = getAddressHierarchyEntriesByLevel(level);
 		List<AddressHierarchyEntry> results = new ArrayList<AddressHierarchyEntry>();
 		
@@ -290,6 +307,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	
 	// TODO: can I get rid of this method?
+	/**
 	@Transactional(readOnly = true)
 	public AddressHierarchyEntry searchAddressHierarchy(String searchString) {
 		
@@ -309,6 +327,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		return entry;
 	}
+	*/
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
@@ -327,8 +346,10 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		if (level != null) {
 			// add the top level to this list
-			levels.add(level);
-			
+			if (level.getAddressField() != null || includeUnmapped == true) {
+				levels.add(level);
+			}
+				
 			// now fetch the children in order
 			while (getChildAddressHierarchyLevel(level) != null) {
 				level = getChildAddressHierarchyLevel(level);
@@ -381,6 +402,15 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
     public AddressHierarchyLevel getChildAddressHierarchyLevel(AddressHierarchyLevel level) {
 	    return dao.getAddressHierarchyLevelByParent(level);
     }
+	
+	@Transactional
+	public AddressHierarchyLevel addAddressHierarchyLevel() {
+		AddressHierarchyLevel newLevel = new AddressHierarchyLevel();
+		newLevel.setParent(getBottomAddressHierarchyLevel());
+		// need to call the service method through the context to take care of AOP
+		Context.getService(AddressHierarchyService.class).saveAddressHierarchyLevel(newLevel);
+		return newLevel;
+	}
 	
 	@Transactional
 	public void saveAddressHierarchyLevel(AddressHierarchyLevel level) {

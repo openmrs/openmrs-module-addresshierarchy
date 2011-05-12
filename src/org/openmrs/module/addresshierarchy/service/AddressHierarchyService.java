@@ -24,7 +24,9 @@ public interface AddressHierarchyService{
 	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel level);
 	
 	// TODO: rename to "getAddressHierarchyEntriesCount" ??
-	public int getAddressHierarchyEntryCount();
+	public Integer getAddressHierarchyEntryCount();
+	
+	public Integer getAddressHierarchyEntryCountByLevel(AddressHierarchyLevel level);
 	
 	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyEntryId);
 	
@@ -58,7 +60,7 @@ public interface AddressHierarchyService{
 	 * Searches the hierarchy based on a search string in the format
 	 * "UNITED STATES|MASSACHUSETTS|BOSTON"
 	 */
-	public AddressHierarchyEntry searchAddressHierarchy(String searchString);
+	//public AddressHierarchyEntry searchAddressHierarchy(String searchString);
 	
 	/**
 	 * Gets all AddressHierarchyLevels, ordered from the top of hierarchy to the bottom
@@ -101,6 +103,11 @@ public interface AddressHierarchyService{
 	 * Finds the child AddressHierarchyLevel of the given AddressHierarchyLevel
 	 */
 	public AddressHierarchyLevel getChildAddressHierarchyLevel(AddressHierarchyLevel level);
+	
+	/**
+	 * Adds a new AddressHierarchyLevel to the bottom of the hierarchy
+	 */
+	public AddressHierarchyLevel addAddressHierarchyLevel();
 	
 	/**
 	 * Saves an AddressHierarchyLevel

@@ -48,9 +48,12 @@ public class AddressHierarchyAjaxController {
 		
 		List<AddressHierarchyEntry> childEntries = null;
 	
-		// if the search parameter is empty, we just want all the top level items
+		// if the search parameter is empty, we just want all items at in the top mapped level
 		if (StringUtils.isBlank(searchString)) {
-			childEntries = ahService.getAddressHierarchyEntriesAtTopLevel();
+			List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);
+			if (levels != null && levels.size() > 0) {
+				childEntries = ahService.getAddressHierarchyEntriesByLevel(levels.get(0));
+			}
 		}
 		else {
 			// other, create the appropriate PersonAddress object and then perform the search
