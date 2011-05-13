@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.io.UnicodeInputStream;
@@ -67,15 +68,17 @@ public class AddressHierarchyImportUtil {
 	        				levels.add(ahService.addAddressHierarchyLevel());
 	        			}
 		        		
+	        			String trimmedLocation = StringUtils.trim(locations[i]);
+	        			
 		        		// fetch the entry associated with this location
-		        		AddressHierarchyEntry entry = ahService.getChildAddressHierarchyEntryByName(entryStack.isEmpty() ? null : entryStack.peek(), locations[i]);		
+		        		AddressHierarchyEntry entry = ahService.getChildAddressHierarchyEntryByName(entryStack.isEmpty() ? null : entryStack.peek(), trimmedLocation);		
 		        		
 		        		// create this entry if need be
 		        		if (entry == null) {
 		        			
 		        			// create the new entry and set its name, location and parent
 		        			entry = new AddressHierarchyEntry();
-		        			entry.setName(locations[i]);
+		        			entry.setName(trimmedLocation);
 		        			entry.setLevel(levels.get(i));
 		        			entry.setParent(entryStack.isEmpty() ? null : entryStack.peek());
 		        			

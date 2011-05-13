@@ -1,6 +1,7 @@
 package org.openmrs.module.addresshierarchy.web.controller.ajax;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,27 +39,25 @@ public class AddressHierarchyAjaxController {
 	 */
 	@RequestMapping("/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form")
 	 public void getChildAddressHierarchyEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
-					                             @RequestParam(value = "searchString", required = false) String searchString,
-					                             @RequestParam(value = "includeUnmapped", required = false) Boolean includeUnmapped) throws Exception {
+					                             @RequestParam(value = "searchString", required = false) String searchString) throws Exception {
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
-		if (includeUnmapped == null) {
-			includeUnmapped = false;
-		}
 		
-		List<AddressHierarchyEntry> childEntries = null;
+		List<String> childEntryNames = new ArrayList<String>();
 	
 		// if the search parameter is empty, we just want all items at in the top mapped level
 		if (StringUtils.isBlank(searchString)) {
 			List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);
 			if (levels != null && levels.size() > 0) {
-				childEntries = ahService.getAddressHierarchyEntriesByLevel(levels.get(0));
+				for (AddressHierarchyEntry entry : ahService.getAddressHierarchyEntriesByLevel(levels.get(0))) {
+					childEntryNames.add(entry.getName());
+				}
 			}
 		}
 		else {
 			// other, create the appropriate PersonAddress object and then perform the search
 			PersonAddress address = new PersonAddress();
-			List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(includeUnmapped);
+			List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);  // note that we only want the mapped hierarchy levels
 			
 			int i = 0;
 			// iterate through all the names in the search string to form the PersonAddress object
@@ -75,7 +74,7 @@ public class AddressHierarchyAjaxController {
 			}			
 			
 			// now do the actual search
-			childEntries = ahService.getPossibleAddressHierarchyEntries(address, levels.get(i));
+			childEntryNames = ahService.getPossibleAddressValues(address, levels.get(i).getAddressField().getName());
 		}
 			
     	response.setContentType("application/json");
@@ -85,12 +84,12 @@ public class AddressHierarchyAjaxController {
     	// start the JSON
     	out.print("[");
 
-    	if (childEntries != null) {
-			Collections.sort(childEntries);
+    	if (childEntryNames != null) {
+			Collections.sort(childEntryNames);
     	
 			// add the elements: ie, { "name": "Boston" }
-			for (AddressHierarchyEntry e : childEntries) {
-				out.print("{ \"name\": \"" + e.getName() + "\" },");
+			for (String name : childEntryNames) {
+				out.print("{ \"name\": \"" + name + "\" },");
 			}
     	}
     	

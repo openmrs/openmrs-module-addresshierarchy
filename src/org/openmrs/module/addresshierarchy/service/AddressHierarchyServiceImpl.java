@@ -56,7 +56,10 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		}
 		
 		for (AddressHierarchyEntry entry : entries) {
-			possibleAddressValues.add(entry.getName());
+			// ignore duplicates
+			if (!AddressHierarchyUtil.caseInsensitiveStringContains(possibleAddressValues, entry.getName())) {
+				possibleAddressValues.add(entry.getName());
+			}
 		}
 		
 		return possibleAddressValues;

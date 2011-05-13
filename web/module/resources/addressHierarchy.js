@@ -66,8 +66,7 @@ function updateOptions(fieldToUpdate, searchString, value) {
 	
 	// do the JSON call and add the appropriate elements
 	$j.getJSON(pageContext + '/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form',
-			{ 'searchString': searchString,
-			  'includeUnmapped': false},
+			{ 'searchString': searchString},
 			function (data) {
 				var foundCurrentValue;
 				
