@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
@@ -46,7 +47,19 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
 				List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);
 				mav.getModelMap().addAttribute("hierarchyLevels", levels);
 				
-				// add the global property that specifies whether we should allow freetext entries or not
+				// figure out at what point we need to switch to free text entry by iterating backwards
+				// through the levels until we find a level with entries
+				Integer i;
+				for (i = levels.size()-1; i > 0; i--) {
+					List<AddressHierarchyEntry> entries = Context.getService(AddressHierarchyService.class).getAddressHierarchyEntriesByLevel(levels.get(i));
+					if (entries != null && entries.size() > 0) {
+						break;
+					}
+				}
+				mav.getModelMap().addAttribute("switchToFreetext", i+1);
+				
+				
+				// add the global property that specifies whether we should allow freetext entries for levels which have entries
 				mav.getModelMap().addAttribute("allowFreetext", AddressHierarchyUtil.getGlobalPropertyAsBoolean("addresshierarchy.allowFreetext"));
 				
 				// set the path to the custom page

@@ -39,14 +39,22 @@
 				<td><spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/></td>
 				<spring:bind path="${hierarchyLevel.addressField.name}">
 				<td>
-					<select type="text"  style="display:none" name="${status.expression}" class="${hierarchyLevel.addressField.name}" 
-					<c:if test="${i.count < fn:length(hierarchyLevels)}">
-							onChange="handleAddressFieldChange($j(this), $j(this).closest('.address').find('.${hierarchyLevels[i.count].addressField.name}'));"
-					</c:if> 
-					<c:if test="${i.count == fn:length(hierarchyLevels)}">
-							onChange="handleAddressFieldChange($j(this), '');"
-					</c:if>
-					/>
+					<c:choose>
+						<c:when test="${i.count <= switchToFreetext}">
+							<select style="display:none" name="${status.expression}" class="${hierarchyLevel.addressField.name}" 
+							<c:if test="${i.count < fn:length(hierarchyLevels)}">
+									onChange="handleAddressFieldChange($j(this), $j(this).closest('.address').find('.${hierarchyLevels[i.count].addressField.name}'));"
+							</c:if> 
+							<c:if test="${i.count == fn:length(hierarchyLevels)}">
+									onChange="handleAddressFieldChange($j(this), '');"
+							</c:if>
+							/>
+						</c:when>
+						<c:otherwise>
+							<!-- for lower levels in the hierarchy that there are no defined entries for -->
+							<input type="text" name="${status.expression}" value="${status.value}" size="30"/>
+						</c:otherwise>
+					</c:choose>
 				</td>
 				<td><input type="text" style="display:none" value="${status.value}"/></td>
 				</spring:bind>

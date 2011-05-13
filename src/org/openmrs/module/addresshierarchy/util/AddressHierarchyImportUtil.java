@@ -68,17 +68,17 @@ public class AddressHierarchyImportUtil {
 	        				levels.add(ahService.addAddressHierarchyLevel());
 	        			}
 		        		
-	        			String trimmedLocation = StringUtils.trim(locations[i]);
+	        			String strippedLocation = StringUtils.strip(StringUtils.trim(locations[i]));
 	        			
 		        		// fetch the entry associated with this location
-		        		AddressHierarchyEntry entry = ahService.getChildAddressHierarchyEntryByName(entryStack.isEmpty() ? null : entryStack.peek(), trimmedLocation);		
+		        		AddressHierarchyEntry entry = ahService.getChildAddressHierarchyEntryByName(entryStack.isEmpty() ? null : entryStack.peek(), strippedLocation);		
 		        		
 		        		// create this entry if need be
 		        		if (entry == null) {
 		        			
 		        			// create the new entry and set its name, location and parent
 		        			entry = new AddressHierarchyEntry();
-		        			entry.setName(trimmedLocation);
+		        			entry.setName(strippedLocation);
 		        			entry.setLevel(levels.get(i));
 		        			entry.setParent(entryStack.isEmpty() ? null : entryStack.peek());
 		        			

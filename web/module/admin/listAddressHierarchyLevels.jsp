@@ -107,7 +107,7 @@
 <tr>
 	<td>
 		<button type="submit">
-			<spring:message code="addresshierarchy.admin.save" text="Upload"/>
+			<spring:message code="addresshierarchy.admin.upload" text="Upload"/>
 		</button>
 		<button type="reset">
 			<spring:message code="addresshierarchy.admin.cancel" text="Cancel"/>

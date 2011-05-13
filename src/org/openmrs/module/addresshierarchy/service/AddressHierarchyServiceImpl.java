@@ -2,8 +2,10 @@ package org.openmrs.module.addresshierarchy.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -35,7 +37,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional(readOnly = true)
 	public List<String> getPossibleAddressValues(PersonAddress address, String fieldName) {	
 		
-		List<String> possibleAddressValues = new ArrayList<String>();
+		Map<String,String> possibleAddressValues = new HashMap<String,String>();
 		AddressHierarchyLevel targetLevel = null;
 		
 		for (AddressHierarchyLevel level : getOrderedAddressHierarchyLevels(false)) {
@@ -56,13 +58,14 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		}
 		
 		for (AddressHierarchyEntry entry : entries) {
-			// ignore duplicates
-			if (!AddressHierarchyUtil.caseInsensitiveStringContains(possibleAddressValues, entry.getName())) {
-				possibleAddressValues.add(entry.getName());
+			if(!possibleAddressValues.containsKey(entry.getName().toLowerCase())) {
+				possibleAddressValues.put(entry.getName().toLowerCase(), entry.getName());
 			}
 		}
 		
-		return possibleAddressValues;
+		List<String> results = new ArrayList<String>();
+		results.addAll(possibleAddressValues.values());
+		return results;
 	}
 	
 	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel targetLevel) {

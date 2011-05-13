@@ -1,7 +1,6 @@
 package org.openmrs.module.addresshierarchy.util;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,22 +27,6 @@ public class AddressHierarchyUtil {
 		}
 
 		throw new AddressHierarchyModuleException("Global property " + globalPropertyName + " must be set to either 'true' or 'false'.");
-	}
-
-	/**
-	 * Give a list of strings and a string, returns true/false based on whether or not that
-	 * string is contained (compared case-insensitive) in the list of strings
-	 */
-	public static final Boolean caseInsensitiveStringContains(List<String> list, String value) {
-		for (String item : list) {
-			if (item.equalsIgnoreCase(value)) {
-				return true;
-			}
-			
-			System.out.println("*" + item + "* does not match *" + value + "*");
-			
-		}
-		return false;
 	}
 	
 	/**
