@@ -10,7 +10,6 @@ import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.DAOException;
@@ -76,9 +75,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
     public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(Integer addressHierarchyLevelId) {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
-		
 		criteria.createCriteria("level").add(Restrictions.eq("levelId", addressHierarchyLevelId));
-	
 		return criteria.list();
 	}
 	
@@ -203,6 +200,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	 * Searches for locations like the <code>searchString</code> Can restrict to a certain type by
 	 * specifying a type id
 	 */
+	/**
 	@SuppressWarnings("unchecked")
 	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact) {
 		Session session = sessionFactory.getCurrentSession();
@@ -216,6 +214,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		hierarchyList = criteria.list();
 		return hierarchyList;
 	}
+	*/
 	
 	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude) {
 		ah.setLatitude(latitude);

@@ -43,5 +43,6 @@
 	<classpathentry kind="lib" path="/openmrs-1.6.x/lib/spring-framework/spring-test.jar" sourcepath="/openmrs-source/spring-framework-2.5.1-with-dependencies.zip"/>
 	<classpathentry kind="lib" path="/openmrs-1.6.x/lib/spring-framework/spring-webmvc.jar" sourcepath="/openmrs-source/spring-webmvc-sources.zip"/>
 	<classpathentry kind="lib" path="/openmrs-1.6.x/lib/commons-fileupload/commons-fileupload-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/openmrs-1.6.x/lib/commons-io/commons-io-1.4.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

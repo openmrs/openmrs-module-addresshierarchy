@@ -44,7 +44,8 @@ public interface AddressHierarchyDAO {
 	
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
 	
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact);
+	// TODO: get rid of this or make it case-insensitive?
+	//public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact);
 	
 	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
 	

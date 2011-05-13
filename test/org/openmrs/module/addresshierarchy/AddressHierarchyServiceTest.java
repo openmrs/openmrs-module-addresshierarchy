@@ -216,6 +216,9 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		
 		Assert.assertEquals(scituateMa, ahService.getChildAddressHierarchyEntryByName(plymouthCounty, "Scituate"));
 		
+		// test to make sure the case-insensitive
+		Assert.assertEquals(scituateMa, ahService.getChildAddressHierarchyEntryByName(plymouthCounty, "sCiTuAtE"));
+		
 	}
 	
 	@Test
@@ -287,6 +290,12 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertEquals(1, entries.size());
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(6)));
 		
+		// test case insensitive
+		entries = ahService.getAddressHierarchyEntriesByLevelAndName(ahService
+	        .getAddressHierarchyLevel(5), "pLyMoUtH");
+		Assert.assertEquals(1, entries.size());
+		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(6)));
+		
 		entries = ahService.getAddressHierarchyEntriesByLevelAndName(ahService.getAddressHierarchyLevel(5), "Scituate");
 		Assert.assertEquals(2, entries.size());
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(7)));
@@ -327,6 +336,15 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertEquals(2, results.size());
 		Assert.assertTrue(results.contains("Rhode Island"));
 		Assert.assertTrue(results.contains("Massachusetts"));
+		
+		// test that the search is case insensitive
+		address = new PersonAddress();
+		address.setCountry("uNiTeD sTaTes");
+		results = ahService.getPossibleAddressValues(address, "stateProvince");
+		Assert.assertEquals(2, results.size());
+		Assert.assertTrue(results.contains("Rhode Island"));
+		Assert.assertTrue(results.contains("Massachusetts"));
+		
 		
 		// how about the "null" case?
 		address = new PersonAddress();

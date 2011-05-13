@@ -39,6 +39,9 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		Assert.assertEquals("Maseru Municipality", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(2), "Maseru Municipality").get(0).getName());
 		Assert.assertEquals("Thaba-Kholo", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(3), "Thaba-Kholo").get(0).getName());
 		
+		// make sure that an entry hasn't been created twice just because it of case-sensitive issues
+		Assert.assertEquals(1, ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "BOTHA-BOTHE").size());
+		
 		// make sure that both samples with the same name have been created
 		List<AddressHierarchyEntry> duplicateSample = ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(3), "Sample Dup");
 		Assert.assertEquals(2, duplicateSample.size());

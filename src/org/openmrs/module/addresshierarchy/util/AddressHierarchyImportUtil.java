@@ -11,6 +11,7 @@ import java.util.Stack;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.io.UnicodeInputStream;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
@@ -31,8 +32,6 @@ public class AddressHierarchyImportUtil {
 		// TODO: enforce that top level is unique, but others do not need to be?
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charset.forName("UTF-8")));
-		
 		String line;
 		
 		// get an ordered list of the address hierarchy levels
@@ -47,28 +46,30 @@ public class AddressHierarchyImportUtil {
 		}
 		
 		try {
+			// Note that we are using UnicodeInputStream to work around this Java bug: http://bugs.sun.com/view_bug.do?bug_id=4508058 
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new UnicodeInputStream(stream), Charset.forName("UTF-8")));
+			
 			// step through the file line by line
 	        while ((line = reader.readLine()) != null) {
+	        	
 	        	// now split the line up by the delimiter
 	        	String [] locations = line.split(delimiter);
 	        	
 	        	if (locations != null) {
-	        		
+	        	
 	        		Stack<AddressHierarchyEntry> entryStack = new Stack<AddressHierarchyEntry>();
 	        		
 		        	// now cycle through all the locations on this line
 		        	for (int i = 0; i < locations.length; i++) {
-		        		
+		        	
 		        		// create a new level if we need it
 	        			if (levels.size() == i) {
 	        				levels.add(ahService.addAddressHierarchyLevel());
 	        			}
 		        		
 		        		// fetch the entry associated with this location
-
-		        		// fetch the entry associated with this location
-		        		AddressHierarchyEntry entry = ahService.getChildAddressHierarchyEntryByName(entryStack.isEmpty() ? null : entryStack.peek(), locations[i]);
-		        			
+		        		AddressHierarchyEntry entry = ahService.getChildAddressHierarchyEntryByName(entryStack.isEmpty() ? null : entryStack.peek(), locations[i]);		
+		        		
 		        		// create this entry if need be
 		        		if (entry == null) {
 		        			

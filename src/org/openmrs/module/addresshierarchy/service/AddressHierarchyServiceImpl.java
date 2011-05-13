@@ -182,7 +182,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 				Iterator<AddressHierarchyEntry> j = possibleEntriesAtNextLevel.iterator();
 				while (j.hasNext()) {
 					AddressHierarchyEntry entry = j.next();
-					if (!entry.getName().equals(levelValue)) {
+					if (!entry.getName().equalsIgnoreCase(levelValue)) {
 						j.remove();
 					}
 				}
@@ -197,11 +197,6 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return results;
 	}
 	
-	private AddressHierarchyEntry getChildAddressHierarchyEntryByLevelAndName(Object object, String topLevelValue) {
-	    // TODO Auto-generated method stub
-	    return null;
-    }
-
 	@Transactional(readOnly = true)
 	public Integer getAddressHierarchyEntryCount() {
 		return dao.getAddressHierarchyEntryCount();
@@ -243,7 +238,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		if (entries != null) {
 			for (AddressHierarchyEntry entry : entries) {
-				if (entry.getName().equals(name)) {
+				if (entry.getName().equalsIgnoreCase(name)) {
 					results.add(entry);
 				}
 			}
@@ -287,7 +282,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		if (entries != null) {
 			for (AddressHierarchyEntry e : entries) {
-				if (e.getName().equals(name)) {
+				if (e.getName().equalsIgnoreCase(name)) {
 					return e;
 				}
 			}
