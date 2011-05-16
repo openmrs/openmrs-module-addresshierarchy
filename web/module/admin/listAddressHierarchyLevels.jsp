@@ -56,8 +56,8 @@
 				<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form?levelId=${level.id}">
 				   <spring:message code="addresshierarchy.admin.edit" />
 				</a>
-				<!-- only show delete option for last element -->
-				<c:if test="${i.count == fn:length(levels)}">
+				<!-- only show delete option for last element, and only if it doesn't have any sample entries -->
+				<c:if test="${i.count == fn:length(levels) && sampleEntries[i.count-1][1] == 0}">
 					&nbsp;|&nbsp;
 					<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/deleteAddressHierarchyLevel.form?levelId=${level.id}"
 					   onclick="return confirm('<spring:message code="addresshierarchy.admin.confirmDeleteLevel"/>');">

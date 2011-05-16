@@ -13,7 +13,7 @@ public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 	
 	private AddressField addressField;
 	
-	private Boolean required;
+	private Boolean required = false;
 	
 	/**
 	 * To string
