@@ -23,8 +23,8 @@
 			<spring:bind path="${hierarchyLevel.addressField.name}">
 				<c:if test="${not empty status.value || i.count == 1}">
 					updateOptions($j('select[name=${status.expression}]'), "${searchString}", "${status.value}");  // use double quotes here so as not conflict with ' in location names
-					<c:set var="searchString">${searchString}${fn:length(searchString) > 0 ? '|' : ''}${status.value}</c:set>
 				</c:if>
+				<c:set var="searchString">${searchString}${!empty status.value ? status.value : '*'}|</c:set>
 			</spring:bind>
 		</c:forEach>
  	});

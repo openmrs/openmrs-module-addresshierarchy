@@ -74,7 +74,7 @@ function updateOptions(fieldToUpdate, searchString, value) {
 				fieldToUpdate.append($j(document.createElement('option')).attr('value','').text(''));
 				$j.each(data, function(i, entry) {
 					var option = $j(document.createElement('option')).attr('value', entry.name).text(entry.name);
-					if (entry.name == value) {
+					if (entry.name.toLowerCase() == value.toLowerCase()) {
 						option.attr('selected',true);
 						foundCurrentValue = true;
 					}
