@@ -29,7 +29,7 @@
 			</spring:bind>
 		</c:forEach>
 
-		// register submit handler for validation as requird
+		// register submit handler for validation as required
 		$j('form:has(div[class=address])').submit(function () {
 			passedValidation = true;
 			var errorMessage = "<spring:message code="addresshierarchy.requiredFields"/>:\n";
@@ -37,10 +37,12 @@
 			<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
 				<c:if test="${hierarchyLevel.required == true}">
 					<spring:bind path="${hierarchyLevel.addressField.name}">
-					  if ($j('[name=${status.expression}]').val() == null || $j('[name=${status.expression}]').val() == '') {
-							errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/>\n";
-							passedValidation = false;
-						}
+						<c:if test="${fn:contains(status.expression,'.')}">  // hacky way to ignore the "add another address" fields on the edit patient long form page 
+						  	if ($j('[name=${status.expression}]').val() == null || $j('[name=${status.expression}]').val() == '') {
+								errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/>\n";
+								passedValidation = false;
+							}
+						</c:if>
 					</spring:bind>
 				</c:if>
 			</c:forEach>
@@ -58,6 +60,22 @@
 
 <div class="address">
 	<table>
+	
+		<!-- handle the "preferred" checkbox if we are in extended mode (this is copied from the existing 1.6 addressLayout.jsp) -->
+		<c:if test="${model.layoutShowExtended == 'true'}">
+			<tr>
+				<td><spring:message code="general.preferred"/></td>
+				<td>
+					<spring:bind path="preferred">
+						<input type="hidden" name="_${status.expression}">
+						<input type="checkbox" name="${status.expression}" onclick="if (preferredBoxClick) preferredBoxClick(this)" value="true" alt="personAddress" <c:if test="${status.value == true}">checked</c:if> />
+						<c:if test="${status.errorMessage != ''}"><span class="error">${status.errorMessage}</span></c:if>
+					</spring:bind>
+				</td>
+			</tr>
+		</c:if>
+	
+		<!--  handles the main display of the hierarchy levels -->
 		<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
 			<tr>
 				<td><spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/></td>
@@ -84,6 +102,58 @@
 				</spring:bind>
 			</tr>
 		</c:forEach>
+		
+		
+		<!-- handle the created by and void options if we are in extended mode (this is copied from the existing 1.6 addressLayout.jsp) -->
+		<c:if test="${model.layoutShowExtended == 'true'}">
+				<spring:bind path="creator">
+					<c:if test="${!(status.value == null)}">
+						<tr>
+							<td><spring:message code="general.createdBy" /></td>
+							<td colspan="4">
+								${status.value.personName} -
+								<openmrs:formatDate path="dateCreated" type="long" />
+							</td>
+						</tr>
+					</c:if>
+				</spring:bind>
+                         <c:if test="${model.layoutHideVoidOption != 'true'}">
+					<tr>
+						<td><spring:message code="general.voided"/></td>
+						<td>
+							<spring:bind path="voided">
+								<input type="hidden" name="_${status.expression}"/>
+								<input type="checkbox" name="${status.expression}" 
+									   <c:if test="${status.value == true}">checked="checked"</c:if> 
+							</spring:bind>
+									   onClick="toggleLayer('<spring:bind path="personAddressId">voidReasonRow-${status.value}</spring:bind>'); if (voidedBoxClicked) voidedBoxClicked(this); "
+								/>
+						</td>
+					</tr>
+					<tr id="<spring:bind path="personAddressId">voidReasonRow-${status.value}</spring:bind>"
+						style="<spring:bind path="voided"><c:if test="${status.value == false}">display: none;</c:if></spring:bind>">
+						<td><spring:message code="general.voidReason"/></td>
+						<spring:bind path="voidReason">
+							<td colspan="4">
+								<input type="text" name="${status.expression}" value="${status.value}" size="43" />
+								<c:if test="${status.errorMessage != ''}"><span class="error">${status.errorMessage}</span></c:if>
+							</td>
+						</spring:bind>
+					</tr>
+					<spring:bind path="voidedBy">
+						<c:if test="${!(status.value == null)}">
+							<tr>
+								<td><spring:message code="general.voidedBy" /></td>
+								<td colspan="4">
+									${status.value.personName} -
+									<openmrs:formatDate path="dateVoided" type="long" />
+								</td>
+							</tr>
+						</c:if>
+					</spring:bind>
+              </c:if>
+		</c:if>
+		
 	</table>
 </div>
 
