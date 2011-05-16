@@ -278,7 +278,7 @@
 		</sql>
 	</diff>
 	
-		<diff>
+	<diff>
 		<version>2.4</version>
 		<author>Mark Goodrich</author>
 		<date>May 12 2011</date>
@@ -287,6 +287,18 @@
 		</description>
 		<sql>
 			ALTER TABLE address_hierarchy_level CHANGE COLUMN `address_field` `address_field` varchar(50);
+		</sql>
+	</diff>
+	
+	<diff>
+		<version>2.5</version>
+		<author>Mark Goodrich</author>
+		<date>May 16 2011</date>
+		<description>
+			Allow add required field to address_field_level
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_level ADD COLUMN `required` tinyint(1) NOT NULL default '0';
 		</sql>
 	</diff>
 	

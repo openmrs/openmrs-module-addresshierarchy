@@ -3,7 +3,6 @@ var $j = jQuery;
 
 // the default handler that is called when a change event occurs on any of the address field selection lists
 function handleAddressFieldChange(changedField, fieldToUpdate) {
-	
 	// if it's been a switch to "other", hand off to the handleSelectOther function
 	if(changedField.val() == '--other--') {
 		handleSelectOther(changedField, true);
@@ -51,11 +50,6 @@ function handleAddressFieldChange(changedField, fieldToUpdate) {
 		}
 	});
 
-	// slice off the trailing "|"
-	if (searchString != null) {
-		searchString = searchString.slice(0,-1);
-	}
-	
 	if (searchString != '') {
 		// update the options of the field to update
 		updateOptions(fieldToUpdate, searchString, '');
@@ -63,7 +57,6 @@ function handleAddressFieldChange(changedField, fieldToUpdate) {
 }
 
 function updateOptions(fieldToUpdate, searchString, value) {	
-	
 	// do the JSON call and add the appropriate elements
 	$j.getJSON(pageContext + '/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form',
 			{ 'searchString': searchString},
@@ -103,7 +96,6 @@ function updateOptions(fieldToUpdate, searchString, value) {
 // called from handleAddressFieldChange to handle the case when a user selects "Other" from the list of options
 // also used to switch fields into the "Other" state upon initialization as required
 function handleSelectOther(field, emptyTextInput) {
-
 	var fieldLevelIndex = findIndexOfLevel(field.attr('class'));
 	var address = field.closest('.address');
 
@@ -170,3 +162,5 @@ function findIndexOfLevel(level) {
 	       }
 	}
 }
+
+

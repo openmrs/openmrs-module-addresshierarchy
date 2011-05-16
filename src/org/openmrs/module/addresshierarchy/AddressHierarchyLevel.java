@@ -13,6 +13,8 @@ public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 	
 	private AddressField addressField;
 	
+	private Boolean required;
+	
 	/**
 	 * To string
 	 */
@@ -64,6 +66,14 @@ public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 
     public void setId(Integer id) {
 	   this.levelId = id;
+    }
+
+	public void setRequired(Boolean required) {
+	    this.required = required;
+    }
+
+	public Boolean getRequired() {
+	    return required;
     }
 
 }

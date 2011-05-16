@@ -25,8 +25,9 @@
 		<th><spring:message code="addresshierarchy.admin.name" /></th>
 		<th><spring:message code="addresshierarchy.admin.exampleEntry" /></th>
 		<th><spring:message code="addresshierarchy.admin.mappedAddressField" /></th>
+		<th><spring:message code="addresshierarchy.admin.required" /></th>
 		<th>&nbsp;</th>
-		<th width="30%">&nbsp;</th>
+		<th width="20%">&nbsp;</th>
 	</tr>
 	<c:forEach items="${levels}" var="level" varStatus="i">
 		<tr>
@@ -42,6 +43,14 @@
 						(<spring:message code="addresshierarchy.admin.none"/>)
 					</c:otherwise>
 				</c:choose>
+			</td>
+			<td>
+				<c:if test="${level.required == true}">
+					<spring:message code="general.yes"/>
+				</c:if>
+				<c:if test="${level.required == false}">
+					<spring:message code="general.no"/>
+				</c:if>
 			</td>
 			<td>
 				<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form?levelId=${level.id}">

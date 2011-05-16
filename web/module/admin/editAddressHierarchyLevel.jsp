@@ -3,6 +3,8 @@
 <openmrs:require privilege="Manage Address Hierarchy" otherwise="/login.htm"
 	redirect="/module/addresshierarchy/admin/editAddressHierarchyLevel.form" />
 
+<openmrs:htmlInclude file="/scripts/jquery/jquery-1.3.2.min.js"/>
+
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="localHeader.jsp"%>
 
@@ -10,6 +12,28 @@
 <style type="text/css">
 	td {padding-left:4px; padding-right:4px; padding-top:2px; padding-bottom:2px; vertical-align:top}
 </style>
+
+<!-- JQUERY FOR THIS PAGE -->
+<script type="text/javascript"><!--
+
+	var $j = jQuery;
+
+	$j(document).ready(function(){
+
+		// toggle the required checkbox
+		$j('#requiredCheckbox').click(function () {
+			if ($j(this).is(':checked')){
+				$j('#required').attr('value', "true");
+			}
+			else {
+				$j('#required').attr('value', "false");
+			} 
+		});		
+	});
+-->
+</script>
+<!-- END JQUERY -->
+
 
 <h2><spring:message code="addresshierarchy.admin.title" /></h2>
 
@@ -57,6 +81,14 @@
 		</select>
 	</td>
 	<td>&nbsp;</td>
+</tr>
+
+<tr>
+	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.required" />:</nobr></td>
+	<td>
+		<input type="hidden" id="required" name="required" value="${level.required}"/>
+		<input type="checkbox" id="requiredCheckbox" name="requiredCheckbox" value="true" <c:if test="${level.required == true}">checked</c:if> />
+	</td>
 </tr>
 
 <tr>

@@ -22,6 +22,9 @@
 		    	<param name="enumClassName">org.openmrs.module.addresshierarchy.AddressField</param>
 		    </type>
 		</property>
+		
+		<property name="required" type="java.lang.Boolean" length="1"
+			not-null="true" />
 
 		<!--  standard OpenmrsMetaData -->
 		<property name="uuid" type="string" length="38" not-null="true" />

@@ -13,6 +13,7 @@
 	var other = "<spring:message code="addresshierarchy.other"/>";
 	var allowFreetext = ${allowFreetext};
 	
+	
 	$j(document).ready(function(){
 
 		// initialize all the address field (if necessary) by updating the options in the relevant select list
@@ -27,6 +28,29 @@
 				<c:set var="searchString">${searchString}${!empty status.value ? status.value : '*'}|</c:set>
 			</spring:bind>
 		</c:forEach>
+
+		// register submit handler for validation as requird
+		$j('form:has(div[class=address])').submit(function () {
+			passedValidation = true;
+			var errorMessage = "<spring:message code="addresshierarchy.requiredFields"/>:\n";
+			
+			<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
+				<c:if test="${hierarchyLevel.required == true}">
+					<spring:bind path="${hierarchyLevel.addressField.name}">
+					  if ($j('[name=${status.expression}]').val() == null || $j('[name=${status.expression}]').val() == '') {
+							errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/>\n";
+							passedValidation = false;
+						}
+					</spring:bind>
+				</c:if>
+			</c:forEach>
+
+			if (!passedValidation) {
+				alert(errorMessage);
+			}
+			
+			return passedValidation;
+		});
  	});
 </script>
 <!-- END JQUERY -->
