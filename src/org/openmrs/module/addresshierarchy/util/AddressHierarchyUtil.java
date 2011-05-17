@@ -14,6 +14,12 @@ public class AddressHierarchyUtil {
 
 	protected static final Log log = LogFactory.getLog(AddressHierarchyUtil.class);
 	
+	/**
+	 * Fetches a global property and converts it to a Boolean value
+	 * 
+	 * @param globalPropertyName
+	 * @return Boolean value of global property
+	 */
 	public static final Boolean getGlobalPropertyAsBoolean(String globalPropertyName) {
 		
 		String globalPropertyValue = Context.getAdministrationService().getGlobalProperty(globalPropertyName, "true");

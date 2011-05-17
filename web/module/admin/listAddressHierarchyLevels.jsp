@@ -16,6 +16,14 @@
 <br/>
 <br/>
 
+<!--  DISPLAY ANY ERROR MESSAGES -->
+<c:if test="${fn:length(messages) > 0}">
+	<c:forEach var="message" items="${messages}">
+		<span class="error"><spring:message code="${message}"/></span><br/><br/>
+	</c:forEach>
+	<br/>
+</c:if>
+
 <!--  display the address hierarchy types -->
 <div>
 <b class="boxHeader"><spring:message code="addresshierarchy.admin.levels" /></b>
@@ -80,14 +88,6 @@
 
 <br/>
 <br/>
-
-<!--  DISPLAY ANY ERROR MESSAGES -->
-<c:if test="${fn:length(messages) > 0}">
-	<c:forEach var="message" items="${messages}">
-		<span class="error"><spring:message code="${message}"/></span><br/><br/>
-	</c:forEach>
-	<br/>
-</c:if>
 
 <div><b class="boxHeader"><spring:message code="addresshierarchy.admin.uploadAddressHierarchy" /></b>
 

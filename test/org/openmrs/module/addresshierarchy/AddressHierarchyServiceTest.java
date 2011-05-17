@@ -253,24 +253,6 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
-	@Verifies(value = "should find all address hierarchy entries by level id", method = "getAddressHierarchyEntriesByLevel(Integer)")
-	public void getAddressHierarchyEntriesByLevel_shouldFindAllAddressHierarchyEntriesByLevelId() throws Exception {
-		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
-		
-		List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesByLevel(ahService
-		        .getAddressHierarchyLevel(5).getId());
-		
-		Assert.assertEquals(7, entries.size());
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(6)));
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(7)));
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(8)));
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(9)));
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(10)));
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(11)));
-		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(15)));
-	}
-	
-	@Test
 	@Verifies(value = "should find address hierarchy entry by id", method = "getAddressHierarchyEntry(int)")
 	public void getAddressHierarchyEntry_shouldFindAddressHierarchyEntryById() throws Exception {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);

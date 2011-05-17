@@ -24,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
-	// TODO: might want to move some calculations into the DAO to improve performance
-	
 	protected static final Log log = LogFactory.getLog(AddressHierarchyServiceImpl.class);
 	
 	private AddressHierarchyDAO dao;
@@ -40,9 +38,11 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		Map<String,String> possibleAddressValues = new HashMap<String,String>();
 		AddressHierarchyLevel targetLevel = null;
 		
+		// iterate through the ordered levels until we reach the level associated with the specified fieldName
 		for (AddressHierarchyLevel level : getOrderedAddressHierarchyLevels(false)) {
 			if (level.getAddressField() != null && level.getAddressField().getName().equals(fieldName)) {
 				targetLevel = level;
+				break;
 			}
 		}
 		
@@ -51,14 +51,20 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			return null;
 		}
 		
+		// calls getPossibleAddressHierarchyEntries(PersonAddress, AddressHierarchLevel) to perform the actual search
 		List<AddressHierarchyEntry> entries = getPossibleAddressHierarchyEntries(address, targetLevel);
 		
 		if (entries == null) {
 			return null;
 		}
 		
+		// take the entries returns and convert them into a list of *unique* names (using case-insensitive comparison)
+		// we use a map here to make this process more efficient
 		for (AddressHierarchyEntry entry : entries) {
+			// see if there is already key for this entry name (converted to lower-case)
 			if(!possibleAddressValues.containsKey(entry.getName().toLowerCase())) {
+				// if not, add the key/value pair for this entry name, where the value equals the entry name,
+				// and the key is the entry name converted to lower-case
 				possibleAddressValues.put(entry.getName().toLowerCase(), entry.getName());
 			}
 		}
@@ -70,9 +76,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel targetLevel) {
 		
-		// TODO: what about cases where there is already a value for fieldname?  Right now we just ignore it
-		
-		// first off, split the levels into levels before and after the level associated with the field name
+		// split the levels into levels before and after the level associated with the field name
 		Boolean reachedFieldLevel = false;
 		List<AddressHierarchyLevel> higherLevels = new ArrayList<AddressHierarchyLevel>();
 		List<AddressHierarchyLevel> lowerLevels = new ArrayList<AddressHierarchyLevel>();
@@ -143,7 +147,6 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		// we are looking for in the hierarchy
 		
 		// we need to loop through the results in reverse and find any fields that have values
-		
 		Collections.reverse(lowerLevels);
 		Iterator<AddressHierarchyLevel> i = lowerLevels.iterator();
 		
@@ -210,9 +213,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Transactional(readOnly = true)
 	public Integer getAddressHierarchyEntryCountByLevel(AddressHierarchyLevel level) {
-		// TODO: do this in the DAO to improve performance?
-		List<AddressHierarchyEntry> entries = getAddressHierarchyEntriesByLevel(level);
-		return entries != null ? entries.size() : 0;
+		return dao.getAddressHierarchyEntryCountByLevel(level);
 	}
 	
 	@Transactional(readOnly = true)
@@ -227,30 +228,12 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level) {
-		return getAddressHierarchyEntriesByLevel(level.getId());
-	}
-	
-	@Transactional(readOnly = true)
-	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(Integer levelId) {
-		return dao.getAddressHierarchyEntriesByLevel(levelId);
+		return dao.getAddressHierarchyEntriesByLevel(level);
 	}
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel level, String name) {
-		
-		// TODO: move this into the DAO if performance is bad?
-		List<AddressHierarchyEntry> entries = getAddressHierarchyEntriesByLevel(level);
-		List<AddressHierarchyEntry> results = new ArrayList<AddressHierarchyEntry>();
-		
-		if (entries != null) {
-			for (AddressHierarchyEntry entry : entries) {
-				if (entry.getName().equalsIgnoreCase(name)) {
-					results.add(entry);
-				}
-			}
-		}
-		
-		return results;
+		return dao.getAddressHierarchyEntriesByLevelAndName(level, name);
 	}
 	
 	@Transactional(readOnly = true)
@@ -260,7 +243,12 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry) {
-		return dao.getChildAddressHierarchyEntries(entry);
+		if (entry != null) {
+			return dao.getChildAddressHierarchyEntries(entry);
+		}
+		else {
+			return getAddressHierarchyEntriesAtTopLevel();
+		}
 	}
 	
 	@Transactional(readOnly = true)
@@ -275,25 +263,22 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
-	public AddressHierarchyEntry getChildAddressHierarchyEntryByName(AddressHierarchyEntry entry, String name) {
-		List<AddressHierarchyEntry> entries;
-		
+	public AddressHierarchyEntry getChildAddressHierarchyEntryByName(AddressHierarchyEntry entry, String childName) {
 		if (entry != null) {
-			entries = getChildAddressHierarchyEntries(entry);
+			return dao.getChildAddressHierarchyEntryByName(entry, childName);
 		}
 		else {
-			// by definition, if no address hierarchy entry specified, operate on the top level
-			entries = getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel());
-		}
-		
-		if (entries != null) {
-			for (AddressHierarchyEntry e : entries) {
-				if (e.getName().equalsIgnoreCase(name)) {
-					return e;
-				}
+			List<AddressHierarchyEntry> entries = dao.getAddressHierarchyEntriesByLevelAndName(getTopAddressHierarchyLevel(), childName);
+			if (entries.size() == 0) {
+				return null;
+			}
+			else if (entries.size() == 1) {
+				return entries.get(0);
+			}
+			else {
+				throw new AddressHierarchyModuleException("Two or more top-level entries have the same name");
 			}
 		}
-		return null;
 	} 
 	
 	@Transactional
@@ -306,40 +291,13 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		dao.deleteAllAddressHierarchyEntries();
 	}
 	
-	
-	// TODO: can I get rid of this method?
-	/**
-	@Transactional(readOnly = true)
-	public AddressHierarchyEntry searchAddressHierarchy(String searchString) {
-		
-		// TODO: do i need move some of this to the DAO to speed up performance
-		
-		AddressHierarchyEntry entry = null;
-		
-		// iterate through all the names in the search string
-		for (String name : searchString.split("\\|")) {
-			
-			entry = getChildAddressHierarchyEntryByName(entry, name);
-				
-			if (entry == null) {
-				return null;
-			}
-		}
-		
-		return entry;
-	}
-	*/
-	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
 		return getOrderedAddressHierarchyLevels(true);
 	}
 	
 	@Transactional(readOnly = true)
-	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels(Boolean includeUnmapped) {
-		
-		// TODO: integrate this with the new method we may create to make sure that the hierarchy is well-formed?
-		
+	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels(Boolean includeUnmapped) {	
 		List<AddressHierarchyLevel> levels = new ArrayList<AddressHierarchyLevel>();
 		
 		// first, get the top level level
@@ -423,30 +381,29 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
     	dao.deleteAddressHierarchyLevel(level);  
     }
 	
+	/**
+	 * The following methods are deprecated and just exist to provide backwards compatibility to
+	 * Rwanda Address Hierarchy module
+	 */
+	
+	@Deprecated
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah) {
 		return dao.getLeafNodes(ah);
 	}
 	
+	@Deprecated
 	@Transactional
 	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude) {
 		dao.associateCoordinates(ah, latitude, longitude);
 	}
 	
-	@Transactional
-	public void truncateHierarchyTables() {
-		dao.truncateHierarchyTables();
-	}
-	
+	@Deprecated
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getTopOfHierarchyList() {
-		return dao.getTopOfHierarchyList();
+		return getAddressHierarchyEntriesAtTopLevel();
 	}
 
-	/**
-	 * The following methods are deprecated and just exist to provide backwards compatibility to
-	 * Rwanda Address Hierarchy module
-	 */
 	
 	@Deprecated
 	@Transactional(readOnly = true)
@@ -502,12 +459,6 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Deprecated
-	@Transactional
-	public AddressHierarchyEntry addLocation(int parentId, String name, int levelId) {
-		return addAddressHierarchyEntry(parentId, name, levelId);
-	}
-	
-	@Deprecated
 	@Transactional(readOnly = true)
 	public AddressHierarchyEntry getAddressHierarchy(int addressHierarchyId) {
 		return getAddressHierarchyEntry(addressHierarchyId);
@@ -519,54 +470,4 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return getAddressHierarchyLevel(levelId);
 	}
 	
-	@Deprecated
-	@Transactional(readOnly = true)
-	public AddressHierarchyEntry editLocationName(Integer parentLocationId, String newName) {
-		return editAddressHierarchyEntryName(parentLocationId, newName);
-	}
-	
-	@Deprecated
-	@Transactional
-	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int levelId) {
-		
-		AddressHierarchyEntry parent = getAddressHierarchyEntry(parentId);
-		
-		if (parent == null) {
-			throw new AddressHierarchyModuleException("Invalid entry id for parent entry");
-		}
-		
-		AddressHierarchyLevel level = getAddressHierarchyLevel(levelId);
-		
-		if (level == null) {
-			// if no level has been specified, use the level of the parent
-			level = parent.getLevel();
-		}
-		
-		AddressHierarchyEntry entry = new AddressHierarchyEntry();
-		entry.setName(name);
-		entry.setParent(parent);
-		entry.setLevel(level);
-		
-		dao.saveAddressHierarchyEntry(entry);
-		
-		return entry;
-	}
-	
-	@Deprecated
-	@Transactional
-	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer locationId, String newName) {
-		
-		AddressHierarchyEntry entry = getAddressHierarchyEntry(locationId);
-		
-		if (entry == null) {
-			throw new AddressHierarchyModuleException("Invalid address entry id");
-		}
-		
-		entry.setName(newName);
-		
-		saveAddressHierarchyEntry(entry);
-		
-		return entry;
-	}
-
 }

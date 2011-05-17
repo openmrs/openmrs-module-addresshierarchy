@@ -13,130 +13,230 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
  */
 public interface AddressHierarchyService{
 	
-	// TODO: remove or deprecate unused methods
-	
-
 	/**
-	 * TODO: note the difference between null and no matches??
+	 * Given a person address, returns the names of all entries that are hierarchically valid for the
+	 * specified addressField.  (Excluding duplicate names and ignoring any current value of the specified addressField)
+	 * 
+	 *  This method can handle restrictions based on address field values not only above but also *below* the specified level.
+	 * (For instance, if the city is set to "Boston", and we ask for possible values for the "state" level,
+	 *  only Massachusetts should be returned) 
+	 * 
+	 * @param address
+	 * @param fieldName
+	 * @return a list of the names of the possible valid address hierarchy entries
 	 */
 	public List<String> getPossibleAddressValues(PersonAddress address, String fieldName);
 	
+	/**
+	 * Given a person address, returns all the address hierarchy entries that are hierarchically valid for the
+	 * specified level.  (Ignoring any current value of the addressField associated with the specified level).
+	 * 
+	 * This method can handle restrictions based on address field values not only above but also *below* the specified level.
+	 * (For instance, if the city is set to "Boston", and we ask for possible values for the "state" level,
+	 *  only Massachusetts should be returned) 
+	 * 
+	 * @param address
+	 * @param level
+	 * @return a list of possible valid address hierarchy entries
+	 */
 	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel level);
 	
-	// TODO: rename to "getAddressHierarchyEntriesCount" ??
+	/**
+	 * Returns a count of the total number of address hierarchy entries
+	 * 
+	 * @return the number of address hierarchy entries
+	 */
 	public Integer getAddressHierarchyEntryCount();
 	
+	/**
+	 * Returns a count of the total number of address hierarchy entries associated with the given level
+	 * 
+	 * @param level
+	 * @return the number of address hierarchy entries associated with the given level
+	 */
 	public Integer getAddressHierarchyEntryCountByLevel(AddressHierarchyLevel level);
 	
+	/**
+	 * Returns the address hierarchy entry with the given id
+	 * 
+	 * @param addressHierarchyEntryId
+	 * @return the address hierarchy entry with the given id
+	 */
 	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyEntryId);
 	
+	/**
+	 * Returns the address hierarchy entry with the given user generated id
+	 * 
+	 * @param userGeneratedId
+	 * @return the address hierarchy entry with the given user generated id
+	 */
 	public AddressHierarchyEntry getAddressHierarchyEntryByUserGenId(String userGeneratedId);
 	
+	/**
+	 * Returns all address hierarchy entries at with the given level 
+	 * 
+	 * @param level
+	 * @return a list of all address hierarchy entries at the given level
+	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level);
 	
-	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(Integer levelId);
-	
+	/**
+	 * Returns all address hierarchy entries at the given level that have the specified name 
+	 * (name match is case-insensitive)
+	 *
+	 * @param level
+	 * @param name
+	 * @return a list of all address hierarchy entries at the given level that have the specified name
+	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel level, String name);
 	
+	/**
+	 * Returns all address hierarchy entries at the top level in the hierarchy
+	 * 
+	 * @return a list of all the address hierarchy entries at the top level of the hierarchy
+	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesAtTopLevel();
 	
+	/**
+	 * Returns all address hierarchy entries that are children of the specified entry
+	 * (If no entry specified, returns all the entries at the top level)
+	 * 
+	 * @param entry
+	 * @return a list of all the address hierarchy entries that are children of the specified entry
+	 */
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry);
 	
+	/**
+	 * Returns all address hierarchy entries that are child of the entry with the given id
+	 * 
+	 * @param entryId
+	 * @return a list of all 
+	 */
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(Integer entryId);
 	
-	// TODO: add note about working at top level of the tree
-	public AddressHierarchyEntry getChildAddressHierarchyEntryByName(AddressHierarchyEntry entry, String name);
+	/**
+	 * Returns the address hierarchy entry that is the child entry of the
+	 * specified entry and have the specified name (case-insensitive)
+	 * (If no entry specified, tests against all entries at the top level)
+	 * (Throws an exception if there is only one match, because there should
+	 * be no two entries with the same parent and name)
+	 * 
+	 * @param entry
+	 * @param name
+	 * @return the entry with the specified parent and name
+	 */
+	public AddressHierarchyEntry getChildAddressHierarchyEntryByName(AddressHierarchyEntry entry, String childName);
 	
+	/**
+	 * Saves the specified address hierarchy entry
+	 * 
+	 * @param entry
+	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry);
 	
 	/**
-	 * Removes all AddressHierarchyEntries--use with care!
+	 * Removes all address hierarchy entries--use with care
 	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void deleteAllAddressHierarchyEntries();
 	
 	/**
-	 * Searches the hierarchy based on a search string in the format
-	 * "UNITED STATES|MASSACHUSETTS|BOSTON"
-	 */
-	//public AddressHierarchyEntry searchAddressHierarchy(String searchString);
-	
-	/**
-	 * Gets all AddressHierarchyLevels, ordered from the top of hierarchy to the bottom
+	 * Gets all address hierarchy levels, ordered from the top of hierarchy to the bottom
+	 * 
+	 * @return the ordered list of address hierarchy levels
 	 */
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels();
 	
 	/**
-	 * Gets the AddressHiearchyLevels, ordered from the top the hierarchy to the bottom
-	 * "includeUnmapped" parameter specifies whether or not to include hierarchy levels that
-	 * aren't mapped to an underlying address field
+	 * Gets the address hierarchy levels, ordered from the top the hierarchy to the bottom
+	 * 
+	 * @param includeUnmapped specifies whether or not to include hierarchy levels that aren't mapped to an underlying address field
+	 * @return the ordered list of address hierarchy levels
 	 */
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels(Boolean includeUnmapped);
 	
 	/**
-	 * Gets all AddressHierarchyLevels
+	 * Gets all address hierarchy levels
+	 * 
+	 * @return a list of all address hierarchy levels
 	 */
 	public List<AddressHierarchyLevel> getAddressHierarchyLevels();
 	
 	/**
-	 * Gets a count of the number of AddressHierarchyLevels
+	 * Gets a count of the number of address hierarchy levels
+	 * 
+	 * @return the number of address hierarchy levels
 	 */
 	public int getAddressHierarchyLevelsCount();
 	
 	/**
-	 * Gets the AddressHierarchyLevel that represents the top level of the hierarchy
+	 * Gets the address hierarchy level that represents the top level of the hierarchy
+	 * 
+	 * @return the address hierarchy level at the top level of the hierarchy
 	 */
 	public AddressHierarchyLevel getTopAddressHierarchyLevel();
 	
 	/**
-	 * Gets the AddressHierarchyLevel that represents the lowest level of the hierarchy
+	 * Gets the address hierarchy level that represents the lowest level of the hierarchy
+	 * 
+	 * @return the address hierarchy level at the lowest level of the hierarchy
 	 */
 	public AddressHierarchyLevel getBottomAddressHierarchyLevel();
 	
 	/**
 	 * Gets an AddressHierarchyLevel by id
+	 * 
+	 * @param levelId
+	 * @return the address hierarchy level with the given id
 	 */
 	public AddressHierarchyLevel getAddressHierarchyLevel(int levelId);
 	
 	/**
 	 * Finds the child AddressHierarchyLevel of the given AddressHierarchyLevel
+	 * 
+	 * @param level
+	 * @return the address hierarchy level that is the child of the given level
 	 */
 	public AddressHierarchyLevel getChildAddressHierarchyLevel(AddressHierarchyLevel level);
 	
 	/**
-	 * Adds a new AddressHierarchyLevel to the bottom of the hierarchy
+	 * Adds (and saves) a new AddressHierarchyLevel at the bottom of the hierarchy
+	 * 
+	 * @return the new address hierarchy level
 	 */
 	public AddressHierarchyLevel addAddressHierarchyLevel();
 	
 	/**
 	 * Saves an AddressHierarchyLevel
+	 * 
+	 * @param the level to save
 	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void saveAddressHierarchyLevel(AddressHierarchyLevel level);
 	
 	/**
 	 * Deletes an AddressHierarchyLevel
+	 * 
+	 * @param the level to delete
 	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void deleteAddressHierarchyLevel(AddressHierarchyLevel level);
-	
-	
-	// TODO: figure out if I need to rename any of these
-	
-	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
-	
-	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
-	
-	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
-	public void truncateHierarchyTables();
-	
-	public List<AddressHierarchyEntry> getTopOfHierarchyList();
-	
+		
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to
 	 * Rwanda Address Hierarchy module
 	 */
+	
+	@Deprecated
+	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah);
+	
+	@Deprecated
+	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
+	
+	@Deprecated
+	public List<AddressHierarchyEntry> getTopOfHierarchyList();
+	
 	@Deprecated
 	public void initializeRwandaHierarchyTables();
 	
@@ -148,14 +248,6 @@ public interface AddressHierarchyService{
 	
 	@Deprecated
 	public List<Object[]> getAllAddresses(int page);
-	
-	@Deprecated
-	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
-	public AddressHierarchyEntry addAddressHierarchyEntry(int parentId, String name, int levelId);
-	
-	@Deprecated
-	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
-	public AddressHierarchyEntry editAddressHierarchyEntryName(Integer parentLocationId, String newName);
 	
 	/**
 	 * I've renamed the following methods to make them a little more clear, but kept the old methods
@@ -175,13 +267,6 @@ public interface AddressHierarchyService{
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void saveAddressHierarchy(AddressHierarchyEntry ah);
 	
-	@Deprecated
-	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
-	public AddressHierarchyEntry addLocation(int parentId, String name, int levelId);
-	
-	@Deprecated
-	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
-	public AddressHierarchyEntry editLocationName(Integer locationId, String newName);
 	
 	@Deprecated
 	public AddressHierarchyEntry getLocationFromUserGenId(String userGeneratedId);

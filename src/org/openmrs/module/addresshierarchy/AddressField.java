@@ -3,9 +3,10 @@ package org.openmrs.module.addresshierarchy;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * This is a list of all the valid address fields on PersonAddress Note that the names of some of
- * the fields changed between Openmrs 1.7 and 1.8. The follow fields refer to the identical field in
- * the database: 
+ * This is a list of all the valid address fields on PersonAddress.
+ * 
+ * Note that the names of some of the fields changed between Openmrs 1.7 and 1.8. 
+ * The follow fields refer to the identical field in the database: 
  * 
  * ADDRESS_3 = NEIGHBORHOOD_CELL
  * ADDRESS_4 = TOWNSHIP_DIVISION
@@ -13,9 +14,6 @@ import org.apache.commons.lang.StringUtils;
  * ADDRESS_6 = REGION
  */
 public enum AddressField {
-	
-	// TODO: some sort of unit test to make sure that all these mappings work
-	// TODO: need to worry about being module specific
 	
 	ADDRESS_1("address1"), ADDRESS_2("address2"), ADDRESS_3("address3"), NEIGHBORHOOD_CELL("neighborhoodCell"), 
 	ADDRESS_4("address4"), TOWNSHIP_DIVISION("townshipDivision"), ADDRESS_5("address5"), SUBREGION("subregion"), 

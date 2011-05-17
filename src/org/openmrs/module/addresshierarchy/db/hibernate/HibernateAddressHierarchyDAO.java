@@ -36,9 +36,6 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		this.sessionFactory = sessionFactory;
 	}
 	
-	/**
-	 * Gets a count of the number of entries in the address hierarchy table
-	 */
 	@SuppressWarnings("unchecked")
 	public int getAddressHierarchyEntryCount() {
 		int x = 0;
@@ -49,7 +46,19 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 			x = rows.get(0).intValue();
 		}
 		return x;
-		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public int getAddressHierarchyEntryCountByLevel(AddressHierarchyLevel level) {
+		int x = 0;
+		Session session = sessionFactory.getCurrentSession();
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
+		criteria.createCriteria("level").add(Restrictions.eq("levelId", level.getId()));
+		List<Integer> rows = criteria.setProjection((Projections.rowCount())).list();
+		if (rows.size() > 0) {
+			x = rows.get(0).intValue();
+		}
+		return x;	
 	}
 	
 	public AddressHierarchyEntry getAddressHierarchyEntry(int addressHierarchyEntryId) {
@@ -72,10 +81,19 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	}
 	
 	@SuppressWarnings("unchecked")
-    public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(Integer addressHierarchyLevelId) {
+    public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel addressHierarchyLevel) {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
-		criteria.createCriteria("level").add(Restrictions.eq("levelId", addressHierarchyLevelId));
+		criteria.createCriteria("level").add(Restrictions.eq("levelId", addressHierarchyLevel.getId()));
+		return criteria.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+    public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel addressHierarchyLevel, String name) {
+		Session session = sessionFactory.getCurrentSession();
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
+		criteria.createCriteria("level").add(Restrictions.eq("levelId", addressHierarchyLevel.getId()));
+		criteria.add(Restrictions.eq("name", name).ignoreCase());
 		return criteria.list();
 	}
 	
@@ -86,6 +104,15 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		List<AddressHierarchyEntry> list = criteria.createCriteria("parent").add(
 		    Restrictions.eq("addressHierarchyEntryId", entry.getId())).list();
 		return list;
+	}
+	
+	public AddressHierarchyEntry getChildAddressHierarchyEntryByName(AddressHierarchyEntry entry, String childName) {
+		Session session = sessionFactory.getCurrentSession();
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
+		criteria.createCriteria("parent").add(Restrictions.eq("addressHierarchyEntryId", entry.getId()));
+		criteria.add(Restrictions.eq("name", childName).ignoreCase());  // do a case-insensitive match
+		// this will throw an exception if we don't get a unique result--entries should always be unique on parent and name
+		return (AddressHierarchyEntry) criteria.uniqueResult();    
 	}
 	
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah) {
@@ -170,18 +197,29 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		}
     }
 	
-    
-    // TODO: triage these and see what will still need
-    
+	/**
+	 * The following methods are deprecated and just exist to provide backwards compatibility to
+	 * Rwanda Address Hierarchy module
+	 */
+	
+	@Deprecated
+	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude) {
+		ah.setLatitude(latitude);
+		ah.setLongitude(longitude);
+		Session session = sessionFactory.getCurrentSession();
+		session.update(ah);
+	}
+	
+	
+	@Deprecated
 	public List<AddressHierarchyEntry> getLeafNodes(AddressHierarchyEntry ah) {
 		List<AddressHierarchyEntry> leafList = new ArrayList<AddressHierarchyEntry>();
 		getLowestLevel(ah, leafList);
 		return leafList;
 	}
 	
-	/**
-	 * Recursively finds leaf nodes of ah
-	 */
+	// Recursively finds leaf nodes of ah 
+	@Deprecated
 	private List<AddressHierarchyEntry> getLowestLevel(AddressHierarchyEntry ah, List<AddressHierarchyEntry> leafList) {
 		List<AddressHierarchyEntry> children = getChildAddressHierarchyEntries(ah);
 		if (children.size() > 0) {
@@ -193,56 +231,6 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		}
 		return children;
 	}
-	
-
-	
-	/**
-	 * Searches for locations like the <code>searchString</code> Can restrict to a certain type by
-	 * specifying a type id
-	 */
-	/**
-	@SuppressWarnings("unchecked")
-	public List<AddressHierarchyEntry> searchHierarchy(String searchString, int levelId, Boolean exact) {
-		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
-		criteria.add(Restrictions.like("locationName", searchString, exact ? MatchMode.EXACT : MatchMode.ANYWHERE));
-		List<AddressHierarchyEntry> hierarchyList;
-		if (levelId != -1) {
-			criteria.createCriteria("level").add(Restrictions.eq("levelId", levelId));
-		}
-		
-		hierarchyList = criteria.list();
-		return hierarchyList;
-	}
-	*/
-	
-	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude) {
-		ah.setLatitude(latitude);
-		ah.setLongitude(longitude);
-		Session session = sessionFactory.getCurrentSession();
-		session.update(ah);
-	}
-	
-	@SuppressWarnings( { "unchecked" })
-	public List<AddressHierarchyEntry> getTopOfHierarchyList() {
-		Session session = sessionFactory.getCurrentSession();
-		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
-		List list = criteria.add(Restrictions.isNull("parent")).createCriteria("type").add(
-		    Restrictions.isNull("parent")).list();
-		
-		return list;
-	}
-	
-	public void truncateHierarchyTables() {
-		Session session = sessionFactory.getCurrentSession();
-		session.createSQLQuery("truncate table address_hierarchy").executeUpdate();
-		session.createSQLQuery("truncate table address_hierarchy_type").executeUpdate();
-	}
-	
-	/**
-	 * The following methods are deprecated and just exist to provide backwards compatibility to
-	 * Rwanda Address Hierarchy module
-	 */
 	
 	@Deprecated
 	public void initializeRwandaHierarchyTables() {

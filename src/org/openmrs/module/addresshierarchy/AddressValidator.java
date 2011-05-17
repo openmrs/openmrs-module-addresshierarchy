@@ -8,6 +8,13 @@ import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
+/**
+ * This Rwanda-specific validator is deprecated and remains only to provide Rwanda compatibility
+ * 
+ * Could replace this with a generic validator?  though isAddressStructured may be more appropriate as a service method?
+ */
+
+@Deprecated
 public class AddressValidator {
 
 	protected final Log log = LogFactory.getLog(getClass());
@@ -15,7 +22,7 @@ public class AddressValidator {
 	// TODO: need make this generic--confirm that is it being used?
 	// TODO: this also can be derived from the AddressHiearchyType "mapping" ?
 	// TODO: will have to use the reflection utility function I plan to create to fetch address component by reflection
-	@SuppressWarnings("deprecation")
+
     public boolean isAddressStructured(PersonAddress pa){
 		
 		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
@@ -44,10 +51,6 @@ public class AddressValidator {
 		return structured;
 	}
 	
-	// TODO: need make this generic
-	// TODO: this also can be derived from the AddressHiearchyType "mapping" ?
-	// TODO: will have to use the reflection utility function I plan to create to fetch address component by reflection
-	@SuppressWarnings("deprecation")
     public String getInvalidReason(PersonAddress pa){
 		
 		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
@@ -111,7 +114,6 @@ public class AddressValidator {
 	 */
 	private int getMatchingLocation(String partToCompare, List<AddressHierarchyEntry> locations){
 		int matchingLocationId = -1;
-		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
 		for(AddressHierarchyEntry ah : locations){
 			if(ah.getLocationName().equalsIgnoreCase(partToCompare)){
 				matchingLocationId = ah.getAddressHierarchyEntryId();

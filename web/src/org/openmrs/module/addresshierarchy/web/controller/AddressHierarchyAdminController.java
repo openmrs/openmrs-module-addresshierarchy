@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
@@ -66,6 +67,15 @@ public class AddressHierarchyAdminController {
 	@ModelAttribute("levels")
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
 		return Context.getService(AddressHierarchyService.class).getAddressHierarchyLevels();
+	}
+	
+	@ModelAttribute("messages")
+	public List<String> showMessage(@RequestParam(value = "message", required = false) String message) {
+		List<String> messages = new ArrayList<String>();
+		if(StringUtils.isNotBlank(message)) {
+			messages.add(message);
+		}
+		return messages;
 	}
 	
 	@ModelAttribute("sampleEntries")
@@ -153,7 +163,9 @@ public class AddressHierarchyAdminController {
     		throw new AddressHierarchyModuleException("Cannot delete Address Hierarchy Level; not bottom type in the hierarchy");
     	}
     	
-    	// TODO: also need to make sure there are no entries at this level!
+    	if (Context.getService(AddressHierarchyService.class).getAddressHierarchyEntryCountByLevel(level) > 0) {
+    		throw new AddressHierarchyModuleException("Cannot delete Address Hierarchy Level; it has associated entries");
+    	}
     	
     	// deletes the address hierarchy type
     	Context.getService(AddressHierarchyService.class).deleteAddressHierarchyLevel(level);
@@ -161,23 +173,21 @@ public class AddressHierarchyAdminController {
     	return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form");
     }
  
+    @SuppressWarnings("unchecked")
     @RequestMapping("/module/addresshierarchy/admin/uploadAddressHierarchy.form")
 	public ModelAndView processAddressHierarchyUploadForm(@RequestParam("file") MultipartFile file,
 	                                                      @RequestParam("delimiter") String delimiter, 
 	                                                      @RequestParam(value = "overwrite", required = false) Boolean overwrite,
-	                                                      ModelMap map) {
-		
-		List<String> messages = new ArrayList<String>();
+	                                                      ModelMap map) {	
 				
 		// handle validation
 		if (delimiter == null || delimiter.isEmpty()) {
-			messages.add("addresshierarchy.admin.validation.noDelimiter");
+			((List<String>) map.get("messages")).add("addresshierarchy.admin.validation.noDelimiter");
 		}
 		if (file == null || file.isEmpty()) {
-			messages.add("addresshierarchy.admin.validation.noFile");
+			((List<String>) map.get("messages")).add("addresshierarchy.admin.validation.noFile");
 		}
-		if (messages.size() > 0) {
-			map.addAttribute("messages", messages);
+		if (((List<String>) map.get("messages")).size() > 0) {
 			map.addAttribute("delimiter", delimiter);
 			map.addAttribute("overwrite", overwrite);
 			return new ModelAndView("/module/addresshierarchy/admin/listAddressHierarchyLevels", map);
@@ -195,14 +205,14 @@ public class AddressHierarchyAdminController {
         }
         catch (Exception e) {
 	        log.error("Unable to import address hierarchy file", e);
-	        messages.add("addresshierarchy.admin.uploadFailure");
-	        map.addAttribute("messages", messages);
+	        ((List<String>) map.get("messages")).add("addresshierarchy.admin.uploadFailure");
 			map.addAttribute("delimiter", delimiter);
 			map.addAttribute("overwrite", overwrite);
 			return new ModelAndView("/module/addresshierarchy/admin/listAddressHierarchyLevels", map);
         }
         
-		return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form", map);
+		return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form?message='" +
+								"addresshierarchy.admin.admin.uploadSuccess'", map);
 	}
 }
 

@@ -58,7 +58,6 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
 				}
 				mav.getModelMap().addAttribute("switchToFreetext", i+1);
 				
-				
 				// add the global property that specifies whether we should allow freetext entries for levels which have entries
 				mav.getModelMap().addAttribute("allowFreetext", AddressHierarchyUtil.getGlobalPropertyAsBoolean("addresshierarchy.allowFreetext"));
 				

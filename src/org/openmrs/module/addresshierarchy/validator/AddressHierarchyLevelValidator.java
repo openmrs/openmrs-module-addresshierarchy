@@ -16,9 +16,7 @@ public class AddressHierarchyLevelValidator implements Validator {
 	
     public void validate(Object obj, Errors errors) {
 	    AddressHierarchyLevel level = (AddressHierarchyLevel) obj;	    
-	    
-	   // ValidationUtils.rejectIfEmptyOrWhitespace(errors, "addressField", "addresshierarchy.admin.validation.addressField.blank");
-	 
+	  
 	    // a level can't have itself as a parent
 	    if (level.getParent() == level) {
 	    	errors.rejectValue("parent", "addresshierarchy.admin.validation.parent.ownParent");

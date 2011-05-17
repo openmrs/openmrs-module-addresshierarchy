@@ -9,10 +9,13 @@ public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 	
 	private Integer levelId;
 	
+	// the parent of this level
 	private AddressHierarchyLevel parent;
 	
+	// the associated address field (see AddressField enum) this level maps to (may be null)
 	private AddressField addressField;
 	
+	// whether or not the associated address field should be allowed to be empty in an Address
 	private Boolean required = false;
 	
 	/**

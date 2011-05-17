@@ -11,12 +11,16 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata implements Compar
 	
 	private Integer addressHierarchyEntryId;
 	
+	// the name of the entry ("Boston")
 	private String name;
-	
+
+	// the associated level in the hierarchy 
 	private AddressHierarchyLevel level;
 	
+	// the parent of the entry ("Boston" would have a parent of "Massachusetts")
 	private AddressHierarchyEntry parent;
 	
+	// not currently used for much outside of some Rwanda-specific use cases
 	private String userGeneratedId;
 	
 	private Double latitude;
@@ -33,7 +37,7 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata implements Compar
 	}
 	
 	/**
-	 * Comparator
+	 * Comparator  -- standard comparison is by name
 	 */
 
     public int compareTo(AddressHierarchyEntry other) {
@@ -56,14 +60,6 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata implements Compar
 	/**
 	 * Getters and Setters
 	 */
-	
-	public String getLocationName() {
-		return name;
-	}
-	
-	public void setLocationName(String locationName) {
-		this.name = locationName;
-	}
 	
 	public Double getLatitude() {
 		return latitude;
@@ -124,6 +120,7 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata implements Compar
 	/**
 	 * Getters and Setters to map fields to alternative names
 	 */
+	
     public Integer getId() {
     	return this.addressHierarchyEntryId;
     }
@@ -132,13 +129,13 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata implements Compar
 	    this.addressHierarchyEntryId = id;	    
     }
 	
-    public String getName() {
-    	return this.name;
-    }
-    
-    public void setName(String name) {
-    	this.name = name;
-    }
+    public String getLocationName() {
+		return name;
+	}
+	
+	public void setLocationName(String locationName) {
+		this.name = locationName;
+	}
     
 	public AddressHierarchyLevel getAddressHierarchyLevel() {
 		return level;
