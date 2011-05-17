@@ -91,16 +91,14 @@
 	</diff>	
 	
 	<diff>
-		<version>1.3.2</version>
-		<author>John DeRiggi</author>
-		<date>Nov 14 2010</date>
+		<version>1.3.9</version>
+		<author>Mark Goodrich</author>
+		<date>May 17 2010</date>
 		<description>
-			Added index on person address created date and fixed possible bug with white space on provinces
+			Added index on address_hierarchy name
 		</description>
 		<sql>
 			create index name_ah on address_hierarchy(name);
-			create index person_address_date_created_index on person_address(date_created);
-			update person_address set person_address.state_province = trim(state_province);
 		</sql>
 	</diff>
 	<!-- end of diffs added by the Rwanda Address Hierarchy module -->
@@ -137,25 +135,10 @@
 		<author>Mark Goodrich</author>
 		<date>Apr 22 2011</date>
 		<description>
-			Added OpenmrsMetadata fields to Address Hierarchy table
+			Added uuid field to Address Hierarchy table
 		</description>
 		<sql>
 			ALTER TABLE address_hierarchy
-			ADD COLUMN `description`
-			varchar(1000),
-			ADD COLUMN `creator` int(11) NOT NULL default '0',
-			ADD
-			COLUMN `date_created` datetime NOT NULL default '0000-00-00
-			00:00:00',
-			ADD COLUMN `changed_by` int(11) default NULL,
-			ADD COLUMN
-			`date_changed` datetime default NULL,
-			ADD COLUMN `retired` tinyint(1)
-			NOT NULL default '0',
-			ADD COLUMN `retired_by` int(11) default NULL,
-			ADD COLUMN `date_retired` datetime default NULL,
-			ADD COLUMN
-			`retire_reason` varchar(255) default NULL,
 			ADD COLUMN `uuid` char(38)
 			NOT NULL;
 		</sql>
@@ -166,25 +149,10 @@
 		<author>Mark Goodrich</author>
 		<date>Apr 22 2011</date>
 		<description>
-			Added OpenmrsMetadata fields to Address Hierarchy type table
+			Added uuid field to Address Hierarchy type table
 		</description>
 		<sql>
 			ALTER TABLE address_hierarchy_type
-			ADD COLUMN `description`
-			varchar(1000),
-			ADD COLUMN `creator` int(11) NOT NULL default '0',
-			ADD
-			COLUMN `date_created` datetime NOT NULL default '0000-00-00
-			00:00:00',
-			ADD COLUMN `changed_by` int(11) default NULL,
-			ADD COLUMN
-			`date_changed` datetime default NULL,
-			ADD COLUMN `retired` tinyint(1)
-			NOT NULL default '0',
-			ADD COLUMN `retired_by` int(11) default NULL,
-			ADD COLUMN `date_retired` datetime default NULL,
-			ADD COLUMN
-			`retire_reason` varchar(255) default NULL,
 			ADD COLUMN `uuid` char(38)
 			NOT NULL;
 		</sql>
@@ -299,6 +267,61 @@
 		</description>
 		<sql>
 			ALTER TABLE address_hierarchy_level ADD COLUMN `required` tinyint(1) NOT NULL default '0';
+		</sql>
+	</diff>
+	
+	<diff>
+		<version>2.6</version>
+		<author>Mark Goodrich</author>
+		<date>May 17 2011</date>
+		<description>
+		 	address_hierarchy_entry level should not be allowed to be null
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_entry CHANGE COLUMN `level_id` `level_id` int(11) NOT NULL;
+		</sql>
+	</diff>
+	
+	<diff>
+		<version>2.6.1</version>
+		<author>Mark Goodrich</author>
+		<date>May 17 2011</date>
+		<description>
+		 	address_hierarchy_level parent_id and address_field should be unique
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_level ADD UNIQUE address_field_unique (address_field);
+			ALTER TABLE address_hierarchy_level ADD UNIQUE parent_level_id_unique (parent_level_id);
+		</sql>
+	</diff>
+	
+	<diff>
+		<version>2.6.2</version>
+		<author>Mark Goodrich</author>
+		<date>May 17 2011</date>
+		<description>
+		 	redo the indexing on address_hierarchy_entry
+		</description>
+		<sql>
+			DROP INDEX parent_location_id ON address_hierarchy_entry;
+			DROP INDEX location_type_id ON address_hierarchy_entry;
+			DROP INDEX name_ah ON address_hierarchy_entry;
+			ALTER TABLE address_hierarchy_entry ADD INDEX parent_name (parent_id,name(20));
+			ALTER TABLE address_hierarchy_entry ADD INDEX level_name (level_id,name(20));
+		</sql>
+	</diff>
+	
+	<diff>
+		<version>2.6.3</version>
+		<author>Mark Goodrich</author>
+		<date>May 17 2011</date>
+		<description>
+			add foreign keys
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_entry ADD CONSTRAINT parent_to_parent FOREIGN KEY (parent_id) REFERENCES address_hierarchy_entry (address_hierarchy_entry_id);
+			ALTER TABLE address_hierarchy_entry ADD CONSTRAINT level_to_level FOREIGN KEY (level_id) REFERENCES address_hierarchy_level (address_hierarchy_level_id);
+			ALTER TABLE address_hierarchy_level ADD CONSTRAINT parent_level FOREIGN KEY (parent_level_id) REFERENCES address_hierarchy_level (address_hierarchy_level_id);
 		</sql>
 	</diff>
 	

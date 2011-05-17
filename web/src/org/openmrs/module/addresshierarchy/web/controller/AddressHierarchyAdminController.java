@@ -212,7 +212,7 @@ public class AddressHierarchyAdminController {
         }
         
 		return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form?message='" +
-								"addresshierarchy.admin.admin.uploadSuccess'", map);
+								"addresshierarchy.admin.uploadSuccess'", map);
 	}
 }
 

@@ -1,13 +1,15 @@
 package org.openmrs.module.addresshierarchy;
 
-import org.openmrs.BaseOpenmrsMetadata;
+import org.openmrs.BaseOpenmrsObject;
 
 /**
  * Represents an Address Hierarchy level (ie., like "Country", or "State", or "City")
  */
-public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
+public class AddressHierarchyLevel extends BaseOpenmrsObject {
 	
 	private Integer levelId;
+	
+	private String name;
 	
 	// the parent of this level
 	private AddressHierarchyLevel parent;
@@ -34,10 +36,18 @@ public class AddressHierarchyLevel extends BaseOpenmrsMetadata {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Getters and Setters
 	 */
+	
+	public void setName(String name) {
+	    this.name = name;
+    }
+
+	public String getName() {
+	    return name;
+    }
 	
 	public AddressHierarchyLevel getParent() {
 		return parent;

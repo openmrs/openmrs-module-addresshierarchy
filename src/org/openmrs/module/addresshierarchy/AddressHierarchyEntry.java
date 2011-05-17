@@ -1,13 +1,13 @@
 package org.openmrs.module.addresshierarchy;
 
-import org.openmrs.BaseOpenmrsMetadata;
+import org.openmrs.BaseOpenmrsObject;
 
 /**
  * Represents a single entry in the Address Hierarchy (ie., like "United States", or "Massachusetts", or "Boston")
  * 
  * Must be unique on combined name and parent
  */
-public class AddressHierarchyEntry extends BaseOpenmrsMetadata implements Comparable<AddressHierarchyEntry> {
+public class AddressHierarchyEntry extends BaseOpenmrsObject implements Comparable<AddressHierarchyEntry> {
 	
 	private Integer addressHierarchyEntryId;
 	
@@ -60,6 +60,14 @@ public class AddressHierarchyEntry extends BaseOpenmrsMetadata implements Compar
 	/**
 	 * Getters and Setters
 	 */
+	
+	public void setName(String name) {
+	    this.name = name;
+    }
+
+	public String getName() {
+	    return name;
+    }
 	
 	public Double getLatitude() {
 		return latitude;
