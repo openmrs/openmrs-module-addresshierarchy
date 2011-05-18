@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
@@ -30,10 +33,18 @@ public class AddressHierarchyImportUtil {
 	 */
 	public static final void importAddressHierarchyFile(InputStream stream, String delimiter, AddressHierarchyLevel startingLevel) {
 		
-		// TODO: enforce that top level is unique, but others do not need to be?
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
 		String line;
+		
+		// to let us know if we even need to query the database (to speed up performance)
+		Boolean hasExistingEntries = ahService.getAddressHierarchyEntryCount() > 0 ? true : false;
+		
+		 // a cache we use to speed up performance
+		Map<AddressHierarchyEntry,Map<String,AddressHierarchyEntry>> entryCache = new HashMap<AddressHierarchyEntry,Map<String,AddressHierarchyEntry>>(); 
+		
+		// the list of all address hierarchy entries
+		List<AddressHierarchyEntry> entries = new LinkedList<AddressHierarchyEntry>();
 		
 		// get an ordered list of the address hierarchy levels
 		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
@@ -46,6 +57,7 @@ public class AddressHierarchyImportUtil {
 			}
 		}
 		
+		// process the file
 		try {
 			// Note that we are using UnicodeInputStream to work around this Java bug: http://bugs.sun.com/view_bug.do?bug_id=4508058 
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new UnicodeInputStream(stream), Charset.forName("UTF-8")));
@@ -70,31 +82,48 @@ public class AddressHierarchyImportUtil {
 		        		
 	        			String strippedLocation = StringUtils.strip(StringUtils.trim(locations[i]));
 	        			
-		        		// fetch the entry associated with this location
-		        		AddressHierarchyEntry entry = ahService.getChildAddressHierarchyEntryByName(entryStack.isEmpty() ? null : entryStack.peek(), strippedLocation);		
-		        		
-		        		// create this entry if need be
+	        			AddressHierarchyEntry entry = null;
+	        			AddressHierarchyEntry parent = entryStack.isEmpty() ? null : entryStack.peek();
+	        			
+	        			// first see if this entry already exists in the cache
+	        			if (entryCache.containsKey(parent) && entryCache.get(parent).containsKey(strippedLocation.toLowerCase())) {
+	        				entry = entryCache.get(parent).get(strippedLocation.toLowerCase());
+	        			}
+	        			// if it is not in the cache, see if it is in the database if there are existing entries
+	        			else if (hasExistingEntries) {
+	            			entry = ahService.getChildAddressHierarchyEntryByName(parent, strippedLocation);
+	            			// if we have found an entry, add it to the cache
+	            			if (entry != null) {
+	            				addToCache(entryCache, parent, entry);
+	            			}
+	        			}
+	        			    		
+		        		// if we still haven't found the entry, we need to create it
 		        		if (entry == null) {
 		        			
 		        			// create the new entry and set its name, location and parent
 		        			entry = new AddressHierarchyEntry();
 		        			entry.setName(strippedLocation);
 		        			entry.setLevel(levels.get(i));
-		        			entry.setParent(entryStack.isEmpty() ? null : entryStack.peek());
+		        			entry.setParent(parent);
 		        			
-		        			// save the new entry
-		        			ahService.saveAddressHierarchyEntry(entry);
+		        			// add the entry to the list to add, and add it to the cache
+		        			entries.add(entry);
+		        			addToCache(entryCache, parent, entry);
+		        			
 		        		}
-		        		
-		        		// push this entry onto the stack on the stack
+		        		// push this entry onto the stack
 	        			entryStack.push(entry);
 		        	}
 	        	}
-	        }
+	        }  
         }
         catch (IOException e) { 
 	        throw new AddressHierarchyModuleException("Error accessing address hierarchy import stream ", e);
         }
+        
+        // now do the actual save
+        ahService.saveAddressHierarchyEntries(entries);
 	}
 	
 	public static final void importAddressHierarchyFile(InputStream stream, String delimiter) {
@@ -113,5 +142,14 @@ public class AddressHierarchyImportUtil {
 	}
 	
 	
-	
+	/**
+	 * Utility methods
+	 */
+	public static final void addToCache(Map<AddressHierarchyEntry,Map<String,AddressHierarchyEntry>> entryCache, 
+	                                    AddressHierarchyEntry parent, AddressHierarchyEntry entry) {
+		if (!entryCache.containsKey(parent)) {
+			entryCache.put(parent, new HashMap<String,AddressHierarchyEntry>());
+		}
+		entryCache.get(parent).put(entry.getName().toLowerCase(), entry);
+	}
 }

@@ -136,6 +136,17 @@ public interface AddressHierarchyService{
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry);
 	
 	/**
+	 * Saves a block of address hierarchy entries within a single transaction
+	 * (This should be used with care since the save interceptors may not be
+	 * used properly. This method is mainly used to speed up the performance
+	 * of importing a hierarchy from a file)
+	 * 
+	 * @param entries
+	 */
+	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
+	public void saveAddressHierarchyEntries(List<AddressHierarchyEntry> entries);
+	
+	/**
 	 * Removes all address hierarchy entries--use with care
 	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })

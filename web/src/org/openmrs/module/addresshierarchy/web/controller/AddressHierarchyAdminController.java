@@ -211,8 +211,8 @@ public class AddressHierarchyAdminController {
 			return new ModelAndView("/module/addresshierarchy/admin/listAddressHierarchyLevels", map);
         }
         
-		return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form?message='" +
-								"addresshierarchy.admin.uploadSuccess'", map);
+		return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form?message=" +
+								"addresshierarchy.admin.uploadSuccess", map);
 	}
 }
 
