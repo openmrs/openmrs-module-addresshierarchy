@@ -334,7 +334,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
-	public int getAddressHierarchyLevelsCount() {
+	public Integer getAddressHierarchyLevelsCount() {
 		List<AddressHierarchyLevel> levels = getAddressHierarchyLevels();
 		return levels != null ? levels.size() : 0;
 	}
@@ -360,7 +360,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
     }
 	
 	@Transactional(readOnly = true)
-	public AddressHierarchyLevel getAddressHierarchyLevel(int levelId) {
+	public AddressHierarchyLevel getAddressHierarchyLevel(Integer levelId) {
 		return dao.getAddressHierarchyLevel(levelId);
 	}
 	
@@ -387,6 +387,29 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
     public void deleteAddressHierarchyLevel(AddressHierarchyLevel level) {
     	dao.deleteAddressHierarchyLevel(level);  
     }
+	
+	@Transactional
+	public void setAddressHierarchyLevelParents() {
+		// iterate through the levels
+		for (AddressHierarchyLevel level : getAddressHierarchyLevels()) {
+			
+			if (getAddressHierarchyEntryCountByLevel(level) > 0) {
+				// get an entry for this level
+				AddressHierarchyEntry entry = getAddressHierarchyEntriesByLevel(level).get(0);
+				// if needed, set the parent for this level based on the level of the parent of this entry
+				if (entry.getParent() != null && entry.getParent().getLevel() != level.getParent()) {
+					level.setParent(entry.getParent().getLevel());
+					// need to call the service method through the context to take care of AOP
+					Context.getService(AddressHierarchyService.class).saveAddressHierarchyLevel(level);
+				}
+			}
+			// if is level has no entries, delete it
+			else {
+				// need to call the service method through the context to take care of AOP
+				Context.getService(AddressHierarchyService.class).deleteAddressHierarchyLevel(level);
+			}
+		}
+	}
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to

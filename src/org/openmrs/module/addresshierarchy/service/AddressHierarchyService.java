@@ -179,7 +179,7 @@ public interface AddressHierarchyService{
 	 * 
 	 * @return the number of address hierarchy levels
 	 */
-	public int getAddressHierarchyLevelsCount();
+	public Integer getAddressHierarchyLevelsCount();
 	
 	/**
 	 * Gets the address hierarchy level that represents the top level of the hierarchy
@@ -201,7 +201,7 @@ public interface AddressHierarchyService{
 	 * @param levelId
 	 * @return the address hierarchy level with the given id
 	 */
-	public AddressHierarchyLevel getAddressHierarchyLevel(int levelId);
+	public AddressHierarchyLevel getAddressHierarchyLevel(Integer levelId);
 	
 	/**
 	 * Finds the child AddressHierarchyLevel of the given AddressHierarchyLevel
@@ -233,7 +233,13 @@ public interface AddressHierarchyService{
 	 */
 	@Authorized( { AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void deleteAddressHierarchyLevel(AddressHierarchyLevel level);
-		
+	
+	/**
+	 * Attempt to determine the hierarchy of address hierarchy levels based on the hierarchy of entries
+	 * and assign the parent levels accordingly (used as part of 1.2 to 1.6 migration)
+	 */
+	public void setAddressHierarchyLevelParents();
+	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to
 	 * Rwanda Address Hierarchy module

@@ -66,6 +66,8 @@ public class AddressHierarchyAdminController {
 	
 	@ModelAttribute("levels")
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
+		// before getting the levels, we first make sure the parents are set properly (mainly to handle any migration from the 1.2 model)
+		Context.getService(AddressHierarchyService.class).setAddressHierarchyLevelParents();
 		return Context.getService(AddressHierarchyService.class).getAddressHierarchyLevels();
 	}
 	
@@ -103,7 +105,7 @@ public class AddressHierarchyAdminController {
 	
 	@ModelAttribute("level")
 	public AddressHierarchyLevel getAddressHierarchyLevel(@RequestParam(value = "levelId", required = false) Integer levelId) {
-		
+				
 		AddressHierarchyLevel level;
     	
     	// fetch the address hierarchy level, or if none specified, create a new one

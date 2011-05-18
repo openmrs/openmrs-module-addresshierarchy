@@ -8,7 +8,7 @@
 	<name>Address Hierarchy</name>
 	<version>1.6</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
-	<author>John DeRiggi, Mark Goodrich</author>
+	<author>Sri Prasanna, John DeRiggi, Mark Goodrich</author>
 	<description>
 			Allows for the entry of structured addresses.
 	</description>

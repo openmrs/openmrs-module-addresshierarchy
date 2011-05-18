@@ -159,6 +159,19 @@
 	</diff>
 	
 	<diff>
+		<version>1.7.1</version>
+		<author>Mark Goodrich</author>
+		<date>Apr 22 2011</date>
+		<description>
+			Add uuids to any existing entries
+		</description>
+		<sql>
+			UPDATE address_hierarchy SET uuid = UUID();
+			UPDATE address_hierarchy_type SET uuid = UUID();
+		</sql>
+	</diff>
+	
+	<diff>
 		<version>1.8</version>
 		<author>Mark Goodrich</author>
 		<date>Apr 25 2011</date>
@@ -287,10 +300,10 @@
 		<author>Mark Goodrich</author>
 		<date>May 17 2011</date>
 		<description>
-		 	address_hierarchy_level parent_id and address_field should be unique
+		 	address_hierarchy_level parent_id and address_field indexes
 		</description>
 		<sql>
-			ALTER TABLE address_hierarchy_level ADD UNIQUE address_field_unique (address_field);
+			ALTER TABLE address_hierarchy_level ADD INDEX address_field_unique (address_field);
 			ALTER TABLE address_hierarchy_level ADD UNIQUE parent_level_id_unique (parent_level_id);
 		</sql>
 	</diff>
