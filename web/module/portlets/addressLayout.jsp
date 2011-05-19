@@ -32,19 +32,25 @@
 		// register submit handler for validation as required
 		$j('form:has(div[class=address])').submit(function () {
 			passedValidation = true;
-			var errorMessage = "<spring:message code="addresshierarchy.requiredFields"/>:\n";
+			var errorMessage = "<spring:message code="addresshierarchy.correctErrors"/>:\n";
 			
 			<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
-				<c:if test="${hierarchyLevel.required == true}">
-					<spring:bind path="${hierarchyLevel.addressField.name}">
+				<spring:bind path="${hierarchyLevel.addressField.name}">
+					<c:if test="${hierarchyLevel.required == true}">
 						<c:if test="${fn:contains(status.expression,'.')}">  // hacky way to ignore the "add another address" fields on the edit patient long form page 
-						  	if ($j('[name=${status.expression}]').val() == null || $j('[name=${status.expression}]').val() == '') {
-								errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/>\n";
+							// handle checking that required fields aren't blank
+					  		if ($j('[name=${status.expression}]').val() == null || $j('[name=${status.expression}]').val() == '') {
+								errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/> <spring:message code="addresshierarchy.requiredField"/>\n";
 								passedValidation = false;
 							}
 						</c:if>
-					</spring:bind>
-				</c:if>
+					</c:if>
+					// handle enforcing no free-text entries if free-text disallowed
+				  	if (!allowFreetext && $j('[name=${status.expression}]').hasClass('other')){
+				  		errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/> <spring:message code="addresshierarchy.cannotBeFreetext"/>\n";
+						passedValidation = false;
+				  	}
+				</spring:bind>
 			</c:forEach>
 
 			if (!passedValidation) {
@@ -98,7 +104,7 @@
 						</c:otherwise>
 					</c:choose>
 				</td>
-				<td><input type="text" style="display:none" value="${status.value}"/></td>
+				<td><input type="text" style="display:none" value="${status.value}" class="other"/></td>
 				</spring:bind>
 			</tr>
 		</c:forEach>
