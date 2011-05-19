@@ -96,7 +96,7 @@
 		<button type="submit">
 			<spring:message code="addresshierarchy.admin.save" text="Save"/>
 		</button>
-		<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/listAddressHierarchyLevels.form">
+		<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/manageAddressHierarchy.form">
 			<button type="button">
 				<spring:message code="addresshierarchy.admin.cancel" text="Cancel"/>
 			</button>

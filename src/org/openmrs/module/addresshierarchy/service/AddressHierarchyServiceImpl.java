@@ -403,8 +403,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 					Context.getService(AddressHierarchyService.class).saveAddressHierarchyLevel(level);
 				}
 			}
-			// if is level has no entries, delete it
-			else {
+			// if is level has no entries and no parents, delete it
+			else if (level.getParent() == null){
 				// need to call the service method through the context to take care of AOP
 				Context.getService(AddressHierarchyService.class).deleteAddressHierarchyLevel(level);
 			}

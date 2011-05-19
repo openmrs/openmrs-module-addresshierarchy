@@ -1,7 +1,7 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 
 <openmrs:require privilege="Manage Address Hierarchy" otherwise="/login.htm"
-	redirect="/module/addresshierarchy/admin/listAddressHierarchyLevels.form" />
+	redirect="/module/addresshierarchy/admin/manageAddressHierarchy.form" />
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="localHeader.jsp"%>

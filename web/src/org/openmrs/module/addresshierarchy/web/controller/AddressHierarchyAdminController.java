@@ -125,9 +125,9 @@ public class AddressHierarchyAdminController {
     	return level;
 	}
 	
-    @RequestMapping("/module/addresshierarchy/admin/listAddressHierarchyLevels.form")
-	public ModelAndView listAddressHierarchyLevels() {
-		return new ModelAndView("/module/addresshierarchy/admin/listAddressHierarchyLevels");
+    @RequestMapping("/module/addresshierarchy/admin/manageAddressHierarchy.form")
+	public ModelAndView manageAddressHierarchy() {
+		return new ModelAndView("/module/addresshierarchy/admin/manageAddressHierarchy");
 	}
     
     @RequestMapping("/module/addresshierarchy/admin/editAddressHierarchyLevel.form")
@@ -153,7 +153,7 @@ public class AddressHierarchyAdminController {
 		// clears the command object from the session
 		status.setComplete();
 		
-		return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form");
+		return new ModelAndView("redirect:/module/addresshierarchy/admin/manageAddressHierarchy.form");
     	
     }
     
@@ -172,7 +172,7 @@ public class AddressHierarchyAdminController {
     	// deletes the address hierarchy type
     	Context.getService(AddressHierarchyService.class).deleteAddressHierarchyLevel(level);
     	
-    	return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form");
+    	return new ModelAndView("redirect:/module/addresshierarchy/admin/manageAddressHierarchy.form");
     }
  
     @SuppressWarnings("unchecked")
@@ -192,7 +192,7 @@ public class AddressHierarchyAdminController {
 		if (((List<String>) map.get("messages")).size() > 0) {
 			map.addAttribute("delimiter", delimiter);
 			map.addAttribute("overwrite", overwrite);
-			return new ModelAndView("/module/addresshierarchy/admin/listAddressHierarchyLevels", map);
+			return new ModelAndView("/module/addresshierarchy/admin/manageAddressHierarchy", map);
 		}
 		
 		// do the actual update
@@ -210,10 +210,10 @@ public class AddressHierarchyAdminController {
 	        ((List<String>) map.get("messages")).add("addresshierarchy.admin.uploadFailure");
 			map.addAttribute("delimiter", delimiter);
 			map.addAttribute("overwrite", overwrite);
-			return new ModelAndView("/module/addresshierarchy/admin/listAddressHierarchyLevels", map);
+			return new ModelAndView("/module/addresshierarchy/admin/manageAddressHierarchy", map);
         }
         
-		return new ModelAndView("redirect:/module/addresshierarchy/admin/listAddressHierarchyLevels.form?message=" +
+		return new ModelAndView("redirect:/module/addresshierarchy/admin/manageAddressHierarchy.form?message=" +
 								"addresshierarchy.admin.uploadSuccess", map);
 	}
 }
