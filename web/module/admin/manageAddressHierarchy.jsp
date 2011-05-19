@@ -30,7 +30,7 @@
 <table cellpadding="2" cellspacing="0" class="box">
 	<tr>
 		<th><spring:message code="addresshierarchy.admin.level" /></th>
-		<th><spring:message code="addresshierarchy.admin.name" /></th>
+		<th><spring:message code="general.name" /></th>
 		<th><spring:message code="addresshierarchy.admin.exampleEntry" /></th>
 		<th><spring:message code="addresshierarchy.admin.mappedAddressField" /></th>
 		<th><spring:message code="addresshierarchy.admin.required" /></th>
@@ -62,14 +62,14 @@
 			</td>
 			<td>
 				<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form?levelId=${level.id}">
-				   <spring:message code="addresshierarchy.admin.edit" />
+				   <spring:message code="general.edit" />
 				</a>
 				<!-- only show delete option for last element, and only if it doesn't have any sample entries -->
 				<c:if test="${i.count == fn:length(levels) && sampleEntries[i.count-1][1] == 0}">
 					&nbsp;|&nbsp;
 					<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/deleteAddressHierarchyLevel.form?levelId=${level.id}"
 					   onclick="return confirm('<spring:message code="addresshierarchy.admin.confirmDeleteLevel"/>');">
-					   <spring:message code="addresshierarchy.admin.delete" />
+					   <spring:message code="general.delete" />
 					</a>
 				</c:if>
 			</td>
@@ -116,10 +116,10 @@
 <tr>
 	<td>
 		<button type="submit">
-			<spring:message code="addresshierarchy.admin.upload" text="Upload"/>
+			<spring:message code="general.upload" text="Upload"/>
 		</button>
 		<button type="reset">
-			<spring:message code="addresshierarchy.admin.cancel" text="Cancel"/>
+			<spring:message code="general.cancel" text="Cancel"/>
 		</button>	
 	</td>
 	<td>&nbsp;</td>

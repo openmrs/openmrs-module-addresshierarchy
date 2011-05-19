@@ -58,7 +58,7 @@
 <table cellspacing="0" cellpadding="0" class="box">
 
 <tr>
-	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.name" />:</nobr></td>
+	<td style="font-weight:bold"><nobr><spring:message code="general.name" />:</nobr></td>
 	<td>
 		<input type="text" name="name" value="${level.name}"/>
 	</td>
@@ -94,11 +94,11 @@
 <tr>
 	<td>
 		<button type="submit">
-			<spring:message code="addresshierarchy.admin.save" text="Save"/>
+			<spring:message code="general.save" text="Save"/>
 		</button>
 		<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/manageAddressHierarchy.form">
 			<button type="button">
-				<spring:message code="addresshierarchy.admin.cancel" text="Cancel"/>
+				<spring:message code="general.cancel" text="Cancel"/>
 			</button>
 		</a>		
 	</td>
