@@ -6,7 +6,7 @@ import org.apache.commons.lang.StringUtils;
  * This is a list of all the valid address fields on PersonAddress.
  * 
  * Note that the names of some of the fields changed between Openmrs 1.7 and 1.8. 
- * The follow fields refer to the identical field in the database: 
+ * The follow fields refer to identical fields in the database: 
  * 
  * ADDRESS_3 = NEIGHBORHOOD_CELL
  * ADDRESS_4 = TOWNSHIP_DIVISION

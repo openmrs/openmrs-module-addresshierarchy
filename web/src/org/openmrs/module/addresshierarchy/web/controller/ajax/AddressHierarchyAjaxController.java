@@ -74,7 +74,7 @@ public class AddressHierarchyAjaxController {
 			}			
 			
 			// now do the actual search
-			childEntryNames = ahService.getPossibleAddressValues(address, levels.get(i).getAddressField().getName());
+			childEntryNames = ahService.getPossibleAddressValues(address, levels.get(i).getAddressField());
 		}
 			
     	response.setContentType("application/json");

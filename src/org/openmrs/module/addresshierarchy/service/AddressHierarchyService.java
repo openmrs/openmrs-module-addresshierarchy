@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.openmrs.PersonAddress;
 import org.openmrs.annotation.Authorized;
+import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
@@ -26,6 +27,20 @@ public interface AddressHierarchyService{
 	 * @return a list of the names of the possible valid address hierarchy entries
 	 */
 	public List<String> getPossibleAddressValues(PersonAddress address, String fieldName);
+	
+	/**
+	 * Given a person address, returns the names of all entries that are hierarchically valid for the
+	 * specified addressField.  (Excluding duplicate names and ignoring any current value of the specified addressField)
+	 * 
+	 *  This method can handle restrictions based on address field values not only above but also *below* the specified level.
+	 * (For instance, if the city is set to "Boston", and we ask for possible values for the "state" level,
+	 *  only Massachusetts should be returned) 
+	 * 
+	 * @param address
+	 * @param field
+	 * @return a list of the names of the possible valid address hierarchy entries
+	 */
+	public List<String> getPossibleAddressValues(PersonAddress address, AddressField field);
 	
 	/**
 	 * Given a person address, returns all the address hierarchy entries that are hierarchically valid for the

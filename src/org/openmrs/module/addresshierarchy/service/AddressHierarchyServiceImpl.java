@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
@@ -35,19 +36,31 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional(readOnly = true)
 	public List<String> getPossibleAddressValues(PersonAddress address, String fieldName) {	
 		
+		AddressField field = AddressField.getByName(fieldName);
+	
+		if (field == null) {
+			throw new AddressHierarchyModuleException(fieldName + " is not the name of a valid address field");
+		}
+		
+		return getPossibleAddressValues(address, field);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<String> getPossibleAddressValues(PersonAddress address, AddressField field) {	
+		
 		Map<String,String> possibleAddressValues = new HashMap<String,String>();
 		AddressHierarchyLevel targetLevel = null;
 		
 		// iterate through the ordered levels until we reach the level associated with the specified fieldName
 		for (AddressHierarchyLevel level : getOrderedAddressHierarchyLevels(false)) {
-			if (level.getAddressField() != null && level.getAddressField().getName().equals(fieldName)) {
+			if (level.getAddressField() != null && level.getAddressField().equals(field)) {
 				targetLevel = level;
 				break;
 			}
 		}
 		
 		if (targetLevel == null) {
-			log.error("Address field " + fieldName + " is either invalid or is not mapped to address hierarchy level.");
+			log.error("Address field " + field + " is not mapped to address hierarchy level.");
 			return null;
 		}
 		
