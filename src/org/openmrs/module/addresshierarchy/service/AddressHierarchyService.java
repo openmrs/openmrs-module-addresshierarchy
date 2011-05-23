@@ -24,7 +24,7 @@ public interface AddressHierarchyService{
 	 * 
 	 * @param address
 	 * @param fieldName
-	 * @return a list of the names of the possible valid address hierarchy entries
+	 * @return a list of the names of the possible valid address hierarchy entries; returns an empty list if no matches, should return null only if error
 	 */
 	public List<String> getPossibleAddressValues(PersonAddress address, String fieldName);
 	
@@ -38,7 +38,7 @@ public interface AddressHierarchyService{
 	 * 
 	 * @param address
 	 * @param field
-	 * @return a list of the names of the possible valid address hierarchy entries
+	 * @return a list of the names of the possible valid address hierarchy entries; returns an empty list if no matches, should return null only if error
 	 */
 	public List<String> getPossibleAddressValues(PersonAddress address, AddressField field);
 	
@@ -52,7 +52,7 @@ public interface AddressHierarchyService{
 	 * 
 	 * @param address
 	 * @param level
-	 * @return a list of possible valid address hierarchy entries
+	 * @return a list of possible valid address hierarchy entries; returns an empty list if no matches, should return null only if error
 	 */
 	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel level);
 	

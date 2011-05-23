@@ -67,9 +67,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		// calls getPossibleAddressHierarchyEntries(PersonAddress, AddressHierarchLevel) to perform the actual search
 		List<AddressHierarchyEntry> entries = getPossibleAddressHierarchyEntries(address, targetLevel);
 		
-		if (entries == null) {
-			return null;
-		}
+		// note that by convention entries should not be null, so we don't test for null here
 		
 		// take the entries returns and convert them into a list of *unique* names (using case-insensitive comparison)
 		// we use a map here to make this process more efficient
@@ -110,7 +108,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		if (!reachedFieldLevel) {
 			// if we haven't found an address hierarchy level associated with this field, then we certainly aren't going to be
 			// able to find a list of possible values
-			return null;
+			// return an empty set here, not null, because null is the default method in core if not overridden
+			return new ArrayList<AddressHierarchyEntry>();
 		}
 		
 		List<AddressHierarchyEntry> possibleEntries = new ArrayList<AddressHierarchyEntry>();
