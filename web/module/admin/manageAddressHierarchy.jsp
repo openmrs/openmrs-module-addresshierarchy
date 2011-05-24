@@ -48,7 +48,7 @@
 						<spring:message code="${nameMappings[level.addressField.name]}"/>
 					</c:when>
 					<c:otherwise>
-						(<spring:message code="addresshierarchy.admin.none"/>)
+						(<spring:message code="general.none"/>)
 					</c:otherwise>
 				</c:choose>
 			</td>

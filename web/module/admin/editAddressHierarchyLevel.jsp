@@ -77,7 +77,7 @@
 					</option>
 				</c:if>
 			</c:forEach>
-			<option value="">(<spring:message code="addresshierarchy.admin.none"/>)</option>
+			<option value="">(<spring:message code="general.none"/>)</option>
 		</select>
 	</td>
 	<td>&nbsp;</td>
