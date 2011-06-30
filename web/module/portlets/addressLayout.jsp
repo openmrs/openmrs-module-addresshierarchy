@@ -22,10 +22,15 @@
 		// note that we build the search string for each hierarchy level by concatenating the values of the previous levels
 		<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
 			<spring:bind path="${hierarchyLevel.addressField.name}">
-				<c:if test="${not empty status.value || i.count == 1}">
-					updateOptions($j('select[name=${status.expression}]'), "${searchString}", "${status.value}");  // use double quotes here so as not conflict with ' in location names
+				<c:if test="${!empty previousValue || i.count == 1}">
+					// value for the selection list is the current value for the field (if one exist), otherwise the default value (if one exists)
+					<c:set var="value">${!empty status.value ? status.value : !empty model.layoutTemplate.elementDefaults[hierarchyLevel.addressField.name] ? model.layoutTemplate.elementDefaults[hierarchyLevel.addressField.name] : ''}</c:set>  			
+
+					updateOptions($j('select[name=${status.expression}]'), "${searchString}", "${value}");  // use double quotes here so as not conflict with ' in location names			
+
+					<c:set var="searchString">${searchString}${!empty value ? value : '*'}|</c:set>
+					<c:set var="previousValue">${value}</c:set>
 				</c:if>
-				<c:set var="searchString">${searchString}${!empty status.value ? status.value : '*'}|</c:set>
 			</spring:bind>
 		</c:forEach>
 
@@ -90,10 +95,10 @@
 					<c:choose>
 						<c:when test="${i.count <= switchToFreetext}">
 							<select style="display:none" name="${status.expression}" class="${hierarchyLevel.addressField.name}" 
-							<c:if test="${i.count < fn:length(hierarchyLevels)}">
+							<c:if test="${i.count < switchToFreetext}">
 									onChange="handleAddressFieldChange($j(this), $j(this).closest('.address').find('.${hierarchyLevels[i.count].addressField.name}'));"
 							</c:if> 
-							<c:if test="${i.count == fn:length(hierarchyLevels)}">
+							<c:if test="${i.count == switchToFreetext}">
 									onChange="handleAddressFieldChange($j(this), '');"
 							</c:if>
 							/>
