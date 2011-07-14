@@ -1,6 +1,7 @@
 package org.openmrs.module.addresshierarchy.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.openmrs.PersonAddress;
 import org.openmrs.annotation.Authorized;
@@ -22,11 +23,25 @@ public interface AddressHierarchyService{
 	 * (For instance, if the city is set to "Boston", and we ask for possible values for the "state" level,
 	 *  only Massachusetts should be returned) 
 	 * 
-	 * @param address
-	 * @param fieldName
-	 * @return a list of the names of the possible valid address hierarchy entries; returns an empty list if no matches, should return null only if error
+	 * @param address the address we are testing against
+	 * @param fieldName name of the address field to look up possible values for
+	 * @return a list of the names of the possible valid address values for the specified field; returns an empty list if no matches, should return null only if error
 	 */
 	public List<String> getPossibleAddressValues(PersonAddress address, String fieldName);
+	
+	/**
+	 * Given a map of address fields to address field values, returns the names of all entries that are hierarchically valid for the
+	 * specified addressField.  (Excluding duplicate names and ignoring any current value of the specified addressField)
+	 * 
+	 *  This method can handle restrictions based on address field values not only above but also *below* the specified level.
+	 * (For instance, if the city is set to "Boston", and we ask for possible values for the "state" level,
+	 *  only Massachusetts should be returned) 
+	 * 
+	 * @param addressMap a map of address fields names to address field values
+	 * @param fieldName name of the address field to look up possible values for
+	 * @return a list of the names of the possible valid address values for the specified field; returns an empty list if no matches, should return null only if error
+	 */
+	public List<String> getPossibleAddressValues(Map<String,String> addressMap, String fieldName);
 	
 	/**
 	 * Given a person address, returns the names of all entries that are hierarchically valid for the

@@ -6,7 +6,7 @@
 	<!-- Base Module Properties -->
 	<id>addresshierarchy</id>
 	<name>Address Hierarchy</name>
-	<version>2.0.2</version>
+	<version>2.0.3</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
 	<author>Sri Prasanna, John DeRiggi, Mark Goodrich</author>
 	<description>

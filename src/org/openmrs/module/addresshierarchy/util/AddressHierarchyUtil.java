@@ -1,6 +1,7 @@
 package org.openmrs.module.addresshierarchy.util;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,6 +62,18 @@ public class AddressHierarchyUtil {
 	        throw new AddressHierarchyModuleException("Unable to set address field " + field.getName() + " on PersonAddress", e);
         }
 	}
+	
+	
+	public static final PersonAddress convertAddressMapToPersonAddress(Map<String,String> addressMap) {
+		PersonAddress address = new PersonAddress();
+
+		for (String addressFieldName : addressMap.keySet()) {
+			setAddressFieldValue(address, AddressField.getByName(addressFieldName), addressMap.get(addressFieldName));
+		}
+		
+		return address;
+	}
+
 }
 
 

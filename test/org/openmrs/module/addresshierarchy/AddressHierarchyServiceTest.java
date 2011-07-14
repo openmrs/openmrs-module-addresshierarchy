@@ -1,6 +1,8 @@
 package org.openmrs.module.addresshierarchy;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -309,6 +311,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	@Test
 	@Verifies(value = "should find possible matching address hiearchy values", method = "getPossibleAddressValues(PersonAddress,String)")
 	public void getPossibleAddressValues_shouldFindPossibleAddressValues() throws Exception {
+		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
 		// lets start with a simple one
@@ -478,5 +481,29 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		address.setCityVillage("Hingham");
 		results = ahService.getPossibleAddressValues(address, "countyDistrict");
 		Assert.assertEquals(0, results.size());
+	}
+	
+	@Test
+	@Verifies(value = "should find possible matching address hiearchy values", method = "getPossibleAddressValues(Map<String,String>,String)")
+	public void getPossibleAddressValuesMap_shouldFindPossibleAddressValues() throws Exception {
+	
+			AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+	
+			// lets start with a simple one
+			Map<String,String> addressMap = new HashMap<String,String>();
+			addressMap.put("country", "United States");
+			List<String> results = ahService.getPossibleAddressValues(addressMap, "stateProvince");
+			Assert.assertEquals(2, results.size());
+			Assert.assertTrue(results.contains("Rhode Island"));
+			Assert.assertTrue(results.contains("Massachusetts"));
+			
+			// now try a two-level search
+			addressMap = new HashMap<String,String>();
+			addressMap.put("country", "United States");
+			addressMap.put("stateProvince", "Massachusetts");
+			results = ahService.getPossibleAddressValues(addressMap, "countyDistrict");
+			Assert.assertEquals(2, results.size());
+			Assert.assertTrue(results.contains("Plymouth County"));
+			Assert.assertTrue(results.contains("Suffolk County"));
 	}
 }

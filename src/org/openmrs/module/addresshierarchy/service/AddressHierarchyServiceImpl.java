@@ -46,6 +46,11 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<String> getPossibleAddressValues(Map<String,String> addressMap, String fieldName) {		
+		return getPossibleAddressValues(AddressHierarchyUtil.convertAddressMapToPersonAddress(addressMap),fieldName);
+	}
+	
+	@Transactional(readOnly = true)
 	public List<String> getPossibleAddressValues(PersonAddress address, AddressField field) {	
 		
 		Map<String,String> possibleAddressValues = new HashMap<String,String>();
@@ -85,6 +90,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return results;
 	}
 	
+	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel targetLevel) {
 		
 		// split the levels into levels before and after the level associated with the field name
