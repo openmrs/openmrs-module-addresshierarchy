@@ -3,14 +3,14 @@
 <openmrs:require privilege="Manage Address Hierarchy" otherwise="/login.htm"
 	redirect="/module/addresshierarchy/admin/editAddressHierarchyLevel.form" />
 
-<openmrs:htmlInclude file="/scripts/jquery/jquery-1.3.2.min.js"/>
-
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="localHeader.jsp"%>
 
+<openmrs:htmlInclude file="/scripts/jquery/jquery-1.3.2.min.js"/>
+
 <!-- SPECIALIZED STYLES FOR THIS PAGE -->
 <style type="text/css">
-	td {padding-left:4px; padding-right:4px; padding-top:2px; padding-bottom:2px; vertical-align:top}
+	td.tableCell {padding-left:4px; padding-right:4px; padding-top:2px; padding-bottom:2px; vertical-align:top}
 </style>
 
 <!-- JQUERY FOR THIS PAGE -->
@@ -58,16 +58,16 @@
 <table cellspacing="0" cellpadding="0" class="box">
 
 <tr>
-	<td style="font-weight:bold"><nobr><spring:message code="general.name" />:</nobr></td>
-	<td>
+	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="general.name" />:</nobr></td>
+	<td class="tableCell">
 		<input type="text" name="name" value="${level.name}"/>
 	</td>
-	<td width="60%">&nbsp;</td>
+	<td class="tableCell" width="60%">&nbsp;</td>
 </tr>
 
 <tr>
-	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.addressField" />:</nobr></td>
-	<td>
+	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.addressField" />:</nobr></td>
+	<td class="tableCell">
 		<select name="addressField">
 			<option value=""></option>
 			<c:forEach var="field" items="${addressFields}">
@@ -80,19 +80,19 @@
 			<option value="">(<spring:message code="general.none"/>)</option>
 		</select>
 	</td>
-	<td>&nbsp;</td>
+	<td class="tableCell">&nbsp;</td>
 </tr>
 
 <tr>
-	<td style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.required" />:</nobr></td>
-	<td>
+	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.required" />:</nobr></td>
+	<td class="tableCell">
 		<input type="hidden" id="required" name="required" value="${level.required}"/>
 		<input type="checkbox" id="requiredCheckbox" name="requiredCheckbox" value="true" <c:if test="${level.required == true}">checked</c:if> />
 	</td>
 </tr>
 
 <tr>
-	<td>
+	<td class="tableCell">
 		<button type="submit">
 			<spring:message code="general.save" text="Save"/>
 		</button>
@@ -102,8 +102,8 @@
 			</button>
 		</a>		
 	</td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
+	<td class="tableCell">&nbsp;</td>
+	<td class="tableCell">&nbsp;</td>
 </tr>
 
 

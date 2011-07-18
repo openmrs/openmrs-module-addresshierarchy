@@ -7,7 +7,7 @@
 <script type="text/javascript">
 
 	var $j = jQuery;	
-
+	
 	var addressHierarchyLevels = [ <c:forEach var="hierarchyLevel" items="${hierarchyLevels}">'${hierarchyLevel.addressField.name}',</c:forEach> ];
 	var pageContext = '${pageContext.request.contextPath}';
 	var other = "<spring:message code="addresshierarchy.other"/>";
@@ -15,7 +15,7 @@
 	
 	
 	$j(document).ready(function(){
-
+		
 		// initialize all the address field (if necessary) by updating the options in the relevant select list
 		// note that we need to reference the select lists by name (as opposed to class) because there may be multiple
 		// instances of the address portlet (and therefore multiple addresses) on a single page

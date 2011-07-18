@@ -3,6 +3,7 @@ package org.openmrs.module.addresshierarchy.web.controller.ajax;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -88,9 +89,17 @@ public class AddressHierarchyAjaxController {
 			Collections.sort(childEntryNames);
     	
 			// add the elements: ie, { "name": "Boston" }
-			for (String name : childEntryNames) {
-				out.print("{ \"name\": \"" + name + "\" },");
-			}
+			Iterator<String> i = childEntryNames.iterator();			
+			while(i.hasNext()) {
+				
+				out.print("{ \"name\": \"" + i.next() + "\" }");
+				
+				// print comma as a delimiter for all but the last option in the list
+				if (i.hasNext()) {
+					out.print(",");  
+				}
+				
+ 			}
     	}
     	
     	// close the JSON
