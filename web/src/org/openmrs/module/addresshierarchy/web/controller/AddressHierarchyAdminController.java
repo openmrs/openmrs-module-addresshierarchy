@@ -61,7 +61,7 @@ public class AddressHierarchyAdminController {
 	
 	@ModelAttribute("nameMappings")
 	public Map<String,String> getAddressNameMappings() {
-		return AddressSupport.getInstance().getDefaultLayoutTemplate().getNameMappings();
+		return (AddressSupport.getInstance() != null && AddressSupport.getInstance().getDefaultLayoutTemplate() != null) ? AddressSupport.getInstance().getDefaultLayoutTemplate().getNameMappings() : null;
 	}
 	
 	@ModelAttribute("levels")
