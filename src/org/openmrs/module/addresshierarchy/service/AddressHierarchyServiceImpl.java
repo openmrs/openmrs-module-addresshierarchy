@@ -318,11 +318,16 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
-		return getOrderedAddressHierarchyLevels(true);
+		return getOrderedAddressHierarchyLevels(true, true);
 	}
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels(Boolean includeUnmapped) {	
+		return getOrderedAddressHierarchyLevels(includeUnmapped, true);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels(Boolean includeUnmapped, Boolean includeEmptyLevels) {
 		List<AddressHierarchyLevel> levels = new ArrayList<AddressHierarchyLevel>();
 		
 		// first, get the top level level
@@ -330,14 +335,16 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		if (level != null) {
 			// add the top level to this list
-			if (level.getAddressField() != null || includeUnmapped == true) {
+			if ((includeUnmapped == true || level.getAddressField() != null) 
+					&& (includeEmptyLevels == true ||  getAddressHierarchyEntryCountByLevel(level) > 0)) {
 				levels.add(level);
 			}
 				
 			// now fetch the children in order
 			while (getChildAddressHierarchyLevel(level) != null) {
 				level = getChildAddressHierarchyLevel(level);
-				if (level.getAddressField() != null || includeUnmapped == true) {	
+				if ((includeUnmapped == true || level.getAddressField() != null) 
+						&& (includeEmptyLevels == true ||  getAddressHierarchyEntryCountByLevel(level) > 0)) {	
 					levels.add(level);
 				}
 			}

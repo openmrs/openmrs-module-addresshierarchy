@@ -198,6 +198,15 @@ public interface AddressHierarchyService{
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels(Boolean includeUnmapped);
 	
 	/**
+	 * Gets the address hierarchy levels, ordered from the top of the hierarchy to the bottom
+	 * 
+	 * @param includeUnmapped specifies whether or not to include hierarchy levels that aren't mapped to an underlying address field
+	 * @param includeEmptyLevels specified whether or not include hierarchy levels that don't have any address hierarchy entries entries
+	 * @return the ordered list of address hierarchy levels
+	 */
+	public List<AddressHierarchyLevel >getOrderedAddressHierarchyLevels(Boolean includeUnmapped, Boolean includeEmptyLevels);
+	
+	/**
 	 * Gets all address hierarchy levels
 	 * 
 	 * @return a list of all address hierarchy levels

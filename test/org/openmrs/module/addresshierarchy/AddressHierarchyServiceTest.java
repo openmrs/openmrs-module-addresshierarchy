@@ -121,6 +121,47 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
+	@Verifies(value = "should get all address hierarchy levels in order ignoring empty levels", method = "getOrderedAddressHierarchyLevels(Boolean,Boolean)")
+	public void getOrderedAddressHierarchyLevels_shouldGetAllAddressHierarchyLevelsInOrderIgnoringEmptyLevels()
+	                                                                                                              throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(true, false);
+		
+		Assert.assertEquals(6, levels.size());
+		
+		// make sure that the list returns the levels in the proper order
+		Assert.assertTrue(levels.get(0) == (ahService.getAddressHierarchyLevel(1)));
+		Assert.assertTrue(levels.get(1) == (ahService.getAddressHierarchyLevel(7)));
+		Assert.assertTrue(levels.get(2) == (ahService.getAddressHierarchyLevel(4)));
+		Assert.assertTrue(levels.get(3) == (ahService.getAddressHierarchyLevel(2)));
+		Assert.assertTrue(levels.get(4) == (ahService.getAddressHierarchyLevel(5)));
+		Assert.assertTrue(levels.get(5) == (ahService.getAddressHierarchyLevel(3)));
+		
+	}
+	
+	@Test
+	@Verifies(value = "should get all address hierarchy levels in order ignoring unmapped levels and empty levels", method = "getOrderedAddressHierarchyLevels(Boolean,Boolean)")
+	public void getOrderedAddressHierarchyLevels_shouldGetAllAddressHierarchyLevelsInOrderIgnoringUnmappedLevelsAndEmptyLevels()
+	                                                                                                              throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false, false);
+		
+		Assert.assertEquals(5, levels.size());
+		
+		// make sure that the list returns the levels in the proper order
+		Assert.assertTrue(levels.get(0) == (ahService.getAddressHierarchyLevel(1)));
+		Assert.assertTrue(levels.get(1) == (ahService.getAddressHierarchyLevel(4)));
+		Assert.assertTrue(levels.get(2) == (ahService.getAddressHierarchyLevel(2)));
+		Assert.assertTrue(levels.get(3) == (ahService.getAddressHierarchyLevel(5)));
+		Assert.assertTrue(levels.get(4) == (ahService.getAddressHierarchyLevel(3)));
+			
+	}
+	
+	@Test
 	@Verifies(value = "should add a address hierarchy level", method = "addAddressHierarchyLevel()")
 	public void addAddressHierarchyLevel_shouldAddAddressHierarchyLevel() throws Exception {
 		
