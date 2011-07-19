@@ -68,11 +68,18 @@
 </script>
 <!-- END JQUERY -->
 
+<!-- wrap everything in a table or a tbody depending on whether or not show table has been selected -->
+<c:choose>
+	<c:when test="${model.layoutShowTable == 'true'}">
+		<table class="address">
+	</c:when>
+	<c:otherwise>
+		<tbody class="address">
+	</c:otherwise>
+</c:choose>
 
-<div class="address">
-	<table>
-	
-		<!-- handle the "preferred" checkbox if we are in extended mode (this is copied from the existing 1.6 addressLayout.jsp) -->
+
+	<!-- handle the "preferred" checkbox if we are in extended mode (this is copied from the existing 1.6 addressLayout.jsp) -->
 		<c:if test="${model.layoutShowExtended == 'true'}">
 			<tr>
 				<td><spring:message code="general.preferred"/></td>
@@ -165,8 +172,16 @@
               </c:if>
 		</c:if>
 		
-	</table>
-</div>
+<c:choose>
+	<c:when test="${model.layoutShowTable == 'true'}">
+		</table>
+	</c:when>
+	<c:otherwise>
+		</tbody>
+	</c:otherwise>
+</c:choose>
+
+
 
 
 
