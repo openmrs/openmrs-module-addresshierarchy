@@ -59,40 +59,42 @@ function handleAddressFieldChange(changedField, fieldToUpdate) {
 function updateOptions(fieldToUpdate, searchString, value) {	
 	
 	// do the JSON call and add the appropriate elements
-	$j.getJSON(pageContext + '/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form',
-			{ 'searchString': searchString},
-			function (data) {
-				
-				var foundCurrentValue;
-				
-				fieldToUpdate.empty();
-				fieldToUpdate.append($j(document.createElement('option')).attr('value','').text(''));
-				$j.each(data, function(i, entry) {
-					var option = $j(document.createElement('option')).attr('value', entry.name).text(entry.name);
-					if (entry.name.toLowerCase() == value.toLowerCase()) {
-						option.attr('selected',true);
-						foundCurrentValue = true;
-					}
-					fieldToUpdate.append(option);
-				});
-				if (allowFreetext == true) {
-					fieldToUpdate.append($j(document.createElement('option')).attr('value', '--other--').text(other));
-				}
+	$j.ajax({
+		  type: 'POST',
+		  url: pageContext + '/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form',
+		  dataType: 'json',
+		  data: { 'searchString': searchString },
+		  success: function (data) {
+					var foundCurrentValue;
 					
-				// if we haven't found a match against the current value of the field, switch to the "Other" case
-				// (note even if allowFreetext == false, we call handleSelectOther, because although we don't want to
-				// allow the creation of new freetext values, we want to display any legacy ones that may exist)
-				if (!foundCurrentValue && value !='') {		
+					fieldToUpdate.empty();
+					fieldToUpdate.append($j(document.createElement('option')).attr('value','').text(''));
+					$j.each(data, function(i, entry) {
+						var option = $j(document.createElement('option')).attr('value', entry.name).text(entry.name);
+						if (entry.name.toLowerCase() == value.toLowerCase()) {
+							option.attr('selected',true);
+							foundCurrentValue = true;
+						}
+						fieldToUpdate.append(option);
+					});
 					if (allowFreetext == true) {
-						fieldToUpdate.val('--other--')
+						fieldToUpdate.append($j(document.createElement('option')).attr('value', '--other--').text(other));
 					}
-					handleSelectOther(fieldToUpdate, false);
+						
+					// if we haven't found a match against the current value of the field, switch to the "Other" case
+					// (note even if allowFreetext == false, we call handleSelectOther, because although we don't want to
+					// allow the creation of new freetext values, we want to display any legacy ones that may exist)
+					if (!foundCurrentValue && value !='') {		
+						if (allowFreetext == true) {
+							fieldToUpdate.val('--other--')
+						}
+						handleSelectOther(fieldToUpdate, false);
+					}
+					
+					// show the select list
+					fieldToUpdate.show();
 				}
-				
-				// show the select list
-				fieldToUpdate.show();
-			}
-		);
+	});
 }
 
 // called from handleAddressFieldChange to handle the case when a user selects "Other" from the list of options
