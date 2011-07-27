@@ -4,14 +4,20 @@ var $j = jQuery;
 // the default handler that is called when a change event occurs on any of the address field selection lists
 function handleAddressFieldChange(changedField, fieldToUpdate) {
 	// if it's been a switch to "other", hand off to the handleSelectOther function
-	if(changedField.val() == '--other--') {
+	if (changedField.val() == '--other--') {
 		handleSelectOther(changedField, true);
+		return;
+	}
+	
+	// if it has been switch to the blank entry, hand off to the handleSelectBlank function
+	if (changedField.val() == '') {
+		handleSelectBlank(changedField);
 		return;
 	}
 	
 	// if it's a switch with no field to update (ie, the last level in the hierarchy), just make sure we've switch back to 
 	// a selection list (to handle the case where we are switching out of the "other" state)
-	if(fieldToUpdate == '') {
+	if (fieldToUpdate == '') {
 		switchToSelectList(changedField);
 		return;
 	}
@@ -96,6 +102,31 @@ function updateOptions(fieldToUpdate, searchString, value) {
 				}
 	});
 }
+
+// called from the handleAddresesFieldChange to handle the case when a user selects the "blank" option from the list of options
+function handleSelectBlank(field) {
+	var fieldLevelIndex = findIndexOfLevel(field.attr('class'));
+	var address = field.closest('.address');
+	
+	// iterate through all the address hierarchy levels
+	$j.each(addressHierarchyLevels, function (i, level) {		
+		// we want to skip all the hierarchy levels before the level of the address field we are operating on
+		if (i >= fieldLevelIndex){
+			
+			var selectList = address.find('.' + level);
+			
+			// empty and hide all select lists of hierarchy levels below the field that was set to "blank"
+			if (i > fieldLevelIndex) {
+				selectList.empty();
+				selectList.hide();
+			}
+			
+			// make sure the fields are set back to select lists
+			switchToSelectList(selectList);
+		}
+	});
+}
+ 
 
 // called from handleAddressFieldChange to handle the case when a user selects "Other" from the list of options
 // also used to switch fields into the "Other" state upon initialization as required

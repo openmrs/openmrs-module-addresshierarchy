@@ -23,7 +23,6 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
 	
 	/** Overrides the handle request to use the custom address hierarchy jsp if in edit mode */
 	
-	@SuppressWarnings("unchecked")
     @Override
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 	                                                                                           IOException {
@@ -37,7 +36,8 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
 		// we only want to override with our custom page if 1) override is enabled, 2) size="full", 
 		// 3) we aren't in view mode, and 4) we have defined address hierarchy levels
 		try {
-			Map map = (Map) mav.getModelMap().get("model");	
+			@SuppressWarnings("unchecked")
+            Map<Object,Object> map = (Map<Object,Object>) mav.getModelMap().get("model");	
 			if (AddressHierarchyUtil.getGlobalPropertyAsBoolean("addresshierarchy.enableOverrideOfAddressPortlet") == true &&
 					map.containsKey("size") && ((String) map.get("size")).equals("full") &&
 					(!map.containsKey("layoutMode") || ((String) map.get("layoutMode")).equals("edit")) &&

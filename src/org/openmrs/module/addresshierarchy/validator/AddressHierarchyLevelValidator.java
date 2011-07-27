@@ -10,8 +10,7 @@ import org.springframework.validation.Validator;
 @Component
 public class AddressHierarchyLevelValidator implements Validator {
 
-	@SuppressWarnings("unchecked")
-	public boolean supports(Class c) {
+	public boolean supports(@SuppressWarnings("rawtypes") Class c) {
 		return AddressHierarchyLevel.class.isAssignableFrom(c);
 	}
 
