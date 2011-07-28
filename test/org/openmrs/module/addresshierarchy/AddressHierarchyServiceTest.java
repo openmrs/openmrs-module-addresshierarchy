@@ -525,7 +525,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
-	@Verifies(value = "should find possible matching address hiearchy values", method = "getPossibleAddressValues(Map<String,String>,String)")
+	@Verifies(value = "should find possible matching address hierarchy values", method = "getPossibleAddressValues(Map<String,String>,String)")
 	public void getPossibleAddressValuesMap_shouldFindPossibleAddressValues() throws Exception {
 	
 			AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
@@ -546,5 +546,57 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 			Assert.assertEquals(2, results.size());
 			Assert.assertTrue(results.contains("Plymouth County"));
 			Assert.assertTrue(results.contains("Suffolk County"));
+	}
+	
+	@Test
+	@Verifies(value = "should find possible full addresses that match search string", method = "getPossibleFullAddresses(String)")
+	public void getPossibleFullAddresses_shouldFindPossibleFullAddressesThatMatchSearchString() throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+	
+		// try a single word that is an exact match for an entry
+		List<String> results = ahService.getPossibleFullAddresses("boston");
+		Assert.assertEquals(2,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Jamaica Plain"));
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
+		
+		// try a partial word
+		results = ahService.getPossibleFullAddresses("bos");
+		Assert.assertEquals(2,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Jamaica Plain"));
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
+		
+		// test case-sensitive
+		results = ahService.getPossibleFullAddresses("bOsToN");
+		Assert.assertEquals(2,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Jamaica Plain"));
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
+		
+		// test multiple words
+		results = ahService.getPossibleFullAddresses("jamaica boston");
+		Assert.assertEquals(1,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Jamaica Plain"));
+		
+		// test multiple words
+		results = ahService.getPossibleFullAddresses("boston new england beacon hill");
+		Assert.assertEquals(1,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
+		
+		// test with multiple, partial words
+		results = ahService.getPossibleFullAddresses("bos hil");
+		Assert.assertEquals(1,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
+		
+		// test a string with commas (or other non-word characters) in it (which should be ignored)
+		results = ahService.getPossibleFullAddresses("boston, beacon hill");
+		Assert.assertEquals(1,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
+		
+		
+		// test case with no results
+		results = ahService.getPossibleFullAddresses("boston new england beacon hill plymouth");
+		Assert.assertEquals(0,results.size());
+	
+		
 	}
 }

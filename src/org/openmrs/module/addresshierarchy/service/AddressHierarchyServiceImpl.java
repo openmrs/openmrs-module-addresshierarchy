@@ -1,11 +1,13 @@
 package org.openmrs.module.addresshierarchy.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -28,6 +30,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	protected static final Log log = LogFactory.getLog(AddressHierarchyServiceImpl.class);
 	
 	private AddressHierarchyDAO dao;
+	
+	private List<String> fullAddressCache;
 	
 	public void setAddressHierarchyDAO(AddressHierarchyDAO dao) {
 		this.dao = dao;
@@ -225,6 +229,57 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<String> getPossibleFullAddresses(String searchString) {
+		
+		// if search string isempty or null, return empty list
+		if (StringUtils.isBlank(searchString)) {
+			return new ArrayList<String>();
+		}
+		
+		// refresh the cache where all the full addresses are stored, if needed
+		if (this.fullAddressCache == null || this.fullAddressCache.size() == 0) {
+			buildFullAddressCache();
+		}
+		
+		List<String> results = new ArrayList<String>();
+		
+		// first remove all characters that are not alphanumerics or whitespace
+		// (more specifically, this pattern matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
+		searchString = Pattern.compile("[\\W&&\\S]+").matcher(searchString).replaceAll("");
+				
+		// split the search string into words
+		String [] words = searchString.split(" ");
+		
+		// another sanity check; return an empty string if nothing to search on
+		if (words.length == 0 || StringUtils.isBlank(words[0])) {
+			return new ArrayList<String>();
+		}
+		
+		// find all addresses in the full address cache that contain the first word in the search string
+		Pattern p = Pattern.compile(Pattern.quote(words[0]), Pattern.CASE_INSENSITIVE);
+		for (String address : fullAddressCache) {
+			if (p.matcher(address).find()) {
+				results.add(address);
+			}
+		}
+		
+		// now go through and remove from the results list any addresses that don't contain the other words in the search string
+		if (words.length > 1) {
+			for (String word : Arrays.copyOfRange(words, 1, words.length)) {
+				Iterator<String> i = results.iterator();
+				p = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE);
+				while (i.hasNext()) {
+					if (!p.matcher(i.next()).find()) {
+						i.remove();
+					}
+				}
+			}
+		}
+ 		
+		return results;
+	}
+	
+	@Transactional(readOnly = true)
 	public Integer getAddressHierarchyEntryCount() {
 		return dao.getAddressHierarchyEntryCount();
 	}
@@ -302,6 +357,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry entry) {
 		dao.saveAddressHierarchyEntry(entry);
+		resetFullAddressCache();
 	}
 	
 	@Transactional
@@ -309,11 +365,13 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		for (AddressHierarchyEntry entry : entries) {
 			dao.saveAddressHierarchyEntry(entry);
 		}
+		resetFullAddressCache();
 	}
 	
 	@Transactional
 	public void deleteAllAddressHierarchyEntries() {
 		dao.deleteAllAddressHierarchyEntries();
+		resetFullAddressCache();
 	}
 	
 	@Transactional(readOnly = true)
@@ -435,6 +493,51 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			}
 		}
 	}
+	
+	/**
+	 * Utility methods
+	 */
+	
+	/**
+	 * Builds a list of pipe-delimited strings that represents all the possible full addresses,
+	 * and stores this in a local cache for use by the getPossibleFullAddresses(String) method
+	 * A full address is represented as a pipe-delimited string of address hierarchy entry names,
+	 * ordered from the entry at the highest level to the entry at the lowest level in the tree.
+	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
+	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
+	 *  
+	 */
+	private void buildFullAddressCache() {
+		
+		// TODO: reset the cache every time the address hierarchy entries are changed?
+		
+		this.fullAddressCache = new ArrayList<String>();
+		
+		List<AddressHierarchyLevel> levels = getOrderedAddressHierarchyLevels(true,false);
+		AddressHierarchyLevel bottomLevel = levels.get(levels.size() - 1);
+		
+		// go through all the entries at the bottom level of the hierarchy
+		for (AddressHierarchyEntry bottomLevelEntry : getAddressHierarchyEntriesByLevel(bottomLevel)) {	
+			StringBuilder address = new StringBuilder();
+			address.append(bottomLevelEntry.getName());
+			
+			AddressHierarchyEntry entry = bottomLevelEntry;
+			
+			// follow back up the tree to the top level and concatenate the names to create the full address string
+			while (entry.getParent() != null) {
+				entry = entry.getParent();
+				address.insert(0, entry.getName() + "|");
+			}
+			
+			this.fullAddressCache.add(address.toString());
+		}
+		
+	}
+	
+	private void resetFullAddressCache() {
+		this.fullAddressCache = null;
+	}
+	
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to

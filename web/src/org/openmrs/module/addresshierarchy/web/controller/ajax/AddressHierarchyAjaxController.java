@@ -90,8 +90,7 @@ public class AddressHierarchyAjaxController {
     	
 			// add the elements: ie, { "name": "Boston" }
 			Iterator<String> i = childEntryNames.iterator();			
-			while(i.hasNext()) {
-				
+			while (i.hasNext()) {
 				out.print("{ \"name\": \"" + i.next() + "\" }");
 				
 				// print comma as a delimiter for all but the last option in the list
@@ -106,4 +105,38 @@ public class AddressHierarchyAjaxController {
 		out.print("]");
 	}
 	
+	/**
+	 * Returns a list of full addresses in string format that match the given search string
+	 * (See docs on the underlying getPossibleFulleAddresses(String) method for more information
+	 */
+	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddresses.form") 
+	public void getPossibleFulleAddressesEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
+					                             @RequestParam("searchString") String searchString) throws Exception {
+		
+		List<String> addresses = Context.getService(AddressHierarchyService.class).getPossibleFullAddresses(searchString);
+		
+		// send back the response
+		response.setContentType("application/json");
+    	response.setCharacterEncoding("UTF-8");
+    	PrintWriter out = response.getWriter();
+
+    	// TODO: perhaps each entry as some sort of JSON object?
+    	
+    	out.print("[");
+    	
+		if (addresses != null && addresses.size() > 0) {
+			Iterator<String> i = addresses.iterator();
+			
+			while (i.hasNext()) {	
+				out.print("{ \"address\": \"" + i.next() + "\" }");
+				
+				// print comma as a delimiter for all but the last option in the list
+				if (i.hasNext()) {
+					out.print(",");  
+				}
+			}
+		}
+		
+    	out.print("]");
+	}
 }

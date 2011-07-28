@@ -56,6 +56,7 @@ public interface AddressHierarchyService{
 	 * @return a list of the names of the possible valid address hierarchy entries; returns an empty list if no matches, should return null only if error
 	 */
 	public List<String> getPossibleAddressValues(PersonAddress address, AddressField field);
+		
 	
 	/**
 	 * Given a person address, returns all the address hierarchy entries that are hierarchically valid for the
@@ -70,6 +71,18 @@ public interface AddressHierarchyService{
 	 * @return a list of possible valid address hierarchy entries; returns an empty list if no matches, should return null only if error
 	 */
 	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel level);
+	
+	/**
+	 * Given a search string, returns all the "full addresses" that match that search string
+	 * Returns a list of full addresses, represented as a pipe-delimited string of 
+	 * address hierarchy entry names, ordered from the entry at the highest level to the entry at the lowest level in the tree.
+	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
+	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
+	 * 
+	 * @param searchString the search string to search for
+	 * @return a list of full addresses; returns an empty list if no matches
+	 */
+	public List<String> getPossibleFullAddresses(String searchString);
 	
 	/**
 	 * Returns a count of the total number of address hierarchy entries
