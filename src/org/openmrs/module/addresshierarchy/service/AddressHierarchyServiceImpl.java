@@ -526,7 +526,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			// follow back up the tree to the top level and concatenate the names to create the full address string
 			while (entry.getParent() != null) {
 				entry = entry.getParent();
-				address.insert(0, entry.getName() + "|");
+				//address.insert(0, entry.getName() + "|");
+				address.append("| " + entry.getName());
 			}
 			
 			this.fullAddressCache.add(address.toString());

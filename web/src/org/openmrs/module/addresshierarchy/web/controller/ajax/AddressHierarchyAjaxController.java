@@ -111,13 +111,19 @@ public class AddressHierarchyAjaxController {
 	 */
 	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddresses.form") 
 	public void getPossibleFulleAddressesEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
-					                             @RequestParam("searchString") String searchString) throws Exception {
+					                             @RequestParam("searchString") String searchString ,
+					                             @RequestParam(value = "separator", required = false) String separator) throws Exception {
 		
 		List<String> addresses = Context.getService(AddressHierarchyService.class).getPossibleFullAddresses(searchString);
-		
+		String delimeter = null;		
+		if(!StringUtils.equals(separator, "|")){
+			delimeter = separator;
+		}
+					
 		// send back the response
-		response.setContentType("application/json");
-    	response.setCharacterEncoding("UTF-8");
+		//response.setContentType("application/json");
+		response.setContentType("text/json");
+    	//response.setCharacterEncoding("UTF-8");
     	PrintWriter out = response.getWriter();
 
     	// TODO: perhaps each entry as some sort of JSON object?
@@ -126,13 +132,21 @@ public class AddressHierarchyAjaxController {
     	
 		if (addresses != null && addresses.size() > 0) {
 			Iterator<String> i = addresses.iterator();
-			
-			while (i.hasNext()) {	
-				out.print("{ \"address\": \"" + i.next() + "\" }");
-				
-				// print comma as a delimiter for all but the last option in the list
-				if (i.hasNext()) {
-					out.print(",");  
+			if(StringUtils.isNotBlank(delimeter)){
+				while (i.hasNext()) {						
+					out.print("{ \"address\": \"" + StringUtils.replace(i.next(), "|", delimeter) + "\" }");				
+					// print comma as a delimiter for all but the last option in the list
+					if (i.hasNext()) {
+						out.print(",");  
+					}
+				}
+			}else{
+				while (i.hasNext()) {	
+					out.print("{ \"address\": \"" + i.next() + "\" }");				
+					// print comma as a delimiter for all but the last option in the list
+					if (i.hasNext()) {
+						out.print(",");  
+					}
 				}
 			}
 		}
