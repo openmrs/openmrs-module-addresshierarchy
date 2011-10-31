@@ -121,9 +121,8 @@ public class AddressHierarchyAjaxController {
 		}
 					
 		// send back the response
-		//response.setContentType("application/json");
 		response.setContentType("text/json");
-    	//response.setCharacterEncoding("UTF-8");
+    	response.setCharacterEncoding("UTF-8");
     	PrintWriter out = response.getWriter();
 
     	// TODO: perhaps each entry as some sort of JSON object?
