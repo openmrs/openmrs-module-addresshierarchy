@@ -106,35 +106,35 @@ public class AddressHierarchyAjaxController {
 	}
 	
 	/**
-	 * Returns a list of full addresses in string format that match the given search string
-	 * (See docs on the underlying getPossibleFulleAddresses(String) method for more information
+	 * Returns a list of full addresses in string format that match the given search string;
+	 * Specify a separator if you want the full address strings returned to be delimited by something other than the pipe (|)
+	 * (See docs on the underlying getPossibleFullAddresses(String) method for more information
 	 */
 	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddresses.form") 
-	public void getPossibleFulleAddressesEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
+	public void getPossibleFullAddressesEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
 					                             @RequestParam("searchString") String searchString ,
 					                             @RequestParam(value = "separator", required = false) String separator) throws Exception {
 		
 		List<String> addresses = Context.getService(AddressHierarchyService.class).getPossibleFullAddresses(searchString);
-		String delimeter = null;		
+		
+		String delimiter = null;		
 		if(!StringUtils.equals(separator, "|")){
-			delimeter = separator;
+			delimiter = separator;
 		}
 					
 		// send back the response
 		response.setContentType("text/json");
     	response.setCharacterEncoding("UTF-8");
     	PrintWriter out = response.getWriter();
-
-    	// TODO: perhaps each entry as some sort of JSON object?
     	
     	out.print("[");
     	
 		if (addresses != null && addresses.size() > 0) {
 			Iterator<String> i = addresses.iterator();
-			if(StringUtils.isNotBlank(delimeter)){
+			if(StringUtils.isNotBlank(delimiter)){
 				while (i.hasNext()) {						
-					out.print("{ \"address\": \"" + StringUtils.replace(i.next(), "|", delimeter) + "\" }");				
-					// print comma as a delimiter for all but the last option in the list
+					out.print("{ \"address\": \"" + StringUtils.replace(i.next(), "|", delimiter) + "\" }");				
+					// print comma between entries for all but the last option in the list
 					if (i.hasNext()) {
 						out.print(",");  
 					}
@@ -142,7 +142,7 @@ public class AddressHierarchyAjaxController {
 			}else{
 				while (i.hasNext()) {	
 					out.print("{ \"address\": \"" + i.next() + "\" }");				
-					// print comma as a delimiter for all but the last option in the list
+					// print comma between entries for all but the last option in the list
 					if (i.hasNext()) {
 						out.print(",");  
 					}
