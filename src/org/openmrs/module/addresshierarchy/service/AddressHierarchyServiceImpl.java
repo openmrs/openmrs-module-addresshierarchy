@@ -236,10 +236,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			return new ArrayList<String>();
 		}
 		
-		// refresh the cache where all the full addresses are stored, if needed
-		if (this.fullAddressCache == null || this.fullAddressCache.size() == 0) {
-			buildFullAddressCache();
-		}
+		// initialize the cache (if necessary)
+		initializeFullAddressCache();
 		
 		List<String> results = new ArrayList<String>();
 		
@@ -257,7 +255,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		// find all addresses in the full address cache that contain the first word in the search string
 		Pattern p = Pattern.compile(Pattern.quote(words[0]), Pattern.CASE_INSENSITIVE);
-		for (String address : fullAddressCache) {
+		for (String address : this.fullAddressCache) {
 			if (p.matcher(address).find()) {
 				results.add(address);
 			}
@@ -505,31 +503,39 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	 * ordered from the entry at the highest level to the entry at the lowest level in the tree.
 	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
 	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
+	 * 
+	 * Need to make sure we synchronize to avoid having multiple threads
+	 * trying to initialize it at the same time, or one using it before it is initialized
+	 * (Note that the one thing this won't prevent against is it being re-initialized while another
+	 * thread is accessing it)
 	 *  
 	 */
-	private void buildFullAddressCache() {
+	
+	 synchronized private void initializeFullAddressCache() {
 		
-		// TODO: reset the cache every time the address hierarchy entries are changed?
-		
-		this.fullAddressCache = new ArrayList<String>();
-		
-		List<AddressHierarchyLevel> levels = getOrderedAddressHierarchyLevels(true,false);
-		AddressHierarchyLevel bottomLevel = levels.get(levels.size() - 1);
-		
-		// go through all the entries at the bottom level of the hierarchy
-		for (AddressHierarchyEntry bottomLevelEntry : getAddressHierarchyEntriesByLevel(bottomLevel)) {	
-			StringBuilder address = new StringBuilder();
-			address.append(bottomLevelEntry.getName());
+		// online initialize if necessary
+		if (this.fullAddressCache == null || this.fullAddressCache.size() == 0) {
 			
-			AddressHierarchyEntry entry = bottomLevelEntry;
+			this.fullAddressCache = new ArrayList<String>();
 			
-			// follow back up the tree to the top level and concatenate the names to create the full address string
-			while (entry.getParent() != null) {
-				entry = entry.getParent();
-				address.insert(0, entry.getName() + "|");				
+			List<AddressHierarchyLevel> levels = getOrderedAddressHierarchyLevels(true,false);
+			AddressHierarchyLevel bottomLevel = levels.get(levels.size() - 1);
+			
+			// go through all the entries at the bottom level of the hierarchy
+			for (AddressHierarchyEntry bottomLevelEntry : getAddressHierarchyEntriesByLevel(bottomLevel)) {	
+				StringBuilder address = new StringBuilder();
+				address.append(bottomLevelEntry.getName());
+				
+				AddressHierarchyEntry entry = bottomLevelEntry;
+				
+				// follow back up the tree to the top level and concatenate the names to create the full address string
+				while (entry.getParent() != null) {
+					entry = entry.getParent();
+					address.insert(0, entry.getName() + "|");				
+				}
+				
+				this.fullAddressCache.add(address.toString());
 			}
-			
-			this.fullAddressCache.add(address.toString());
 		}
 		
 	}
@@ -537,7 +543,6 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	private void resetFullAddressCache() {
 		this.fullAddressCache = null;
 	}
-	
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to
