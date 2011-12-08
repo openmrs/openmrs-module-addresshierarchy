@@ -26,6 +26,10 @@ import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 public class AddressHierarchyImportUtil {
 	
 	  protected static final Log log = LogFactory.getLog(AddressHierarchyImportUtil.class);
+	  
+	  // number of entries to save at one time
+	  // we want to save in batches to improve performance, but if try to save ALL at once we can run into memory issues
+	  protected static final int ENTRY_BATCH_SIZE = 10;
 	
 	/**
 	 * Takes a file of delimited addresses and creates and address hierarchy out of it
@@ -122,8 +126,21 @@ public class AddressHierarchyImportUtil {
 	        throw new AddressHierarchyModuleException("Error accessing address hierarchy import stream ", e);
         }
         
-        // now do the actual save
-        ahService.saveAddressHierarchyEntries(entries);
+		log.info(entries.size() + " address hierarchy entries to save");
+		
+        // now do the actual save, broken up into batches
+		int batchStart = 0;
+		int batchEnd = ENTRY_BATCH_SIZE; 
+	
+		while (batchEnd <= entries.size()) {
+			ahService.saveAddressHierarchyEntries(entries.subList(batchStart, batchEnd));
+			batchStart = batchEnd;
+			batchEnd = batchEnd + ENTRY_BATCH_SIZE;
+		}
+		
+		if (batchStart < entries.size()) {
+			ahService.saveAddressHierarchyEntries(entries.subList(batchStart, entries.size()));
+		}
 	}
 	
 	public static final void importAddressHierarchyFile(InputStream stream, String delimiter) {
