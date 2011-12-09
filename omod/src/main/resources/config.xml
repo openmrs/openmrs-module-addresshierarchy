@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--   <!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.0.dtd"> -->
+
+<module configVersion="1.0">
+	
+	<!-- Base Module Properties -->
+	<id>@MODULE_ID@</id>
+	<name>@MODULE_NAME@</name>
+	<version>${project.parent.version}</version>
+	<package>@MODULE_PACKAGE@</package>
+	<author>Sri Prasanna, John DeRiggi, Mark Goodrich</author>
+	<description>
+			Allows for the entry of structured addresses.
+	</description>
+
+	<activator>org.openmrs.module.addresshierarchy.AddressHierarchyActivator</activator>
+	
+	<updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL>
+	
+	<!-- /Base Module Properties -->
+	
+	<require_version>1.6</require_version>
+	
+	<!-- Extensions -->
+	<extension>
+		<point>org.openmrs.admin.list</point>
+		<class>org.openmrs.module.addresshierarchy.extension.html.AdminList</class>
+	</extension>
+	
+	<!-- Required Privileges -->
+	<privilege>
+		<name>Manage Address Hierarchy</name>
+		<description>Allows user to access/modify the defined address hierarchy</description>
+	</privilege>
+	 <!-- /Required Privileges -->
+
+
+	<!-- Required Global Properties -->
+	<globalProperty>
+		<property>addresshierarchy.allowFreetext</property>
+		<defaultValue>true</defaultValue>
+		<description>
+			Valid values: true/false. When overriding the address portlet, allow the entry of free text for address fields associated with the address hierarchy by providing an "Other" option
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>addresshierarchy.enableOverrideOfAddressPortlet</property>
+		<defaultValue>true</defaultValue>
+		<description>
+			Valid values: true/false. When enabled, the existing "edit" component of the address portlet is overridden by the new functionality provided by the address hierarchy module
+		</description>
+	</globalProperty>
+	
+	
+	<!-- Internationalization -->
+	<!-- All message codes should start with @MODULE_ID@.* -->
+	<messages>
+		<lang>en</lang>
+		<file>messages.properties</file>
+	</messages>
+	<messages>
+		<lang>fr</lang>
+		<file>messages_fr.properties</file>
+	</messages>  
+<!--  	<messages>
+		<lang>es</lang>
+		<file>messages_es.properties</file>
+	</messages>-->
+	<!-- /Internationalization -->
+	
+	<mappingFiles>
+		${omodHbmConfig}
+	</mappingFiles>
+	
+</module>
+
