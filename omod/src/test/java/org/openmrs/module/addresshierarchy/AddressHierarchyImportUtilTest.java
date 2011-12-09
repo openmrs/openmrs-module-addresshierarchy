@@ -17,6 +17,8 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 	
 	protected static final String CSV_FILE_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleFile.csv";
 	
+	protected static final String CSV_LARGE_FILE_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleLargeFile.csv";
+	
 	@Before
 	public void setupDatabase() throws Exception {
 		initializeInMemoryDatabase();
@@ -50,4 +52,26 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		Assert.assertTrue(!duplicateSample.get(0).getParent().getName().equals(duplicateSample.get(1).getParent().getName()));
 		
 	}
+	
+	@Test
+	@Verifies(value = "should import large csv file", method = "importAddressHierarchyFile()")
+	public void importCsvFile_shouldImportLargeCsvFile() throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		InputStream file = getClass().getClassLoader().getResourceAsStream(CSV_LARGE_FILE_TO_IMPORT);
+		AddressHierarchyImportUtil.importAddressHierarchyFile(file, ",");
+		
+		// confirm that all 17902 entries have been added
+		Assert.assertEquals(new Integer(17902), ahService.getAddressHierarchyEntryCount());
+		
+		// verify that a few data points exist	
+		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
+		Assert.assertEquals("Haiti", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "Haiti").get(0).getName());
+		Assert.assertEquals("Sud-Est", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(1), "Sud-Est").get(0).getName());
+		Assert.assertEquals("Thiotte", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(2), "Thiotte").get(0).getName());
+		Assert.assertEquals("Tou Roche", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(4), "Tou Roche").get(0).getName());
+		
+	}
+
 }
