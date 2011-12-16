@@ -19,7 +19,7 @@
 			column="level_id" lazy="false" />
 
 		<many-to-one name="parent" class="AddressHierarchyEntry"
-			column="parent_id" />
+			column="parent_id" cascade="delete"/>
 
 		<property name="userGeneratedId" type="string" column="user_generated_id" />
 

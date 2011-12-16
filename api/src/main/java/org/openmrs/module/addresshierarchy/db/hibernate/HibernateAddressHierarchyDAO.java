@@ -126,9 +126,15 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	
 	public void deleteAllAddressHierarchyEntries() {
 		Session session = sessionFactory.getCurrentSession();
-		session.createSQLQuery("SET foreign_key_checks = 0").executeUpdate();
-		session.createSQLQuery("DELETE FROM address_hierarchy_entry").executeUpdate();
-		session.createSQLQuery("SET foreign_key_checks = 1").executeUpdate();
+		
+		// cycle through all the top-level entries and delete them; the rest should be deleted via cascade
+		// note that I haven't been able to figure out how to have this cascade work on the hibernate level,
+		// so I have defined it at the database level in mysql; therefore, the unit test for this doesn't work
+		
+		for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
+			session.delete(entry);
+		}
+		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -380,5 +386,6 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		
 		return allAddresses;
 	}
+
 
 }

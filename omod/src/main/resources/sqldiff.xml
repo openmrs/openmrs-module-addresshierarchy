@@ -338,4 +338,18 @@
 		</sql>
 	</diff>
 	
+	<diff>
+		<version>2.7.0</version>
+		<author>Mark Goodrich</author>
+		<date>December 16 2011</date>
+		<description>
+			update the foreign key constraint on entries so that deletes cascade
+		</description>
+		<sql>
+			ALTER TABLE address_hierarchy_entry DROP FOREIGN KEY parent_to_parent;
+			ALTER TABLE address_hierarchy_entry ADD CONSTRAINT `parent-to-parent` FOREIGN KEY (`parent_id`) REFERENCES `address_hierarchy_entry` (`address_hierarchy_entry_id`) ON DELETE CASCADE;
+		</sql>
+	
+	</diff>
+	
 </sqldiff>

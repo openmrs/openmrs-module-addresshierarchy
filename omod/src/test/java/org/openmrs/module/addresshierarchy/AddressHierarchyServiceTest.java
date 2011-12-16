@@ -185,6 +185,30 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		
 	}
 	
+	
+	/**
+	 * 
+	 * note that I haven't been able to figure out how to have this cascade work on the hibernate level,
+	 * so I have defined it at the database level in mysql; therefore, the unit test doesn't work
+	 *
+	@Test
+	@Verifies(value = "should delete all address hierarchy entries", method = "deleteAllAddressHierarchyEntries()")
+	public void deleteAllAddressHierarchyEntries_shouldDeleteAllAddressHierarchyEntries() throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// as a sanity check, make sure that we have some entries
+		Assert.assertTrue(ahService.getAddressHierarchyEntryCount() != null || ahService.getAddressHierarchyEntryCount() != 0);
+		
+		// delete all the entries
+		ahService.deleteAllAddressHierarchyEntries();
+		
+		// make sure that there aren't any level
+		Assert.assertTrue(ahService.getAddressHierarchyEntryCount() == null || ahService.getAddressHierarchyEntryCount() == 0);
+		
+	}
+	*/
+	
 	@Test
 	@Verifies(value = "should count address hierarchy entries at level", method = "getAddressHierarchyEntryCountByLevel(AddressHierarchyLevel)")
 	public void getAddressHierarchyEntryCountByLevel_shouldGetCountOfAddressHierarchyEntries() throws Exception {
