@@ -1,5 +1,6 @@
 package org.openmrs.module.addresshierarchy.service;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,7 +15,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.addresshierarchy.AddressField;
+import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
@@ -31,7 +34,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	private AddressHierarchyDAO dao;
 	
-	private List<String> fullAddressCache;
+	private Map<String,String> fullAddressCache;
 	
 	public void setAddressHierarchyDAO(AddressHierarchyDAO dao) {
 		this.dao = dao;
@@ -231,7 +234,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional(readOnly = true)
 	public List<String> getPossibleFullAddresses(String searchString) {
 		
-		// if search string isempty or null, return empty list
+		// if search string is empty or null, just return empty list
 		if (StringUtils.isBlank(searchString)) {
 			return new ArrayList<String>();
 		}
@@ -239,7 +242,11 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		// initialize the cache (if necessary)
 		initializeFullAddressCache();
 		
-		List<String> results = new ArrayList<String>();
+		// first determine if we are going to do phonetic processing
+		String phoneticProcessor = fetchPhoneticProcessor();
+		Method encodeStringMethod = fetchEncodeStringMethod();
+		
+		List<String> matchingKeys = new ArrayList<String>();
 		
 		// first remove all characters that are not alphanumerics or whitespace
 		// (more specifically, this pattern matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
@@ -254,18 +261,19 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		}
 		
 		// find all addresses in the full address cache that contain the first word in the search string
-		Pattern p = Pattern.compile(Pattern.quote(words[0]), Pattern.CASE_INSENSITIVE);
-		for (String address : this.fullAddressCache) {
+		Pattern p = Pattern.compile(Pattern.quote(encodeString(encodeStringMethod, words[0], phoneticProcessor)), Pattern.CASE_INSENSITIVE);
+		for (String address : this.fullAddressCache.keySet()) {
 			if (p.matcher(address).find()) {
-				results.add(address);
+				matchingKeys.add(address);
 			}
 		}
 		
 		// now go through and remove from the results list any addresses that don't contain the other words in the search string
 		if (words.length > 1) {
 			for (String word : Arrays.copyOfRange(words, 1, words.length)) {
-				Iterator<String> i = results.iterator();
-				p = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE);
+				Iterator<String> i = matchingKeys.iterator();
+				
+				p = Pattern.compile(Pattern.quote(encodeString(encodeStringMethod, word, phoneticProcessor)), Pattern.CASE_INSENSITIVE);
 				while (i.hasNext()) {
 					if (!p.matcher(i.next()).find()) {
 						i.remove();
@@ -274,6 +282,13 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			}
 		}
  		
+		List<String> results = new ArrayList<String>();
+		
+		// the results are the values for the matching keys
+		for (String key : matchingKeys) {
+			results.add(fullAddressCache.get(key));
+		}
+		
 		return results;
 	}
 	
@@ -492,17 +507,29 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		}
 	}
 	
+	@Transactional(readOnly = true)
+	public void resetFullAddressCache() {
+		this.fullAddressCache = null;
+	}
+	
 	/**
 	 * Utility methods
 	 */
 	
 	/**
-	 * Builds a list of pipe-delimited strings that represents all the possible full addresses,
+	 * Builds a key/value map of pipe-delimited strings that represents all the possible full addresses,
 	 * and stores this in a local cache for use by the getPossibleFullAddresses(String) method
-	 * A full address is represented as a pipe-delimited string of address hierarchy entry names,
+	 * 
+	 * The map values are full addresses represented as a pipe-delimited string of address hierarchy entry names,
 	 * ordered from the entry at the highest level to the entry at the lowest level in the tree.
 	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
 	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
+	 * 
+	 * In the standard implemention, the keys are the same as the values.  However, if the Name Phonetics module
+	 * has been installed, and the addresshierarchy.soundexProcessor global property has been configured, the keys
+	 * will be the same pipe-delimited string, but with each entry name transformed via the specified soundex processor
+	 * 
+	 * The getPossibleFullAddresses method compares the input string against the keys, and returns the values of any matches
 	 * 
 	 * Need to make sure we synchronize to avoid having multiple threads
 	 * trying to initialize it at the same time, or one using it before it is initialized
@@ -513,35 +540,122 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	 synchronized private void initializeFullAddressCache() {
 		
-		// online initialize if necessary
+		// only initialize if necessary
 		if (this.fullAddressCache == null || this.fullAddressCache.size() == 0) {
-			
-			this.fullAddressCache = new ArrayList<String>();
-			
+				
+			this.fullAddressCache = new HashMap<String,String>();
+		 
+			// first determine if we are going to do phonetic processing
+			String phoneticProcessor = fetchPhoneticProcessor();
+			Method encodeStringMethod = fetchEncodeStringMethod();
+			 
 			List<AddressHierarchyLevel> levels = getOrderedAddressHierarchyLevels(true,false);
 			AddressHierarchyLevel bottomLevel = levels.get(levels.size() - 1);
 			
 			// go through all the entries at the bottom level of the hierarchy
 			for (AddressHierarchyEntry bottomLevelEntry : getAddressHierarchyEntriesByLevel(bottomLevel)) {	
-				StringBuilder address = new StringBuilder();
-				address.append(bottomLevelEntry.getName());
+				StringBuilder key = new StringBuilder();
+				StringBuilder value = new StringBuilder();
+				
+				// set the key to the encoded name of the entry, and the value to the actual name
+				key.append(encodeString(encodeStringMethod, bottomLevelEntry.getName(), phoneticProcessor));
+				value.append(bottomLevelEntry.getName());
 				
 				AddressHierarchyEntry entry = bottomLevelEntry;
 				
 				// follow back up the tree to the top level and concatenate the names to create the full address string
 				while (entry.getParent() != null) {
-					entry = entry.getParent();
-					address.insert(0, entry.getName() + "|");				
+					entry = entry.getParent();		
+					key.insert(0, encodeString(encodeStringMethod, entry.getName(), phoneticProcessor) + "|");		
+					value.insert(0, entry.getName() + "|");	
 				}
 				
-				this.fullAddressCache.add(address.toString());
+				this.fullAddressCache.put(key.toString(), value.toString());
 			}
-		}
-		
+		}	
 	}
 	
-	private void resetFullAddressCache() {
-		this.fullAddressCache = null;
+
+	// utility method used to retrieve name of soundex processor from a global property and then determine if it is valid or not
+	private String fetchPhoneticProcessor() {
+		String phoneticProcessor = null;
+		
+		// only relevant if we have the name phonetics module running
+		if (ModuleFactory.getStartedModulesMap().containsKey("namephonetics")) {
+			phoneticProcessor = Context.getAdministrationService().getGlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_SOUNDEX_PROCESSER);
+			
+			// if a soundex algorithm has been specified, make sure it is valid
+			if (StringUtils.isNotBlank(phoneticProcessor)) {
+				
+				// call the name phonetics service by reflection and see if the processor has been registered
+				try {
+					Class<?> namePhoneticsServiceClass = Context.loadClass("org.openmrs.module.namephonetics.NamePhoneticsService");
+					Object namePhonetics = Context.getService(namePhoneticsServiceClass);
+			        Method getProcessorClassName = namePhoneticsServiceClass.getMethod("getProcessorClassName", String.class);
+			        
+			        // log an error and clear out the processor name if we don't find it
+			        if (getProcessorClassName.invoke(namePhonetics, phoneticProcessor) == null) {
+			        	log.error("No soundex processor found with name " + phoneticProcessor+" - will do standard string comparison");
+			        	phoneticProcessor = null;
+			        }
+				}
+				catch (Exception e) {
+					log.error("Unable to access Name Phonetics service for address search.  Is the Name Phonetics module installed and up-to-date?", e);
+					phoneticProcessor = null;
+				} 
+			}
+		}
+		return phoneticProcessor;
+	}
+	 
+	// utility method that retrieves the encodeString method from the Name phonetics module
+	private Method fetchEncodeStringMethod() {
+		Method encodeStringMethod = null;
+		
+		if (ModuleFactory.getStartedModulesMap().containsKey("namephonetics")) {
+			try {
+				Class<?> namePhoneticsUtilClass = Context.loadClass("org.openmrs.module.namephonetics.NamePhoneticsUtil");
+		        encodeStringMethod = namePhoneticsUtilClass.getMethod("encodeString", String.class, String.class);
+			}
+			catch (Exception e) {
+				log.error("Unable to access Name Phonetics service for address search.  Is the Name Phonetics module installed and up-to-date?", e);
+			} 
+		}
+		return encodeStringMethod;
+	}
+	 
+	// utility method to call the encodeString method via reflection
+	private String encodeString(Method encodeStringMethod, String stringToEncode, String phoneticProcessor) {
+		
+		// if the phonetics processor hasn't been set, or the string to encode is blank, just return original string
+		if (StringUtils.isBlank(stringToEncode) || StringUtils.isBlank(phoneticProcessor) || encodeStringMethod == null) {
+			return stringToEncode;
+		}
+		
+		StringBuilder codedString = new StringBuilder();	
+
+		// first remove all characters that are not alphanumerics or whitespace
+		// (more specifically, this pattern matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
+		stringToEncode = Pattern.compile("[\\W&&\\S]+").matcher(stringToEncode).replaceAll("");
+		
+		// break the string to encode into words
+		String [] words = stringToEncode.split(" ");
+		
+		// cycle through each word in the string, encode it, and then add it to the new coded string
+		for (String word : words) {
+			try {
+	            codedString.append((String) encodeStringMethod.invoke(null, word, phoneticProcessor) + " ");
+	        }
+	        catch (Exception e) {
+	        	// hopefully we will never get here, because problems will be caught earlier
+	        	throw new AddressHierarchyModuleException("Unable to encode string", e);
+	        }
+		}
+		
+		// remove the trailing space
+		codedString.deleteCharAt(codedString.length() - 1);
+		
+		return codedString.toString();
 	}
 	
 	/**

@@ -50,6 +50,13 @@
 			Valid values: true/false. When enabled, the existing "edit" component of the address portlet is overridden by the new functionality provided by the address hierarchy module
 		</description>
 	</globalProperty>
+	<globalProperty>
+		<property>addresshierarchy.soundexProcessor</property>
+		<defaultValue></defaultValue>
+		<description>
+			If the Name Phonetics module is installed, this defines the name of a soundex algorithm used by the getPossibleFullAddresses service method. 
+		</description>
+	</globalProperty>
 	
 	
 	<!-- Internationalization -->

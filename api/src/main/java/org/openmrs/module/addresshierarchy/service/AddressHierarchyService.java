@@ -79,6 +79,10 @@ public interface AddressHierarchyService{
 	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
 	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
 	 * 
+	 * Note that if the Name Phonetics module has been installed, and the global property addresshierarchy.soundexProcessor
+	 * has been set to the name of a recognized soundex processor, this method will perform a soundex search as
+	 * opposed to a straight word search
+	 * 
 	 * @param searchString the search string to search for
 	 * @return a list of full addresses; returns an empty list if no matches
 	 */
@@ -291,6 +295,12 @@ public interface AddressHierarchyService{
 	 * and assign the parent levels accordingly (used as part of 1.2 to 1.6 migration)
 	 */
 	public void setAddressHierarchyLevelParents();
+	
+	/**
+	 * Resets the internal address cache used to perform full address services to null
+	 * @return 
+	 */
+	public void resetFullAddressCache();
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to

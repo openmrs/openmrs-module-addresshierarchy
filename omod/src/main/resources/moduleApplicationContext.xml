@@ -16,7 +16,7 @@
 	
 	<!-- for annotation mapping --> 
 	<context:component-scan base-package="@MODULE_PACKAGE@" />
-	
+		
 	<bean parent="serviceContext">
 		<property name="moduleService">
 	   		<list>
@@ -54,6 +54,14 @@
     </bean>
 	
 	<bean id="ahAddressLayoutPortletController" class="org.openmrs.module.addresshierarchy.web.controller.portlet.AddressLayoutPortletController" />
-	
+
+	<!-- configure the listener that resets the full address cache as needed -->
+	<bean id="AddressCacheResetSupport" parent="openmrsEventListeners">
+	    <property name="globalPropertyListeners">
+	        <list value-type="org.openmrs.api.GlobalPropertyListener" merge="true">
+	            <bean class="org.openmrs.module.addresshierarchy.AddressCacheResetSupport" />
+	        </list>
+	    </property>
+	</bean>	
 	
 </beans>
