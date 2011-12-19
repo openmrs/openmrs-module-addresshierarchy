@@ -36,7 +36,7 @@
 		</c:forEach>
 
 		// register submit handler for validation as required
-		$j('form:has(div[class=address])').submit(function () {
+		$j('form:has(div[id=addressPortlet])').submit(function () {
 			passedValidation = true;
 			var errorMessage = "<spring:message code="addresshierarchy.correctErrors"/>:\n";
 			
