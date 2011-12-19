@@ -22,15 +22,16 @@
 		// note that we build the search string for each hierarchy level by concatenating the values of the previous levels
 		<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
 			<spring:bind path="${hierarchyLevel.addressField.name}">
-				<c:if test="${!empty previousValue || i.count == 1}">
-					// value for the selection list is the current value for the field (if one exist), otherwise the default value (if one exists)
-					<c:set var="value">${!empty status.value ? status.value : !empty model.layoutTemplate.elementDefaults[hierarchyLevel.addressField.name] ? model.layoutTemplate.elementDefaults[hierarchyLevel.addressField.name] : ''}</c:set>  			
+				// value for the selection list is the current value for the field (if one exist), otherwise the default value (if one exists)
+				<c:set var="value">${!empty status.value ? status.value : !empty model.layoutTemplate.elementDefaults[hierarchyLevel.addressField.name] ? model.layoutTemplate.elementDefaults[hierarchyLevel.addressField.name] : ''}</c:set>  			
 
-					updateOptions($j('select[name=${status.expression}]'), "${searchString}", "${value}");  // use double quotes here so as not conflict with ' in location names			
-
-					<c:set var="searchString">${searchString}${!empty value ? value : '*'}|</c:set>
-					<c:set var="previousValue">${value}</c:set>
-				</c:if>
+					  // only display selection this for list level if a) the previous level in the hierarchy has a value, b) the level itself has a value, or c) this is the top level in the hierarchy
+					<c:if test="${!empty previousValue || !empty status.value || i.count == 1}">
+						updateOptions($j('select[name=${status.expression}]'), "${searchString}", "${value}");  // use double quotes here so as not conflict with ' in location names			
+					</c:if>
+						
+				<c:set var="searchString">${searchString}${!empty value ? value : '*'}|</c:set>
+				<c:set var="previousValue">${value}</c:set>
 			</spring:bind>
 		</c:forEach>
 
