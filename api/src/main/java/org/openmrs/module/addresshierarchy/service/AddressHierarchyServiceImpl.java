@@ -133,7 +133,10 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		// if we have a top level value, find the top-level entry that matches that value
 		if (StringUtils.isNotBlank(topLevelValue)) {
-			possibleEntries.add(getChildAddressHierarchyEntryByName(null, topLevelValue));
+			AddressHierarchyEntry entry = getChildAddressHierarchyEntryByName(null, topLevelValue);	
+			if (entry != null) {
+				possibleEntries.add(entry);
+			}
 		}
 		// otherwise, get all the entries at the top level
 		else {
@@ -225,7 +228,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			possibleEntries = possibleEntriesAtNextLevel;
 		}
 		
-		// do a union of the results from the higher and lower level tests
+		// do an intersection of the results from the higher and lower level tests
 		if (results.retainAll(possibleEntries));
 		
 		return results;

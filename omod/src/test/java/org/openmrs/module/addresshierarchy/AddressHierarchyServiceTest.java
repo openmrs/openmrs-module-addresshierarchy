@@ -546,6 +546,11 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		address.setCityVillage("Hingham");
 		results = ahService.getPossibleAddressValues(address, "countyDistrict");
 		Assert.assertEquals(0, results.size());
+		
+		// try with unmatched name at top level
+		address = new PersonAddress();
+		address.setCountry("Blah");
+		Assert.assertEquals(0, results.size());
 	}
 	
 	@Test
