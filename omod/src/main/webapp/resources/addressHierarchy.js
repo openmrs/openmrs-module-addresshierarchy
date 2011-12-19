@@ -97,9 +97,11 @@ function updateOptions(fieldToUpdate, searchString, value) {
 						handleSelectOther(fieldToUpdate, false);
 					}
 					
-					// show the select list
-					fieldToUpdate.show();
-				}
+					// show the select list (if there are any options to display (besides the default empty option)
+					if (fieldToUpdate.children('option').length > 1) {
+						fieldToUpdate.show();
+					}
+	  		}
 	});
 }
 
