@@ -3,6 +3,7 @@ package org.openmrs.module.addresshierarchy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -159,6 +160,28 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertTrue(levels.get(3) == (ahService.getAddressHierarchyLevel(5)));
 		Assert.assertTrue(levels.get(4) == (ahService.getAddressHierarchyLevel(3)));
 			
+	}
+	
+	@Test
+	@Verifies(value = "should get address hierarchy level by AddressField", method = "getAddressHierarchyLevelByAddressField")
+	public void getAddressHierarchyLevelByAddressField_shouldGetAddressHierarchyLevelByAddressField() {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// test a few different levels
+		AddressHierarchyLevel level = ahService.getAddressHierarchyLevelByAddressField(AddressField.STATE_PROVINCE);
+		Assert.assertTrue(level == (ahService.getAddressHierarchyLevel(4)));
+		
+		level = ahService.getAddressHierarchyLevelByAddressField(AddressField.COUNTRY);
+		Assert.assertTrue(level == (ahService.getAddressHierarchyLevel(1)));
+		
+		// try an unmapped field and make sure it returns null
+		level = ahService.getAddressHierarchyLevelByAddressField(AddressField.ADDRESS_5);
+		Assert.assertTrue(level == null);
+		
+		// make sure it handles null
+		level = ahService.getAddressHierarchyLevelByAddressField(null);
+		Assert.assertTrue(level == null);
+		
 	}
 	
 	@Test
@@ -356,20 +379,20 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	
 	/**
 	@Test
-	@Verifies(value = "should find appropriate address hierarchy entries", method = "searchHierarchy(String, int)")
-	public void searchHierarchy_shouldFindAppropriateHierarchyEntries() throws Exception {
+	@Verifies(value = "should find address hierarchy entry by level and name and parent", method = "getAddressHierarchyEntryByLevelAndNameAndParent(AddressHierarchyLevel,String)")
+	public void getAddressHierarchyEntryByLevelAndNameAndParent_shouldFindAddressHierarchyEntryByLevelAndNameAndParent() throws Exception {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		// first try a basic search
-		Assert.assertTrue(ahService.searchAddressHierarchy("United States|New England|Massachusetts|Suffolk County|Boston")
-		        .getId() == 10);
+		// do a basic test
+		List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesByLevelAndNameAndParent(ahService
+		        .getAddressHierarchyLevel(5), "Plymouth", ahService.getAddressHierarchyEntry(4));
+		Assert.assertEquals(1, entries.size());
+		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(6)));
 		
-		// make sure it can distinguish between the two Scituates
-		Assert.assertTrue(ahService.searchAddressHierarchy(
-		    "United States|New England|Massachusetts|Plymouth County|Scituate").getId() == 7);
-		Assert.assertTrue(ahService.searchAddressHierarchy(
-		    "United States|New England|Rhode Island|Providence County|Scituate").getId() == 15);
-		
+		// now make sure that Plymouth is NOT found if the parent is set to Rhode Island instead of Massachusetts
+		entries = ahService.getAddressHierarchyEntriesByLevelAndNameAndParent(ahService
+	        .getAddressHierarchyLevel(5), "Plymouth", ahService.getAddressHierarchyEntry(5));
+		Assert.assertEquals(0, entries.size());
 	}
 	*/
 	
@@ -578,53 +601,125 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
+	@Verifies(value = "should generate possible full addresses for AddressHierarchyEntry", method = "generatePossibleFullAddressesForAddressHierarchyEntry(AddressHierarchyEntry)")
+	public void generatePossibleFullAddresses_shouldGeneratePossibleFullAddressesForAddressHierarchyEntry() {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// try a child entry (Jampaica Plain)
+		List<String> results = ahService.getPossibleFullAddresses(ahService.getAddressHierarchyEntry(12));
+		Assert.assertEquals(1,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Jamaica Plain"));
+		
+		// try a mid-level entry (Plymouth County)
+		results = ahService.getPossibleFullAddresses(ahService.getAddressHierarchyEntry(4));
+		Assert.assertEquals(4,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Plymouth County|Scituate"));
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Plymouth County|Plymouth"));
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Plymouth County|Cohasset"));
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Plymouth County|Hingham"));
+		
+		// try a top-level entry (China)
+		results = ahService.getPossibleFullAddresses(ahService.getAddressHierarchyEntry(16));
+		Assert.assertEquals(1,results.size());
+		Assert.assertTrue(results.contains("China"));
+		
+		// make sure it handles null properly
+		AddressHierarchyEntry nullTest = null;
+		results = ahService.getPossibleFullAddresses(nullTest);
+		Assert.assertEquals(0,results.size());
+	}
+	
+	
+	@Test
 	@Verifies(value = "should find possible full addresses that match search string", method = "getPossibleFullAddresses(String)")
-	public void getPossibleFullAddresses_shouldFindPossibleFullAddressesThatMatchSearchString() throws Exception {
+	public void searchAddresses_shouldFindPossibleFullAddressesThatMatchSearchString() throws Exception {
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 	
 		// try a single word that is an exact match for an entry
-		List<String> results = ahService.getPossibleFullAddresses("boston");
+		Set<String> results = ahService.searchAddresses("boston", null);
 		Assert.assertEquals(2,results.size());
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Jamaica Plain"));
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
+		
+		results = ahService.searchAddresses("china",null);
+		Assert.assertEquals(1,results.size());
+		Assert.assertTrue(results.contains("China"));
 		
 		// try a partial word
-		results = ahService.getPossibleFullAddresses("bos");
+		results = ahService.searchAddresses("bos", null);
 		Assert.assertEquals(2,results.size());
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Jamaica Plain"));
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
 		
+		results = ahService.searchAddresses("scit", null);
+		Assert.assertEquals(2,results.size());
+		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Plymouth County|Scituate"));
+		Assert.assertTrue(results.contains("United States|New England|Rhode Island|Providence County|Scituate"));
+		
 		// test case-sensitive
-		results = ahService.getPossibleFullAddresses("bOsToN");
+		results = ahService.searchAddresses("bOsToN", null);
 		Assert.assertEquals(2,results.size());
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Jamaica Plain"));
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
 		
 		// test multiple words
-		results = ahService.getPossibleFullAddresses("jamaica boston");
+		results = ahService.searchAddresses("jamaica boston", null);
 		Assert.assertEquals(1,results.size());
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Jamaica Plain"));
 		
 		// test multiple words
-		results = ahService.getPossibleFullAddresses("boston new england beacon hill");
+		results = ahService.searchAddresses("boston new england beacon hill", null);
 		Assert.assertEquals(1,results.size());
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
 		
 		// test with multiple, partial words
-		results = ahService.getPossibleFullAddresses("bos hil");
+		results = ahService.searchAddresses("bos hil", null);
 		Assert.assertEquals(1,results.size());
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
 		
 		// test a string with commas (or other non-word characters) in it (which should be ignored)
-		results = ahService.getPossibleFullAddresses("boston, beacon hill");
+		results = ahService.searchAddresses("boston, beacon hill", null);
 		Assert.assertEquals(1,results.size());
 		Assert.assertTrue(results.contains("United States|New England|Massachusetts|Suffolk County|Boston|Beacon Hill"));
 		
 		
 		// test case with no results
-		results = ahService.getPossibleFullAddresses("boston new england beacon hill plymouth");
+		results = ahService.searchAddresses("boston new england beacon hill plymouth", null);
 		Assert.assertEquals(0,results.size());
+		
+	}
+	
+
+
+
+	@Test
+	@Verifies(value = "should find possible full addresses that match search string", method = "getPossibleFullAddresses(String)")
+	public void searchAddresses_shouldRestrictSearchToSpecifiedLevel() throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+	
+		// try a single word that is an exact match for an entry
+		Set<String> results = ahService.searchAddresses("boston", ahService.getAddressHierarchyLevel(5));
+		Assert.assertEquals(1,results.size());
+		Assert.assertTrue(results.contains("Boston"));
+		
+		// make sure that a single word for the wrong level doesn't match
+		results = ahService.searchAddresses("boston", ahService.getAddressHierarchyLevel(1));
+		Assert.assertEquals(0,results.size());
+		
+		// make sure multiple matches are found
+		results = ahService.searchAddresses("county", ahService.getAddressHierarchyLevel(2));
+		Assert.assertEquals(3,results.size());
+		Assert.assertTrue(results.contains("Plymouth County"));
+		Assert.assertTrue(results.contains("Suffolk County"));
+		Assert.assertTrue(results.contains("Providence County"));
+		
+		// make sure matching still works with multiple words
+		results = ahService.searchAddresses("plymouth coun", ahService.getAddressHierarchyLevel(2));
+		Assert.assertEquals(1,results.size());
+		Assert.assertTrue(results.contains("Plymouth County"));
 	
 		
 	}

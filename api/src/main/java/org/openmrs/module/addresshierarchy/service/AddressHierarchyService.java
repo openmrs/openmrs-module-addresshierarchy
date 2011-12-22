@@ -2,6 +2,7 @@ package org.openmrs.module.addresshierarchy.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.openmrs.PersonAddress;
 import org.openmrs.annotation.Authorized;
@@ -73,6 +74,17 @@ public interface AddressHierarchyService{
 	public List<AddressHierarchyEntry> getPossibleAddressHierarchyEntries(PersonAddress address, AddressHierarchyLevel level);
 	
 	/**
+	 * Given an AddressHierarchyEntry, returns all the "full addresses" that contain that entry, represented as a pipe-delimited string of 
+	 * address hierarchy entry names, ordered from the entry at the highest level to the entry at the lowest level in the tree.
+	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
+	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
+	 * 
+	 * @param addressHierarchyEntry
+	 * @return a list of full addresses associated with that entry
+	 */
+	public List<String> getPossibleFullAddresses(AddressHierarchyEntry entry);
+	
+	/**
 	 * Given a search string, returns all the "full addresses" that match that search string
 	 * Returns a list of full addresses, represented as a pipe-delimited string of 
 	 * address hierarchy entry names, ordered from the entry at the highest level to the entry at the lowest level in the tree.
@@ -86,7 +98,23 @@ public interface AddressHierarchyService{
 	 * @param searchString the search string to search for
 	 * @return a list of full addresses; returns an empty list if no matches
 	 */
-	public List<String> getPossibleFullAddresses(String searchString);
+	public Set<String> searchAddresses(String searchString);
+	
+	/**
+	 * Given a search string, returns the name of all the entries for the specified level 
+     * that match that search string
+     * 
+	 * Note that if the Name Phonetics module has been installed, and the global property addresshierarchy.soundexProcessor
+	 * has been set to the name of a recognized soundex processor, this method will perform a soundex search as
+	 * opposed to a straight word search
+	 * 
+	 * If no level is specified, this method operates as if a searchAddress(String) call
+     *
+	 * @param searchString the search string to search for
+	 * @param level level to search
+	 * @return a list of address hierarchy entry names; returns an empty list if no matches
+	 */
+	public Set<String> searchAddresses(String searchString, AddressHierarchyLevel level);
 	
 	/**
 	 * Returns a count of the total number of address hierarchy entries
@@ -260,6 +288,14 @@ public interface AddressHierarchyService{
 	public AddressHierarchyLevel getAddressHierarchyLevel(Integer levelId);
 	
 	/**
+	 * Gets the AddressHierarchyLevel associated with the specified AddressField
+	 * 
+	 * @param addressField
+	 * @return the address hierarchy level associated with the specified AddressField
+	 */
+	public AddressHierarchyLevel getAddressHierarchyLevelByAddressField(AddressField addressField);
+	
+	/**
 	 * Finds the child AddressHierarchyLevel of the given AddressHierarchyLevel
 	 * 
 	 * @param level
@@ -301,6 +337,14 @@ public interface AddressHierarchyService{
 	 * @return 
 	 */
 	public void resetFullAddressCache();
+	
+	/**
+	 * Deprecated methods
+	 */
+	
+	// this has been renamed searchAddresses
+	@Deprecated
+	public List<String> getPossibleFullAddresses(String searchString);
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to
@@ -351,6 +395,6 @@ public interface AddressHierarchyService{
 	public AddressHierarchyEntry getLocationFromUserGenId(String userGeneratedId);
 	
 	@Deprecated
-	public AddressHierarchyLevel getHierarchyType(int levelId);;
-	
+	public AddressHierarchyLevel getHierarchyType(int levelId);
+
 }

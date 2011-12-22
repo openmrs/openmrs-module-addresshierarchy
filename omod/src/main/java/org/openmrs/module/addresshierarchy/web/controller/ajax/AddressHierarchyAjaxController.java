@@ -1,10 +1,13 @@
 package org.openmrs.module.addresshierarchy.web.controller.ajax;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
@@ -76,20 +80,134 @@ public class AddressHierarchyAjaxController {
 			
 			// now do the actual search
 			childEntryNames = ahService.getPossibleAddressValues(address, levels.get(i).getAddressField());
+				
 		}
+		
+		generateAddressHierarchyEntryNamesResponse(response, childEntryNames); 
+	}
+		
+	/**
+	 * Given an search string and an AddressField, returns all the entries at the level mapped to the address field that
+	 * contain the search string
+	 * 
+	 * If Name Phonetics module has been configured, does a soundex match instead of a straight string match
+     *
+	 * @throws IOException 
+	 */
+	@RequestMapping("/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntries.form")
+	public void getPossibleAddressHierarchyEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response,
+	                                               	@RequestParam("searchString") String searchString,
+						                            @RequestParam("addressField") String addressFieldString) throws IOException {
+		
+		if (StringUtils.isBlank(searchString) || StringUtils.isBlank(addressFieldString)) {
+			log.error("Must specify both an address field and a search string");
+			// return an empty response
+			generateAddressHierarchyEntryNamesResponse(response, null);
+		}
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// find the address hierarchy level associated with the given address field
+		AddressHierarchyLevel level = ahService.getAddressHierarchyLevelByAddressField(AddressField.getByName(addressFieldString));
+		
+		if (level == null) {
+			log.error("Invalid address field or address field has no associated address hierarchy level");
+			// return an empty response
+			generateAddressHierarchyEntryNamesResponse(response, null);
+		}
+		
+		Set<String> names = ahService.searchAddresses(searchString, level);
+		generateAddressHierarchyEntryNamesResponse(response, new ArrayList<String>(names));
+	}
+    
+	/**
+	 * Returns a list of full addresses that contain address hierarchy entries with the specified name at the specified hierarchy level
+	 * 
+	 * Specify a separator if you want the full address strings returned to be delimited by something other than the pipe (|)
+	 */
+	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddressesForAddressHierarchyEntry.form") 
+	public void getPossibleFullAddressesForAddressHierarchyEntry(ModelMap model, HttpServletRequest request, HttpServletResponse response,
+					                             @RequestParam(value = "entryName", required = false) String entryName,
+					                             @RequestParam(value = "addressField", required = false) String addressField,
+					                             @RequestParam(value = "separator", required = false) String separator) throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		if (StringUtils.isBlank(entryName) || StringUtils.isBlank(addressField)) {
+			log.error("Must specify both an address field and a entry name");
+			// return an empty response
+			generateFullAddressResponse(response, null, separator);
+		}
+		else {
+			// do the exact-match search
+			AddressHierarchyLevel level = ahService.getAddressHierarchyLevelByAddressField(AddressField.getByName(addressField));
 			
-    	response.setContentType("application/json");
-    	response.setCharacterEncoding("UTF-8");
-    	PrintWriter out = response.getWriter();
-
-    	// start the JSON
-    	out.print("[");
-
-    	if (childEntryNames != null) {
-			Collections.sort(childEntryNames);
-    	
+			if (level == null) {
+				log.error("Invalid address field passed to getPossbleFullAddressEntries");
+			}
+			
+			// find all the entries for the matching level and name
+			List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesByLevelAndName(level, entryName);
+			
+			// now generate all the possible addresses for these entries
+			Set<String> addresses = new HashSet<String>();
+			for (AddressHierarchyEntry entry : entries) {
+				addresses.addAll(ahService.getPossibleFullAddresses(entry));
+			}
+			
+			// generate the response
+			generateFullAddressResponse(response, addresses, separator);
+		}
+	}
+	
+	/**
+	 * Returns a list of full addresses in string format that match the given search string;
+	 * 
+	 * If Name Phonetics module has been configured, does a soundex match instead of a straight string match
+	 * Specify a separator if you want the full address strings returned to be delimited by something other than the pipe (|)
+	 * 
+	 * (See docs on the underlying getPossibleFullAddresses(String) method for more information
+	 */
+	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddresses.form") 
+	public void getPossibleFullAddresses(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
+					                             @RequestParam(value = "searchString", required = false) String searchString,
+					                             @RequestParam(value = "separator", required = false) String separator) throws Exception {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// determine what kind of a search to do based on parameters specified
+		if (StringUtils.isBlank(searchString)) {
+			log.error("Must specific a search string");
+			// return an empty response
+			generateFullAddressResponse(response, null, separator);
+		}
+		else {
+			// perform the search string search
+			Set<String> addresses = ahService.searchAddresses(searchString, null);
+			generateFullAddressResponse(response, addresses, separator);
+		}
+	}
+	
+	/**
+	 * Utility methods
+	 */
+	
+	/**
+	 * Helper method used to generate the AJAX response the getChildAddressHierarchyEntries and getPossibleAddressHierarchyEntries methods return
+	 */
+	private void generateAddressHierarchyEntryNamesResponse(HttpServletResponse response, List<String> names) throws IOException {
+		response.setContentType("text/json");
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+	
+		// start the JSON
+		out.print("[");
+	
+		if (names != null) {
+			Collections.sort(names);
+		
 			// add the elements: ie, { "name": "Boston" }
-			Iterator<String> i = childEntryNames.iterator();			
+			Iterator<String> i = names.iterator();			
 			while (i.hasNext()) {
 				out.print("{ \"name\": \"" + i.next() + "\" }");
 				
@@ -98,31 +216,23 @@ public class AddressHierarchyAjaxController {
 					out.print(",");  
 				}
 				
- 			}
-    	}
-    	
-    	// close the JSON
+				}
+		}
+	
+		// close the JSON
 		out.print("]");
 	}
 	
 	/**
-	 * Returns a list of full addresses in string format that match the given search string;
-	 * Specify a separator if you want the full address strings returned to be delimited by something other than the pipe (|)
-	 * (See docs on the underlying getPossibleFullAddresses(String) method for more information
+	 * Helper method used to generate the AJAX response the getPossibleFullAddressEntries method returns
 	 */
-	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddresses.form") 
-	public void getPossibleFullAddressesEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
-					                             @RequestParam("searchString") String searchString ,
-					                             @RequestParam(value = "separator", required = false) String separator) throws Exception {
-		
-		List<String> addresses = Context.getService(AddressHierarchyService.class).getPossibleFullAddresses(searchString);
+	private void generateFullAddressResponse(HttpServletResponse response, Set<String> addresses, String separator) throws IOException {
 		
 		String delimiter = null;		
 		if(!StringUtils.equals(separator, "|")){
 			delimiter = separator;
 		}
-					
-		// send back the response
+		
 		response.setContentType("text/json");
     	response.setCharacterEncoding("UTF-8");
     	PrintWriter out = response.getWriter();
@@ -139,7 +249,8 @@ public class AddressHierarchyAjaxController {
 						out.print(",");  
 					}
 				}
-			}else{
+			}
+			else{
 				while (i.hasNext()) {	
 					out.print("{ \"address\": \"" + i.next() + "\" }");				
 					// print comma between entries for all but the last option in the list

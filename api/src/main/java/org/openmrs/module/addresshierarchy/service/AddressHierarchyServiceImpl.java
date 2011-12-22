@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,7 +36,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	private AddressHierarchyDAO dao;
 	
-	private Map<String,String> fullAddressCache;
+	private Map<String,List<String>> fullAddressCache;
+	private Boolean fullAddressCacheInitialized = false;
 	
 	public void setAddressHierarchyDAO(AddressHierarchyDAO dao) {
 		this.dao = dao;
@@ -235,11 +238,57 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<String> getPossibleFullAddresses(String searchString) {
+	public List<String> getPossibleFullAddresses(AddressHierarchyEntry entry) {
+		// if entry is null, just return empty list
+		if (entry == null) {
+			return new ArrayList<String>();
+		}
+		
+		// use the helper method recursively to create the list of possible addresses
+		List<String> addresses = new  ArrayList<String>();
+		generatePossibleFullAddressesHelper(entry, addresses);
+		return addresses;
+    }
+	
+	// helper method for getPossibleFullAddresses(AddressHierarchyEntry entry)
+	private void generatePossibleFullAddressesHelper(AddressHierarchyEntry entry, List<String> addresses)  {
+		
+		List<AddressHierarchyEntry> entries = getChildAddressHierarchyEntries(entry);
+		
+		// if this is leaf node, then create the full address and add it to the list of addresses to return
+		if (entries == null || entries.isEmpty()) {
+			StringBuilder address = new StringBuilder();
+			address.append(entry.getName());
+			
+			AddressHierarchyEntry tempEntry = entry;
+			// follow back up the tree to the top level and concatenate the names to create the full address string
+			while (tempEntry.getParent() != null) {
+				tempEntry = tempEntry.getParent();		
+				address.insert(0, tempEntry.getName() + "|");	
+			}
+			
+			// add the string to the results
+			addresses.add(address.toString());
+		}
+		// if not a leaf node, process it's children recursively
+		else {
+			for (AddressHierarchyEntry currentEntry : entries) {
+				generatePossibleFullAddressesHelper(currentEntry, addresses);
+			}
+		}
+	}
+	
+	@Transactional(readOnly = true)
+	public Set<String> searchAddresses(String searchString) {
+		return searchAddresses(searchString, null);
+	}
+	
+	@Transactional(readOnly = true)
+	public Set<String> searchAddresses(String searchString, AddressHierarchyLevel level) {
 		
 		// if search string is empty or null, just return empty list
 		if (StringUtils.isBlank(searchString)) {
-			return new ArrayList<String>();
+			return new HashSet<String>();
 		}
 		
 		// initialize the cache (if necessary)
@@ -249,9 +298,20 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		String phoneticProcessor = fetchPhoneticProcessor();
 		Method encodeStringMethod = fetchEncodeStringMethod();
 		
-		List<String> matchingKeys = new ArrayList<String>();
+		// if we have been passed an address hierarchy level, figure out the index of that
+		// level so that we can split the string appropriately for the search
+		Integer levelIndex = null;
+		List<AddressHierarchyLevel> levels = getOrderedAddressHierarchyLevels(true);
+		if (level != null) {
+			for (int i = 0; i < levels.size() ; i++) {
+				if (levels.get(i).equals(level)) {
+					levelIndex = i;
+					break;
+				}
+			}
+		}
 		
-		// first remove all characters that are not alphanumerics or whitespace
+		// remove all characters that are not alphanumerics or whitespace
 		// (more specifically, this pattern matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
 		searchString = Pattern.compile("[\\W&&\\S]+").matcher(searchString).replaceAll("");
 				
@@ -260,13 +320,16 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		// another sanity check; return an empty string if nothing to search on
 		if (words.length == 0 || StringUtils.isBlank(words[0])) {
-			return new ArrayList<String>();
+			return new HashSet<String>();
 		}
 		
+		List<String> matchingKeys = new ArrayList<String>();
+		
 		// find all addresses in the full address cache that contain the first word in the search string
+		// (optionally restricting the search to a single address level in the address cache)
 		Pattern p = Pattern.compile(Pattern.quote(encodeString(encodeStringMethod, words[0], phoneticProcessor)), Pattern.CASE_INSENSITIVE);
 		for (String address : this.fullAddressCache.keySet()) {
-			if (p.matcher(address).find()) {
+			if (p.matcher(retrieveSpecifiedLevel(address, levelIndex)).find()) {
 				matchingKeys.add(address);
 			}
 		}
@@ -278,21 +341,42 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 				
 				p = Pattern.compile(Pattern.quote(encodeString(encodeStringMethod, word, phoneticProcessor)), Pattern.CASE_INSENSITIVE);
 				while (i.hasNext()) {
-					if (!p.matcher(i.next()).find()) {
+					String address = i.next();
+					if (!p.matcher(retrieveSpecifiedLevel(address, levelIndex)).find()) {
 						i.remove();
 					}
 				}
 			}
 		}
  		
-		List<String> results = new ArrayList<String>();
+		Set<String> results = new HashSet<String>();
 		
 		// the results are the values for the matching keys
 		for (String key : matchingKeys) {
-			results.add(fullAddressCache.get(key));
+			for (String address : fullAddressCache.get(key)) {
+				results.add(retrieveSpecifiedLevel(address, levelIndex));
+			}
 		}
 		
 		return results;
+	}
+	
+	// utility method used by searchAddress(String, AddressHierarchyLevel)
+	private String retrieveSpecifiedLevel(String address, Integer levelIndex) {
+		
+		// if no level is specified, return the entire address
+		if (levelIndex == null) {
+			return address;
+		}
+		
+		String subAddresses[] = address.split("\\|");
+		
+		// if this level isn't in this full address, return blank string
+		if (levelIndex >= subAddresses.length) {
+			return ""; 
+		}
+ 		
+		return subAddresses[levelIndex];
 	}
 	
 	@Transactional(readOnly = true)
@@ -317,11 +401,19 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level) {
+		if (level == null) {
+			return null;
+		}
+		
 		return dao.getAddressHierarchyEntriesByLevel(level);
 	}
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel level, String name) {
+		if (level == null || StringUtils.isBlank(name)) {
+			return null;
+		}
+		
 		return dao.getAddressHierarchyEntriesByLevelAndName(level, name);
 	}
 	
@@ -464,6 +556,21 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
+	public AddressHierarchyLevel getAddressHierarchyLevelByAddressField(AddressField addressField) {
+		if (addressField == null) {
+			return null;
+		}
+		
+		for (AddressHierarchyLevel level : getAddressHierarchyLevels()) {
+			if (level.getAddressField() != null && level.getAddressField().equals(addressField)) {
+				return level;
+			}
+		}
+		// if we have gotten here, no match, return null
+		return null;
+	}
+	
+	@Transactional(readOnly = true)
     public AddressHierarchyLevel getChildAddressHierarchyLevel(AddressHierarchyLevel level) {
 	    return dao.getAddressHierarchyLevelByParent(level);
     }
@@ -509,10 +616,11 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			}
 		}
 	}
-	
+
 	@Transactional(readOnly = true)
 	public void resetFullAddressCache() {
 		this.fullAddressCache = null;
+		this.fullAddressCacheInitialized = false;
 	}
 	
 	/**
@@ -544,42 +652,63 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	 synchronized private void initializeFullAddressCache() {
 		
 		// only initialize if necessary
-		if (this.fullAddressCache == null || this.fullAddressCache.size() == 0) {
+		if (this.fullAddressCacheInitialized == false || this.fullAddressCache == null && this.fullAddressCache.isEmpty()) {
 				
-			this.fullAddressCache = new HashMap<String,String>();
-		 
-			// first determine if we are going to do phonetic processing
-			String phoneticProcessor = fetchPhoneticProcessor();
-			Method encodeStringMethod = fetchEncodeStringMethod();
-			 
-			List<AddressHierarchyLevel> levels = getOrderedAddressHierarchyLevels(true,false);
-			AddressHierarchyLevel bottomLevel = levels.get(levels.size() - 1);
-			
-			// go through all the entries at the bottom level of the hierarchy
-			for (AddressHierarchyEntry bottomLevelEntry : getAddressHierarchyEntriesByLevel(bottomLevel)) {	
-				StringBuilder key = new StringBuilder();
-				StringBuilder value = new StringBuilder();
-				
-				// set the key to the encoded name of the entry, and the value to the actual name
-				key.append(encodeString(encodeStringMethod, bottomLevelEntry.getName(), phoneticProcessor));
-				value.append(bottomLevelEntry.getName());
-				
-				AddressHierarchyEntry entry = bottomLevelEntry;
-				
-				// follow back up the tree to the top level and concatenate the names to create the full address string
-				while (entry.getParent() != null) {
-					entry = entry.getParent();		
-					key.insert(0, encodeString(encodeStringMethod, entry.getName(), phoneticProcessor) + "|");		
-					value.insert(0, entry.getName() + "|");	
-				}
-				
-				this.fullAddressCache.put(key.toString(), value.toString());
+			this.fullAddressCache = new HashMap<String,List<String>>();
+		 			 
+			for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {	
+				initializeFullAddressCacheHelper(entry);
 			}
+			
+			this.fullAddressCacheInitialized = true;
 		}	
 	}
 	
+	private void initializeFullAddressCacheHelper(AddressHierarchyEntry entry) {
+		
+		List<AddressHierarchyEntry> entries = getChildAddressHierarchyEntries(entry);
+		
+		// if this is leaf node, then create the full address and add it to the list of addresses to return
+		if (entries == null || entries.isEmpty()) {
+		
+			// first determine if we are going to do phonetic processing
+			String phoneticProcessor = fetchPhoneticProcessor();
+			Method encodeStringMethod = fetchEncodeStringMethod();
+			
+			StringBuilder key = new StringBuilder();
+			StringBuilder value = new StringBuilder();
+			
+			// set the key to the encoded name of the entry, and the value to the actual name
+			key.append(encodeString(encodeStringMethod, entry.getName(), phoneticProcessor));
+			value.append(entry.getName());
+			
+			AddressHierarchyEntry tempEntry = entry;
+			
+			// follow back up the tree to the top level and concatenate the names to create the full address string
+			while (tempEntry.getParent() != null) {
+				tempEntry = tempEntry.getParent();		
+				key.insert(0, encodeString(encodeStringMethod, tempEntry.getName(), phoneticProcessor) + "|");		
+				value.insert(0, tempEntry.getName() + "|");	
+			}
+			
+			// add it to the cache
+			if (!this.fullAddressCache.containsKey(key.toString())) {
+				this.fullAddressCache.put(key.toString(), new ArrayList<String>());
+			}
+			this.fullAddressCache.get(key.toString()).add(value.toString());
+		}
+		// if not a leaf node, process it's children recursively
+		else {
+			for (AddressHierarchyEntry currentEntry : entries) {
+				initializeFullAddressCacheHelper(currentEntry);
+			}
+		}
+	}
+	 
 
-	// utility method used to retrieve name of soundex processor from a global property and then determine if it is valid or not
+	/**
+	 * Utility method used to retrieve name of soundex processor from a global property and then determine if it is valid or not
+	 */
 	private String fetchPhoneticProcessor() {
 		String phoneticProcessor = null;
 		
@@ -611,7 +740,9 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return phoneticProcessor;
 	}
 	 
-	// utility method that retrieves the encodeString method from the Name phonetics module
+	/**
+	 * Utility method that retrieves the encodeString method from the Name phonetics module
+	 */
 	private Method fetchEncodeStringMethod() {
 		Method encodeStringMethod = null;
 		
@@ -627,7 +758,9 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return encodeStringMethod;
 	}
 	 
-	// utility method to call the encodeString method via reflection
+	/**
+	 * Utility method to call the encodeString method via reflection
+	 */
 	private String encodeString(Method encodeStringMethod, String stringToEncode, String phoneticProcessor) {
 		
 		// if the phonetics processor hasn't been set, or the string to encode is blank, just return original string
@@ -660,6 +793,16 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		return codedString.toString();
 	}
+	
+	/**
+	 * Deprecated methods
+	 */
+	
+	@Deprecated
+	@Transactional(readOnly = true)
+	public List<String> getPossibleFullAddresses(String searchString) {
+	    return new ArrayList<String>(searchAddresses(searchString, null));  
+    }
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to
@@ -749,5 +892,5 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	public AddressHierarchyLevel getHierarchyType(int levelId) {
 		return getAddressHierarchyLevel(levelId);
 	}
-	
+
 }
