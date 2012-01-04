@@ -46,7 +46,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		int x = 0;
 		Session session = sessionFactory.getCurrentSession();
 		Criteria c = session.createCriteria(AddressHierarchyEntry.class);
-		List<Integer> rows = c.setProjection((Projections.rowCount())).list();
+		List<Number> rows = c.setProjection((Projections.rowCount())).list();
 		if (rows.size() > 0) {
 			x = rows.get(0).intValue();
 		}
@@ -59,7 +59,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		criteria.createCriteria("level").add(Restrictions.eq("levelId", level.getId()));
-		List<Integer> rows = criteria.setProjection((Projections.rowCount())).list();
+		List<Number> rows = criteria.setProjection((Projections.rowCount())).list();
 		if (rows.size() > 0) {
 			x = rows.get(0).intValue();
 		}
