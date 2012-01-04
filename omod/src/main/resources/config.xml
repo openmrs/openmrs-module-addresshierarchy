@@ -57,6 +57,13 @@
 			If the Name Phonetics module is installed, this defines the name of a soundex algorithm used by the getPossibleFullAddresses service method. 
 		</description>
 	</globalProperty>
+	<globalProperty>
+		<property>addresshierarchy.addressToEntryMapUpdaterLastStartTime</property>
+		<defaultValue></defaultValue>
+		<description>
+			The module uses this field to store when the AddressToEntryMapUpdater task was last started; DO NOT MODIFY
+		</description>
+	</globalProperty>
 	
 	
 	<!-- Internationalization -->

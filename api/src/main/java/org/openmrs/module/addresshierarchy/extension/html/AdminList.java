@@ -13,8 +13,8 @@
  */
 package org.openmrs.module.addresshierarchy.extension.html;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.openmrs.module.Extension;
 import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
@@ -52,8 +52,9 @@ public class AdminList extends AdministrationSectionExt {
 	 * @see org.openmrs.module.web.extension.AdministrationSectionExt#getLinks()
 	 */
 	public Map<String, String> getLinks() {
-		Map<String, String> map = new TreeMap<String, String>();
+		Map<String, String> map = new LinkedHashMap<String, String>();
 		map.put("/module/addresshierarchy/admin/manageAddressHierarchy.form", "addresshierarchy.admin.manageHierarchy");
+		map.put("/module/addresshierarchy/admin/advancedFeatures.form", "addresshierarchy.admin.advancedFeatures");
 		return map;
 	}
 	

@@ -1,14 +1,19 @@
 package org.openmrs.module.addresshierarchy.util;
 
 import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Patient;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.AddressField;
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
+import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 
 public class AddressHierarchyUtil {
@@ -64,6 +69,13 @@ public class AddressHierarchyUtil {
 	}
 	
 	
+	/**
+	 * Converts a map of address field name to address value pairs to an actualy person address
+	 * Auto generated method comment
+	 * 
+	 * @param addressMap
+	 * @return
+	 */
 	public static final PersonAddress convertAddressMapToPersonAddress(Map<String,String> addressMap) {
 		PersonAddress address = new PersonAddress();
 
@@ -73,7 +85,60 @@ public class AddressHierarchyUtil {
 		
 		return address;
 	}
-
+	
+	/**
+	 * Tests whether the first addresses hierarchy entry is the descendant of the second--i.e., can you reach the second entry by travelling
+	 * up the tree from the first hierarchy entry  
+	 */
+	public static final boolean isDescendantOf(AddressHierarchyEntry descendant, AddressHierarchyEntry ancestor) {
+		// handle null case
+		if (descendant == null || ancestor == null) {
+			return false;
+		}
+		
+		AddressHierarchyEntry parent = descendant.getParent();
+		
+		// cycle up the tree to until we either find a match or reach the top
+		while (parent != null) {
+			if (parent.equals(ancestor)) {
+				return true;
+			}
+			
+			parent = parent.getParent();
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Given a Java Date, this method finds all the non-voided Patients that have
+	 * a date changed after the specified date, and the updates the AddressToEntryMaps
+	 * for all PersonAddresses associated with this patient
+	 * 
+	 * (Pulled this out the AddressHierarchyService so that the entire operation doesn't
+	 * happen as part of a single transaction)
+	 */
+	public static final void updateAddressToEntryMapsForPatientsWithDateChangedAfter(Date date) {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+	    List<Patient> patients;
+	    
+	    log.info("Updating AddressToEntryMaps for all patients with date changed after " + date);
+	    
+	    if (date != null) {
+	    	patients = ahService.findAllPatientsWithDateChangedAfter(date);
+	    }
+	    else {
+	    	patients = Context.getPatientService().getAllPatients();
+	    }
+	    	    
+	    if (patients != null && patients.size() > 0) {
+	    	for (Patient patient : patients) {
+	    		ahService.updateAddressToEntryMapsForPerson(patient);
+	    	}
+	    }
+    }
 }
 
 

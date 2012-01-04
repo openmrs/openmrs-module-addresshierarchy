@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,6 +16,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Patient;
+import org.openmrs.Person;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ModuleFactory;
@@ -22,6 +25,7 @@ import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
+import org.openmrs.module.addresshierarchy.AddressToEntryMap;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
@@ -418,6 +422,16 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent) {
+		if (level == null || StringUtils.isBlank(name) || parent == null) {
+			return null;
+		}
+		
+	    return dao.getAddressHierarchyEntriesByLevelAndNameAndParent(level, name, parent);
+    }
+	
+	
+	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesAtTopLevel() {
 		return getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel());
 	}
@@ -623,6 +637,110 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		this.fullAddressCacheInitialized = false;
 	}
 	
+	@Transactional(readOnly = true)
+	public AddressToEntryMap getAddressToEntryMap(Integer id) {
+		if (id == null) {
+			return null;
+		}
+		
+	    return dao.getAddressToEntryMap(id);
+    }
+
+	@Transactional(readOnly = true)
+	public List<AddressToEntryMap> getAddressToEntryMapsByPersonAddress(PersonAddress address) {
+		if (address == null) {
+			return null;
+		}
+		
+	    return dao.getAddressToEntryMapByPersonAddress(address);
+    }
+	
+	@Transactional
+	public void saveAddressToEntryMap(AddressToEntryMap addressToEntry) {
+		if (addressToEntry == null) {
+			return;
+		}
+		
+	    dao.saveAddressToEntryMap(addressToEntry);
+    }
+
+	@Transactional
+	public void deleteAddressToEntryMap(AddressToEntryMap addressToEntryMap) {
+		if (addressToEntryMap == null) {
+			return;
+		}
+		
+		dao.deleteAddressToEntryMap(addressToEntryMap);
+	}
+
+	@Transactional
+	public void deleteAddressToEntryMapsByPersonAddress(PersonAddress address) {
+		if (address == null) {
+			return;
+		}
+		
+	   	List<AddressToEntryMap> maps = getAddressToEntryMapsByPersonAddress(address);
+	   	
+	   	if (maps != null && maps.size() > 0) {
+	   		for (AddressToEntryMap map : maps) {
+	   			dao.deleteAddressToEntryMap(map);
+	   		}
+	   	}
+    }
+
+	@Transactional
+	public void updateAddressToEntryMapsForPersonAddress(PersonAddress address) {
+		log.info("Updating AddressToEntryMaps for PersonAddress " + address);
+		if (address == null) {
+			return;
+		}
+		
+	  	// first delete any existing maps for this person address
+		List<AddressToEntryMap> maps = getAddressToEntryMapsByPersonAddress(address);
+		if (maps != null && !maps.isEmpty()) {
+			for (AddressToEntryMap map : maps) {
+				deleteAddressToEntryMap(map);
+			}
+		}
+		
+		// now create and save the new maps if the Person Address has not been voided
+    	if (!address.isVoided()) {
+	    	maps = createAddressToEntryMapsForPersonAddress(address);
+	    	if (maps != null && !maps.isEmpty()) {
+	    		for (AddressToEntryMap map : maps) {
+	    			Context.getService(AddressHierarchyService.class).saveAddressToEntryMap(map);
+	    		}
+	    	}
+    	}
+    }
+
+	@Transactional
+	public void updateAddressToEntryMapsForPerson(Person person) {
+		log.info("Updating AddressToEntryMaps for person " + person);
+		if (person == null) {
+			return;
+		}
+		
+		Set<PersonAddress> addresses = person.getAddresses();
+		if (addresses != null && !addresses.isEmpty()) {
+			for (PersonAddress address : addresses) {
+				if (address != null && !address.isVoided()) {
+					updateAddressToEntryMapsForPersonAddress(address);
+				}
+			}
+		}
+	    
+    }
+
+	@Transactional
+	public List<Patient> findAllPatientsWithDateChangedAfter(Date date) {
+		if (date == null) {
+			return null;
+		}
+		
+		return dao.findAllPatientsWithDateChangedAfter(date);
+	}
+	
 	/**
 	 * Utility methods
 	 */
@@ -792,6 +910,49 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		codedString.deleteCharAt(codedString.length() - 1);
 		
 		return codedString.toString();
+	}
+	
+	/**
+	 * Utility method that tests an existing Person Address against the Address Hierarchy Entries for matches, and returns a list of AddressToEntryMaps
+	 * for any matches it finds; in essence, this method returns a list of records that map the passed person address to all address hierarchy
+	 * entries it matches
+	 */
+	private List<AddressToEntryMap> createAddressToEntryMapsForPersonAddress(PersonAddress address) {
+	
+		List<AddressToEntryMap> results = new ArrayList<AddressToEntryMap>();
+		
+		// iterate through all the address hierarchy levels, and see if we can find a match at each level
+		AddressHierarchyEntry parent = null;
+			
+		for (AddressHierarchyLevel level : getOrderedAddressHierarchyLevels(false, false)) {
+			List<AddressHierarchyEntry> entries;
+			
+			// get all the entries at that level that are possible matches for the given name
+			entries = getAddressHierarchyEntriesByLevelAndName(level, AddressHierarchyUtil.getAddressFieldValue(address, level.getAddressField()));
+
+			if (entries != null && entries.size() > 0) {
+				
+				// make sure we remove any results that aren't descendants of the previous level matched
+				if (parent != null) {
+					Iterator<AddressHierarchyEntry> i = entries.iterator();
+					while (i.hasNext()) {
+						if (!(AddressHierarchyUtil.isDescendantOf(i.next(),parent))) {
+							i.remove();
+						}
+					}
+				}
+				
+				// we only want to create a new record if we have one and only one matches
+				if (entries.size() == 1) {
+					// create the new AddressToEntry record and add it to the results list
+					results.add(new AddressToEntryMap(address, entries.get(0)));
+					// set this entry as the parent for the next level search
+					parent = entries.get(0);
+				}
+			}
+		}
+		
+		return results;
 	}
 	
 	/**

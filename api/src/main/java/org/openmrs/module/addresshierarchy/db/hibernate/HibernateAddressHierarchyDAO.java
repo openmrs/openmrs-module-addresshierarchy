@@ -1,6 +1,7 @@
 package org.openmrs.module.addresshierarchy.db.hibernate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -10,11 +11,15 @@ import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.openmrs.Patient;
+import org.openmrs.PersonAddress;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
+import org.openmrs.module.addresshierarchy.AddressToEntryMap;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 
@@ -98,6 +103,16 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel addressHierarchyLevel, String name, AddressHierarchyEntry parent) {
+		Session session = sessionFactory.getCurrentSession();
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
+		criteria.createCriteria("level").add(Restrictions.eq("levelId", addressHierarchyLevel.getId()));
+		criteria.createCriteria("parent").add(Restrictions.eq("addressHierarchyEntryId", parent.getId()));
+		criteria.add(Restrictions.eq("name", name).ignoreCase());
+		return criteria.list();
+	}
+	
+	@SuppressWarnings("unchecked")
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry) {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
@@ -117,7 +132,8 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah) {
 		try {
-			sessionFactory.getCurrentSession().saveOrUpdate(ah);
+			Session session = sessionFactory.getCurrentSession();
+			session.saveOrUpdate(ah);
 		}
 		catch (Throwable t) {
 			throw new DAOException(t);
@@ -186,7 +202,8 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	
 	public void saveAddressHierarchyLevel(AddressHierarchyLevel level) {
 		try {
-			sessionFactory.getCurrentSession().saveOrUpdate(level);
+			Session session = sessionFactory.getCurrentSession();
+			session.saveOrUpdate(level);
 		}
 		catch (Throwable t) {
 			throw new DAOException(t);
@@ -196,12 +213,57 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 
     public void deleteAddressHierarchyLevel(AddressHierarchyLevel level) {
     	try {
-			sessionFactory.getCurrentSession().delete(level);
+    		Session session = sessionFactory.getCurrentSession();
+			session.delete(level);
 		}
 		catch (Throwable t) {
 			throw new DAOException(t);
 		}
     }
+	
+	public AddressToEntryMap getAddressToEntryMap(int id) {
+		Session session = sessionFactory.getCurrentSession();
+		AddressToEntryMap result = (AddressToEntryMap) session.load(AddressToEntryMap.class, id);
+		return result;
+    }
+
+	public void saveAddressToEntryMap(AddressToEntryMap addressToEntryMap) {
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			session.saveOrUpdate(addressToEntryMap);
+		}
+		catch (Throwable t) {
+			throw new DAOException(t);
+		}
+    }
+	
+	public void deleteAddressToEntryMap(AddressToEntryMap addressToEntryMap) {
+		try {
+			Session session = sessionFactory.getCurrentSession();
+			session.delete(addressToEntryMap);
+		}
+		catch (Throwable t) {
+			throw new DAOException(t);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+    public List<AddressToEntryMap> getAddressToEntryMapByPersonAddress(PersonAddress address) {
+		Session session = sessionFactory.getCurrentSession();
+    	Criteria criteria = session.createCriteria(AddressToEntryMap.class);
+		criteria.createCriteria("address").add(Restrictions.eq("personAddressId", address.getId()));
+    	return criteria.list();
+    }
+	
+	@SuppressWarnings("unchecked")
+    public List<Patient> findAllPatientsWithDateChangedAfter(Date date) {
+		Session session = sessionFactory.getCurrentSession();
+    	Criteria criteria = session.createCriteria(Patient.class);
+    	criteria.add(Expression.ge("dateChanged",date) );
+    	criteria.add(Expression.eq("voided", false));
+	    return criteria.list();
+    }
+
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to
@@ -386,6 +448,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		
 		return allAddresses;
 	}
+
 
 
 }

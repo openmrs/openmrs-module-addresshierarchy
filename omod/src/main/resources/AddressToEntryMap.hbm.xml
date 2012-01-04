@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.1//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="org.openmrs.module.addresshierarchy">
+
+	<class name="AddressToEntryMap" table="address_hierarchy_address_to_entry_map">
+
+		<id name="addressToEntryMapId" type="int" column="address_to_entry_map_id"
+			unsaved-value="0">
+			<generator class="native" />
+		</id>
+
+		<many-to-one name="address" class="org.openmrs.PersonAddress" column="address_id"/>
+		
+		<many-to-one name="entry" class="org.openmrs.module.addresshierarchy.AddressHierarchyEntry" column="entry_id"/>
+		
+		<property name="uuid" type="string" length="38" not-null="true" />
+		
+	</class>
+
+</hibernate-mapping>

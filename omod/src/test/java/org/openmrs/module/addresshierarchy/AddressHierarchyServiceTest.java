@@ -1,6 +1,8 @@
 package org.openmrs.module.addresshierarchy;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,9 +13,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Patient;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
+import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 
@@ -377,7 +381,6 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertEquals(0, entries.size());
 	}
 	
-	/**
 	@Test
 	@Verifies(value = "should find address hierarchy entry by level and name and parent", method = "getAddressHierarchyEntryByLevelAndNameAndParent(AddressHierarchyLevel,String)")
 	public void getAddressHierarchyEntryByLevelAndNameAndParent_shouldFindAddressHierarchyEntryByLevelAndNameAndParent() throws Exception {
@@ -394,7 +397,6 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	        .getAddressHierarchyLevel(5), "Plymouth", ahService.getAddressHierarchyEntry(5));
 		Assert.assertEquals(0, entries.size());
 	}
-	*/
 	
 	@Test
 	@Verifies(value = "should find possible matching address hiearchy values", method = "getPossibleAddressValues(PersonAddress,String)")
@@ -720,7 +722,298 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		results = ahService.searchAddresses("plymouth coun", ahService.getAddressHierarchyLevel(2));
 		Assert.assertEquals(1,results.size());
 		Assert.assertTrue(results.contains("Plymouth County"));
-	
+	}
+		
+	@Test
+	@Verifies(value = "should getAddressToyEntryMap by id", method = "getAddressToyEntryMap(int id)")
+	public void getAddressToEntryMap_shouldGetAddressToEntryMapById() throws Exception {
+		AddressToEntryMap addressToEntry = Context.getService(AddressHierarchyService.class).getAddressToEntryMap(1);
+		
+		Assert.assertEquals(new Integer(2), addressToEntry.getAddress().getId());
+		Assert.assertEquals("Scituate", addressToEntry.getEntry().getName());
 		
 	}
+	
+	@Test
+	@Verifies(value = "should get AddressToEntryMap by PersonAddress", method = "getAddressToEntryMapByPersonAddress(PersonAddress address)")
+	public void getAddressToEntryMapByPersonAddress_shouldGetAddressToEntryMapByPersonAddress() throws Exception {
+		PersonAddress address = Context.getPersonService().getPerson(2).getPersonAddress();
+		
+		List<AddressToEntryMap> addressToEntryList = Context.getService(AddressHierarchyService.class).getAddressToEntryMapsByPersonAddress(address);
+		
+		// this should load the four AddressToEntry records defined in the test dataset
+		Assert.assertEquals(4, addressToEntryList.size());
+		
+		Set<AddressHierarchyEntry> entries = new HashSet<AddressHierarchyEntry>();
+		
+		for (AddressToEntryMap addressToEntry : addressToEntryList) {
+			Assert.assertTrue(address.equals(addressToEntry.getAddress()));
+			entries.add(addressToEntry.getEntry());
+		}
+		
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(1)));
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(2)));	
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(4)));	
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(7)));	
+				
+	}
+	
+	@Test
+	@Verifies(value = "should save AddressToEntryMap", method = "saveAddressToEntryMap(AddressToEntry addressToEntry)")
+	public void saveAddressToEntryMap_shouldSaveAddressToEntryyMap() throws Exception {
+		 AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// create and save a new AddressToEntryMap and save it
+		PersonAddress address = Context.getPersonService().getPerson(2).getPersonAddress();
+		AddressHierarchyEntry entry = ahService.getAddressHierarchyEntry(17);
+		ahService.saveAddressToEntryMap(new AddressToEntryMap(address, entry));
+		
+		// now load the records for this PersonAddress and make sure it includes the record we just added
+		List<AddressToEntryMap> addressToEntryList = ahService.getAddressToEntryMapsByPersonAddress(address);
+		
+		Assert.assertEquals(5, addressToEntryList.size());
+		
+		Set<AddressHierarchyEntry> entries = new HashSet<AddressHierarchyEntry>();
+		
+		for (AddressToEntryMap addressToEntry : addressToEntryList) {
+			Assert.assertTrue(address.equals(addressToEntry.getAddress()));
+			entries.add(addressToEntry.getEntry());
+		}
+		
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(1)));
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(2)));	
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(4)));	
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(7)));	
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(17)));	
+				
+	}
+	
+	@Test
+	@Verifies(value = "should delete AddressToEntryMaps associated with PersonAddress", method = "deleteAddressToEntryMapsByPersonAddress(PersonAddress address)")
+	public void deleteAddressToEntryMapsByPersonAddress_shouldDeleteAddressToEntryMapsByPersonAddress() throws Exception {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		PersonAddress address = Context.getPersonService().getPerson(2).getPersonAddress();
+		ahService.deleteAddressToEntryMapsByPersonAddress(address);
+		
+		// confirm that the maps for this address have been deleted
+		List<AddressToEntryMap> maps = ahService.getAddressToEntryMapsByPersonAddress(address);
+		Assert.assertTrue(maps == null || maps.size() == 0);
+		
+		// as a double check, make sure the map in the test data for another address still exists
+		Assert.assertNotNull(ahService.getAddressToEntryMap(5));
+	}
+	
+	@Test
+	@Verifies(value = "should create empty set for PersonAddress field with no fields matching address hierarchy entries", method = "updateAddressToEntryMapsForPersonAddress()")
+	public void updateAddressToEntryMapsForPersonAddress_shouldCreateEmptySetIfNoMatches() {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// load an existing Person Address field that doesn't have any matches in the hierarchy
+		PersonAddress address = Context.getPersonService().getPerson(2).getPersonAddress();
+		
+		// call the method to update the maps for this address
+		ahService.updateAddressToEntryMapsForPersonAddress(address);
+		
+		// confirm that no maps have been created
+		List<AddressToEntryMap> addressToEntryList = ahService.getAddressToEntryMapsByPersonAddress(address);
+		Assert.assertEquals(0, addressToEntryList.size());
+	}
+
+	@Test
+	@Verifies(value = "should create set of AddressToEntryMaps for passed PersonAddress", method = "updateAddressToEntryMapsForPerson()")
+	public void updateAddressToEntryMapsForPerson_shouldCreateAddressToEntryMaps() {
+	
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// create a new person address with some sample date
+		PersonAddress address = new PersonAddress();
+		address.setCountry("united states");
+		address.setStateProvince("massachusetts");
+		address.setCountyDistrict("suffolk county");
+		// skip a level
+		address.setNeighborhoodCell("jamaica plain");
+		
+		// add this address to an existing patient and persist it
+		Patient patient = Context.getPatientService().getPatient(2);
+		patient.addAddress(address);
+		Context.getPatientService().savePatient(patient);
+		
+		// call the method to update the maps for this patient
+		ahService.updateAddressToEntryMapsForPerson(patient);
+		
+		// make sure that mapping records have been created for united states, massachusetts and suffolk, and jamaica plain
+		List<AddressToEntryMap> addressToEntryList = ahService.getAddressToEntryMapsByPersonAddress(address);
+		Assert.assertEquals(4, addressToEntryList.size());
+		
+		Set<AddressHierarchyEntry> entries = new HashSet<AddressHierarchyEntry>();
+		
+		for (AddressToEntryMap addressToEntry : addressToEntryList) {
+			Assert.assertTrue(address.equalsContent(addressToEntry.getAddress()));
+			entries.add(addressToEntry.getEntry());
+		}
+		
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(1)));
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(2)));
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(5)));	
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(12)));	
+	}
+
+	
+	@Test
+	@Verifies(value = "should create set of AddressToEntryMaps for passed PersonAddress", method = "updateAddressToEntryMapsForPerson()")
+	public void updateAddressToEntryMapsForPerson_shouldCreateAddressToEntryMapsEvenIfTopLevelEmpty() {
+		
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// now let's test that it works even if the top level is empty
+		// create a new person address with some sample date
+		PersonAddress address = new PersonAddress();
+		address.setStateProvince("massachusetts");
+		address.setCountyDistrict("suffolk county");
+		// skip a level
+		address.setNeighborhoodCell("jamaica plain");
+		
+		// add this address to an existing patient and persist it
+		Patient patient = Context.getPatientService().getPatient(2);
+		patient.addAddress(address);
+		Context.getPatientService().savePatient(patient);
+		
+		// call the method to update the maps for this patient
+		ahService.updateAddressToEntryMapsForPerson(patient);
+		
+		// make sure that mapping records have been created for united states, massachusetts and suffolk, and jamaica plain
+		List<AddressToEntryMap> addressToEntryList = ahService.getAddressToEntryMapsByPersonAddress(address);
+		Assert.assertEquals(3, addressToEntryList.size());
+		
+		Set<AddressHierarchyEntry> entries = new HashSet<AddressHierarchyEntry>();
+		
+		for (AddressToEntryMap addressToEntry : addressToEntryList) {
+			Assert.assertTrue(address.equalsContent(addressToEntry.getAddress()));
+			entries.add(addressToEntry.getEntry());
+		}
+		
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(2)));
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(5)));	
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(12)));	
+		
+	}
+	
+	@Test
+	@Verifies(value = "should create set of AddressToEntryMaps for passed PersonAddress", method = "updateAddressToEntryMapsForPerson()")
+	public void updateAddressToEntryMapsForPatientsWithDateChangedAfter_shouldUpdatePatient() {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// try the same address as previously, but now try to trigger it via the updateAddressToEntryMapsForPatientsWithDateChangedAfter()
+		Date date = new Date(); // get a timestamp BEFORE we update the patient
+		
+		PersonAddress address = new PersonAddress();
+		address.setStateProvince("massachusetts");
+		address.setCountyDistrict("suffolk county");
+		address.setNeighborhoodCell("jamaica plain");
+		
+		// add this address to an existing patient and persist it
+		Patient patient = Context.getPatientService().getPatient(2);
+		patient.addAddress(address);
+		Context.getPatientService().savePatient(patient);
+		
+		// call the method to update the maps based on date changed
+		AddressHierarchyUtil.updateAddressToEntryMapsForPatientsWithDateChangedAfter(date);
+		
+		// make sure that mapping records have been created for united states, massachusetts and suffolk, and jamaica plain
+		List<AddressToEntryMap> addressToEntryList = ahService.getAddressToEntryMapsByPersonAddress(address);
+		Assert.assertEquals(3, addressToEntryList.size());
+		
+		Set<AddressHierarchyEntry> entries = new HashSet<AddressHierarchyEntry>();
+		
+		for (AddressToEntryMap addressToEntry : addressToEntryList) {
+			Assert.assertTrue(address.equalsContent(addressToEntry.getAddress()));
+			entries.add(addressToEntry.getEntry());
+		}
+		
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(2)));
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(5)));	
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(12)));	
+		
+	}
+	
+	@Test
+	@Verifies(value = "should create set of AddressToEntryMaps for passed PersonAddress", method = "updateAddressToEntryMapsForPerson()")
+	public void updateAddressToEntryMapsForPatientsWithDateChangedAfter_shouldNotUpdatePatient() throws InterruptedException {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// now perform the same test but set the date changed to be AFTER the patient save
+		
+		// try the same address as previously, but now try to trigger it via the updateAddressToEntryMapsForPatientsWithDateChangedAfter()	
+		PersonAddress address = new PersonAddress();
+		address.setStateProvince("massachusetts");
+		address.setCountyDistrict("suffolk county");
+		address.setNeighborhoodCell("jamaica plain");
+		
+		// add this address to an existing patient and persist it
+		Patient patient = Context.getPatientService().getPatient(2);
+		patient.addAddress(address);
+		Context.getPatientService().savePatient(patient);
+		
+		Thread.sleep(10);
+		Date date = new Date(); // get a timestamp AFTER we update the patient
+		
+		// call the method to update the maps based on date changed
+		AddressHierarchyUtil.updateAddressToEntryMapsForPatientsWithDateChangedAfter(date);
+		
+		// make sure that no mappings have been created because the timestamp we test against is AFTER the patient was saved
+		List<AddressToEntryMap> addressToEntryList = ahService.getAddressToEntryMapsByPersonAddress(address);
+		Assert.assertTrue(addressToEntryList == null || addressToEntryList.size() == 0);
+	}
+	
+	@Test
+	@Verifies(value = "should update set of AddressToEntryMaps for passed PersonAddress", method = "updateAddressToEntryMapsForPerson()")
+	public void updateAddressToEntryMapsForPerson_shouldUpdateAddressToEntryMaps() {
+	
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// create a new person address with some sample date
+		PersonAddress address = new PersonAddress();
+		address.setCountry("united states");
+		address.setStateProvince("massachusetts");
+		address.setCountyDistrict("suffolk county");
+		// skip a level
+		address.setNeighborhoodCell("jamaica plain");
+		
+		// add this address to an existing patient and persist it
+		Patient patient = Context.getPatientService().getPatient(2);
+		patient.addAddress(address);
+		Context.getPatientService().savePatient(patient);
+		
+		// call the method to update the maps for this patient
+		ahService.updateAddressToEntryMapsForPerson(patient);
+		
+		// now CHANGE the data for this address
+		address.setStateProvince("rhode island");
+		address.setCountyDistrict("providence county");
+		address.setCityVillage("scituate");
+		address.setNeighborhoodCell("");
+		
+		// resave the patient and re-call the method to update the address entry maps for this patient
+		Context.getPatientService().savePatient(patient);
+		ahService.updateAddressToEntryMapsForPerson(patient);
+		
+		// make sure that mapping records have been created for united states, rhode island, province, and scituate
+		List<AddressToEntryMap> addressToEntryList = ahService.getAddressToEntryMapsByPersonAddress(address);
+		Assert.assertEquals(4, addressToEntryList.size());
+		
+		Set<AddressHierarchyEntry> entries = new HashSet<AddressHierarchyEntry>();
+		
+		for (AddressToEntryMap addressToEntry : addressToEntryList) {
+			Assert.assertTrue(address.equalsContent(addressToEntry.getAddress()));
+			entries.add(addressToEntry.getEntry());
+		}
+		
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(1)));
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(3)));
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(14)));	
+		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(15)));	
+	}
+
 }

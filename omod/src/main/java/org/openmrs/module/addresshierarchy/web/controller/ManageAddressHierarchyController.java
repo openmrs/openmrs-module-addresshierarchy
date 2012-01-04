@@ -35,15 +35,15 @@ import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
-public class AddressHierarchyAdminController {
+public class ManageAddressHierarchyController {
 
-	protected static final Log log = LogFactory.getLog(AddressHierarchyAdminController.class);
+	protected static final Log log = LogFactory.getLog(ManageAddressHierarchyController.class);
 	
 	/** Validator for this controller */
 	private AddressHierarchyLevelValidator validator;
 	
 	@Autowired
-	public AddressHierarchyAdminController(AddressHierarchyLevelValidator validator) {
+	public ManageAddressHierarchyController(AddressHierarchyLevelValidator validator) {
 		this.validator = validator;
 	}
 	

@@ -1,15 +1,19 @@
 package org.openmrs.module.addresshierarchy.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.openmrs.Patient;
+import org.openmrs.Person;
 import org.openmrs.PersonAddress;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
+import org.openmrs.module.addresshierarchy.AddressToEntryMap;
 
 /**
  * The Interface AddressHierarchyService has the service methods for AddressHierarchy module.
@@ -162,8 +166,21 @@ public interface AddressHierarchyService{
 	 * @param level
 	 * @param name
 	 * @return a list of all address hierarchy entries at the given level that have the specified name
+	 * @should return null if either level or name is blank or empty
 	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel level, String name);
+	
+	/**
+	 * Returns all address hierarchy entries at the given level that have both the specified name and the specified parent
+	 * (name match is case-insensitive)
+	 *
+	 * @param level
+	 * @param name
+	 * @param parent
+	 * @return a list of all address hierarchy entries at the given level that have the specified name
+	 * @should return null if level, name, or parent is blank or empty
+	 */
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
 	
 	/**
 	 * Returns all address hierarchy entries at the top level in the hierarchy
@@ -337,6 +354,65 @@ public interface AddressHierarchyService{
 	 * @return 
 	 */
 	public void resetFullAddressCache();
+	
+	/**
+	 * Fetches the AddressToEntryMap with the given id
+	 * 
+	 * @param id id of the AddressToEntryMap object to fetch
+	 */
+	public AddressToEntryMap getAddressToEntryMap(Integer id);
+	
+	/**
+	 * Fetches the AddressToyEntryMap objects that match the given PersonAddress
+	 * 
+	 * @param personAddress the PersonAddreses to retrieve AddressToEntry records for
+	 */
+	public List<AddressToEntryMap> getAddressToEntryMapsByPersonAddress(PersonAddress address);
+	
+	/**
+	 * Saves the passed AddressToEntry map
+	 * 
+	 * @param addressToEntry the AddressToyEntryMap to save
+	 */
+	public void saveAddressToEntryMap(AddressToEntryMap addressToEntry);
+	
+	/**
+	 * Deletes the given AddressToEntryMap
+	 * 
+	 * @param addressToEntryMap
+	 */
+	public void deleteAddressToEntryMap(AddressToEntryMap addressToEntryMap);
+
+	/**
+	 * Deletes all AddressToEntryMaps for the given PersonAddress
+	 * 
+	 * @param address
+	 */
+	public void deleteAddressToEntryMapsByPersonAddress(PersonAddress address);
+	
+	/**
+	 * Given a PersonAddress, updates all the AddressToEntryMaps for that
+	 * PersonAddress
+	 * 
+	 * @param address
+	 */
+	public void updateAddressToEntryMapsForPersonAddress(PersonAddress address);
+	
+	/**
+	 * Given a person, updates all the AddressToEntryMaps for all non-voided
+	 * PersonAddresses associated with that person
+	 *  
+	 * @param person
+	 */
+	public void updateAddressToEntryMapsForPerson(Person person);
+	
+	
+	/**
+	 * Finds all patients with a date changed after the given date
+	 * 
+	 * @param date
+	 */
+	public List<Patient> findAllPatientsWithDateChangedAfter(Date date);
 	
 	/**
 	 * Deprecated methods

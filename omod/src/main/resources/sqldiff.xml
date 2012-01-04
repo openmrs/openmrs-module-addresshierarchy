@@ -352,4 +352,25 @@
 	
 	</diff>
 	
+	<diff>
+		<version>2.8.0</version>
+		<author>Mark Goodrich</author>
+		<date>December 9 2011</date>
+		<description>
+			Add table linking address hierarchy entry to person address
+		</description>
+		<sql>
+			CREATE TABLE IF NOT EXISTS address_hierarchy_address_to_entry_map
+            (
+                address_to_entry_map_id int(11) NOT NULL auto_increment,
+            	address_id int(11) NOT NULL,
+                entry_id int(11) NOT NULL,
+                uuid char(38) NOT NULL,
+                PRIMARY KEY (address_to_entry_map_id),
+                CONSTRAINT address_id_to_person_address_table FOREIGN KEY person_address_index (address_id) REFERENCES person_address (person_address_id),
+                CONSTRAINT entry_id_to_address_hierarchy_table FOREIGN KEY address_hierarchy_index (entry_id) REFERENCES address_hierarchy_entry (address_hierarchy_entry_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		</sql>
+	</diff>
+	
 </sqldiff>

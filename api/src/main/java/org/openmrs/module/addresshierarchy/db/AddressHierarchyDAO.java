@@ -1,9 +1,14 @@
 package org.openmrs.module.addresshierarchy.db;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
+import org.openmrs.Patient;
+import org.openmrs.PersonAddress;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
+import org.openmrs.module.addresshierarchy.AddressToEntryMap;
 
 /**
  * The Interface AddressHierarchyDAO which is implemented in HibernateAddressHierarchyDAO which
@@ -41,6 +46,11 @@ public interface AddressHierarchyDAO {
 	 * Gets all address hierarchy entries associated with the a certain level that have the specified name
 	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel level, String name);
+	
+	/**
+	 * Gets all address hierarchy entries associated with the a certain level that have the specified name and the specified parent
+	 */
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
 	
 	/**
 	 * Gets all the address hierarchy entries that are children of the specified entry
@@ -95,7 +105,30 @@ public interface AddressHierarchyDAO {
 	 */
 	public void deleteAddressHierarchyLevel(AddressHierarchyLevel level);
 	
+	/**
+	 * Gets a AddressToEntryMap by Id
+	 */
+	public AddressToEntryMap getAddressToEntryMap(int id);
 	
+	/**
+	 * Gets all the AddressToEntryMap objects for a given PersonAddress
+	 */
+	public List<AddressToEntryMap> getAddressToEntryMapByPersonAddress(PersonAddress address);
+	
+	/**
+	 * Saves the specified AddressToEntryMap
+	 */
+	public void saveAddressToEntryMap(AddressToEntryMap addressToEntry);
+	
+	/**
+	 * Deletes the specified AddressToEntryMap
+	 */
+	public void deleteAddressToEntryMap(AddressToEntryMap addressToEntryMap);
+	
+	/**
+	 * Finds all patients which have dateChanged after or equal to the specified date
+	 */
+	public List<Patient> findAllPatientsWithDateChangedAfter(Date date);
 	
 	/**
 	 * The following methods are deprecated and just exist to provide backwards compatibility to
@@ -121,5 +154,5 @@ public interface AddressHierarchyDAO {
 	
 	@Deprecated
 	public List<Object[]> getAllAddresses(int page);
-	
+
 }
