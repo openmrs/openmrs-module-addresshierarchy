@@ -317,7 +317,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		// remove all characters that are not alphanumerics or whitespace
 		// (more specifically, this pattern matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
-		searchString = Pattern.compile("[\\W&&\\S]+").matcher(searchString).replaceAll("");
+		searchString = AddressHierarchyConstants.PATTERN_NON_WORD_AND_NON_WHITESPACE.matcher(searchString).replaceAll("");
 				
 		// split the search string into words
 		String [] words = searchString.split(" ");
@@ -890,20 +890,27 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 
 		// first remove all characters that are not alphanumerics or whitespace
 		// (more specifically, this pattern matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
-		stringToEncode = Pattern.compile("[\\W&&\\S]+").matcher(stringToEncode).replaceAll("");
+		stringToEncode = AddressHierarchyConstants.PATTERN_NON_WORD_AND_NON_WHITESPACE.matcher(stringToEncode).replaceAll("");
 		
 		// break the string to encode into words
 		String [] words = stringToEncode.split(" ");
 		
 		// cycle through each word in the string, encode it, and then add it to the new coded string
 		for (String word : words) {
-			try {
-	            codedString.append((String) encodeStringMethod.invoke(null, word, phoneticProcessor) + " ");
-	        }
-	        catch (Exception e) {
-	        	// hopefully we will never get here, because problems will be caught earlier
-	        	throw new AddressHierarchyModuleException("Unable to encode string", e);
-	        }
+			// if a "word" contains a digit, don't bother to encode it, just return as-is 
+			if (AddressHierarchyConstants.PATTERN_ANY_DIGIT.matcher(word).find()) {
+				codedString.append(word + " ");
+			}
+			
+			else {
+				try {
+		            codedString.append((String) encodeStringMethod.invoke(null, word, phoneticProcessor) + " ");
+		        }
+		        catch (Exception e) {
+		        	// hopefully we will never get here, because problems will be caught earlier
+		        	throw new AddressHierarchyModuleException("Unable to encode string", e);
+		        }
+			}
 		}
 		
 		// remove the trailing space
