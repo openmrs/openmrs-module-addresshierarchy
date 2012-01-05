@@ -349,6 +349,32 @@ public interface AddressHierarchyService{
 	 */
 	public void setAddressHierarchyLevelParents();
 	
+	/** 
+	 * Builds a key/value map of pipe-delimited strings that represents all the possible full addresses,
+	 * and stores this in a local cache for use by the searchAddresses(String) method
+	 * 
+	 * The map values are full addresses represented as a pipe-delimited string of address hierarchy entry names,
+	 * ordered from the entry at the highest level to the entry at the lowest level in the tree.
+	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
+	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
+	 * 
+	 * In the standard implemention, the keys are the same as the values.  However, if the Name Phonetics module
+	 * has been installed, and the addresshierarchy.soundexProcessor global property has been configured, the keys
+	 * will be the same pipe-delimited string, but with each entry name transformed via the specified soundex processor
+	 * 
+	 * The searchAddresses method compares the input string against the keys, and returns the values of any matches
+	 * 
+	 * Need to make sure we synchronize to avoid having multiple threads
+	 * trying to initialize it at the same time, or one using it before it is initialized
+	 * (Note that the one thing this won't prevent against is it being re-initialized while another
+	 * thread is accessing it)
+	 * 
+	 * NOTE: this method ONLY initializes the full address cache if it has not yet been initialized--
+	 * if you want to RE-initialized the full address cache, first call resetFullAddressCache
+	 * and then this method
+	 */
+	public void initializeFullAddressCache();
+	
 	/**
 	 * Resets the internal address cache used to perform full address services to null
 	 * @return 
