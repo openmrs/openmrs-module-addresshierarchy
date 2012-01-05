@@ -55,7 +55,7 @@ public class AdvancedFeaturesController {
 		}
 		
 		// start or stop the task as needed
-		if (updaterStarted) {
+		if (updaterStarted != null && updaterStarted) {
 			updaterTask.setStarted(true);
 			updaterTask.setStartOnStartup(true);
 			

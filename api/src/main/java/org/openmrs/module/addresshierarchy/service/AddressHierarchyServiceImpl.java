@@ -317,7 +317,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		// remove all characters that are not alphanumerics or whitespace
 		// (more specifically, this pattern matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
-		searchString = Pattern.compile("[\\W&&\\S]+").matcher(searchString).replaceAll("");
+		searchString = AddressHierarchyConstants.PATTERN_NON_WORD_AND_NON_WHITESPACE.matcher(searchString).replaceAll("");
 				
 		// split the search string into words
 		String [] words = searchString.split(" ");
@@ -632,6 +632,64 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 
 	@Transactional(readOnly = true)
+	synchronized public void initializeFullAddressCache() {
+		
+		// only initialize if necessary
+		if (this.fullAddressCacheInitialized == false || this.fullAddressCache == null && this.fullAddressCache.isEmpty()) {
+				
+			this.fullAddressCache = new HashMap<String,List<String>>();
+		 			 
+			for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {	
+				initializeFullAddressCacheHelper(entry);
+			}
+			
+			this.fullAddressCacheInitialized = true;
+		}	
+	}
+	
+	private void initializeFullAddressCacheHelper(AddressHierarchyEntry entry) {
+		
+		List<AddressHierarchyEntry> entries = getChildAddressHierarchyEntries(entry);
+		
+		// if this is leaf node, then create the full address and add it to the list of addresses to return
+		if (entries == null || entries.isEmpty()) {
+		
+			// first determine if we are going to do phonetic processing
+			String phoneticProcessor = fetchPhoneticProcessor();
+			Method encodeStringMethod = fetchEncodeStringMethod();
+			
+			StringBuilder key = new StringBuilder();
+			StringBuilder value = new StringBuilder();
+			
+			// set the key to the encoded name of the entry, and the value to the actual name
+			key.append(encodeString(encodeStringMethod, entry.getName(), phoneticProcessor));
+			value.append(entry.getName());
+			
+			AddressHierarchyEntry tempEntry = entry;
+			
+			// follow back up the tree to the top level and concatenate the names to create the full address string
+			while (tempEntry.getParent() != null) {
+				tempEntry = tempEntry.getParent();		
+				key.insert(0, encodeString(encodeStringMethod, tempEntry.getName(), phoneticProcessor) + "|");		
+				value.insert(0, tempEntry.getName() + "|");	
+			}
+			
+			// add it to the cache
+			if (!this.fullAddressCache.containsKey(key.toString())) {
+				this.fullAddressCache.put(key.toString(), new ArrayList<String>());
+			}
+			this.fullAddressCache.get(key.toString()).add(value.toString());
+		}
+		// if not a leaf node, process it's children recursively
+		else {
+			for (AddressHierarchyEntry currentEntry : entries) {
+				initializeFullAddressCacheHelper(currentEntry);
+			}
+		}
+	}
+	 
+	
+	@Transactional(readOnly = true)
 	public void resetFullAddressCache() {
 		this.fullAddressCache = null;
 		this.fullAddressCacheInitialized = false;
@@ -741,88 +799,11 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		return dao.findAllPatientsWithDateChangedAfter(date);
 	}
 	
+	
 	/**
 	 * Utility methods
 	 */
 	
-	/**
-	 * Builds a key/value map of pipe-delimited strings that represents all the possible full addresses,
-	 * and stores this in a local cache for use by the getPossibleFullAddresses(String) method
-	 * 
-	 * The map values are full addresses represented as a pipe-delimited string of address hierarchy entry names,
-	 * ordered from the entry at the highest level to the entry at the lowest level in the tree.
-	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
-	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
-	 * 
-	 * In the standard implemention, the keys are the same as the values.  However, if the Name Phonetics module
-	 * has been installed, and the addresshierarchy.soundexProcessor global property has been configured, the keys
-	 * will be the same pipe-delimited string, but with each entry name transformed via the specified soundex processor
-	 * 
-	 * The getPossibleFullAddresses method compares the input string against the keys, and returns the values of any matches
-	 * 
-	 * Need to make sure we synchronize to avoid having multiple threads
-	 * trying to initialize it at the same time, or one using it before it is initialized
-	 * (Note that the one thing this won't prevent against is it being re-initialized while another
-	 * thread is accessing it)
-	 *  
-	 */
-	
-	 synchronized private void initializeFullAddressCache() {
-		
-		// only initialize if necessary
-		if (this.fullAddressCacheInitialized == false || this.fullAddressCache == null && this.fullAddressCache.isEmpty()) {
-				
-			this.fullAddressCache = new HashMap<String,List<String>>();
-		 			 
-			for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {	
-				initializeFullAddressCacheHelper(entry);
-			}
-			
-			this.fullAddressCacheInitialized = true;
-		}	
-	}
-	
-	private void initializeFullAddressCacheHelper(AddressHierarchyEntry entry) {
-		
-		List<AddressHierarchyEntry> entries = getChildAddressHierarchyEntries(entry);
-		
-		// if this is leaf node, then create the full address and add it to the list of addresses to return
-		if (entries == null || entries.isEmpty()) {
-		
-			// first determine if we are going to do phonetic processing
-			String phoneticProcessor = fetchPhoneticProcessor();
-			Method encodeStringMethod = fetchEncodeStringMethod();
-			
-			StringBuilder key = new StringBuilder();
-			StringBuilder value = new StringBuilder();
-			
-			// set the key to the encoded name of the entry, and the value to the actual name
-			key.append(encodeString(encodeStringMethod, entry.getName(), phoneticProcessor));
-			value.append(entry.getName());
-			
-			AddressHierarchyEntry tempEntry = entry;
-			
-			// follow back up the tree to the top level and concatenate the names to create the full address string
-			while (tempEntry.getParent() != null) {
-				tempEntry = tempEntry.getParent();		
-				key.insert(0, encodeString(encodeStringMethod, tempEntry.getName(), phoneticProcessor) + "|");		
-				value.insert(0, tempEntry.getName() + "|");	
-			}
-			
-			// add it to the cache
-			if (!this.fullAddressCache.containsKey(key.toString())) {
-				this.fullAddressCache.put(key.toString(), new ArrayList<String>());
-			}
-			this.fullAddressCache.get(key.toString()).add(value.toString());
-		}
-		// if not a leaf node, process it's children recursively
-		else {
-			for (AddressHierarchyEntry currentEntry : entries) {
-				initializeFullAddressCacheHelper(currentEntry);
-			}
-		}
-	}
-	 
 
 	/**
 	 * Utility method used to retrieve name of soundex processor from a global property and then determine if it is valid or not
@@ -890,20 +871,27 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 
 		// first remove all characters that are not alphanumerics or whitespace
 		// (more specifically, this pattern matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
-		stringToEncode = Pattern.compile("[\\W&&\\S]+").matcher(stringToEncode).replaceAll("");
+		stringToEncode = AddressHierarchyConstants.PATTERN_NON_WORD_AND_NON_WHITESPACE.matcher(stringToEncode).replaceAll("");
 		
 		// break the string to encode into words
 		String [] words = stringToEncode.split(" ");
 		
 		// cycle through each word in the string, encode it, and then add it to the new coded string
 		for (String word : words) {
-			try {
-	            codedString.append((String) encodeStringMethod.invoke(null, word, phoneticProcessor) + " ");
-	        }
-	        catch (Exception e) {
-	        	// hopefully we will never get here, because problems will be caught earlier
-	        	throw new AddressHierarchyModuleException("Unable to encode string", e);
-	        }
+			// if a "word" contains a digit, don't bother to encode it, just return as-is 
+			if (AddressHierarchyConstants.PATTERN_ANY_DIGIT.matcher(word).find()) {
+				codedString.append(word + " ");
+			}
+			
+			else {
+				try {
+		            codedString.append((String) encodeStringMethod.invoke(null, word, phoneticProcessor) + " ");
+		        }
+		        catch (Exception e) {
+		        	// hopefully we will never get here, because problems will be caught earlier
+		        	throw new AddressHierarchyModuleException("Unable to encode string", e);
+		        }
+			}
 		}
 		
 		// remove the trailing space
