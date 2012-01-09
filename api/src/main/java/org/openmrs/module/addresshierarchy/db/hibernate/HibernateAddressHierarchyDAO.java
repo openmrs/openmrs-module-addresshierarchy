@@ -147,10 +147,13 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		// note that I haven't been able to figure out how to have this cascade work on the hibernate level,
 		// so I have defined it at the database level in mysql; therefore, the unit test for this doesn't work
 		
-		for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
-			session.delete(entry);
-		}
+		AddressHierarchyLevel top = getTopAddressHierarchyLevel();
 		
+		if (top != null) {
+			for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(top)) {
+				session.delete(entry);
+			}
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
