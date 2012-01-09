@@ -266,7 +266,7 @@ public interface AddressHierarchyService{
 	 * @param includeEmptyLevels specified whether or not include hierarchy levels that don't have any address hierarchy entries entries
 	 * @return the ordered list of address hierarchy levels
 	 */
-	public List<AddressHierarchyLevel >getOrderedAddressHierarchyLevels(Boolean includeUnmapped, Boolean includeEmptyLevels);
+	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels(Boolean includeUnmapped, Boolean includeEmptyLevels);
 	
 	/**
 	 * Gets all address hierarchy levels
