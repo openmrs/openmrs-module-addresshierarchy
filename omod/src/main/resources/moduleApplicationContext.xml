@@ -64,4 +64,20 @@
 	    </property>
 	</bean>	
 	
+	<!--  configure the task that initializes the full address cache if needed -->
+	<bean id="initializeFullAddressCacheTask" class="org.openmrs.module.addresshierarchy.scheduler.InitializeFullAddressCacheTask"/>
+	
+	<bean id="initializeFullAddressCacheTimerTask" class="org.springframework.scheduling.timer.ScheduledTimerTask">
+	    <property name="period" value="60000" /> <!-- run every minute -->
+	    <property name="timerTask" ref="initializeFullAddressCacheTask"/>
+	</bean>
+	
+	<bean id="addressHierarchyTimerFactory" class="org.springframework.scheduling.timer.TimerFactoryBean">
+	    <property name="scheduledTimerTasks">
+	        <list>
+	            <ref bean="initializeFullAddressCacheTimerTask"/>
+	        </list>
+	    </property>
+	</bean>
+	
 </beans>
