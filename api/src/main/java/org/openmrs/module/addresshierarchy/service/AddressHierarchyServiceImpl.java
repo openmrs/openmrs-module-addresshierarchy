@@ -650,7 +650,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	synchronized public void initializeFullAddressCache() {
 		
 		// only initialize if necessary (and if we have entries)
-		if (this.fullAddressCacheInitialized == false || this.fullAddressCache == null && this.fullAddressCache.isEmpty() && this.getAddressHierarchyEntryCount() > 0) {
+		if ((this.fullAddressCacheInitialized == false || this.fullAddressCache == null || this.fullAddressCache.isEmpty()) && this.getAddressHierarchyEntryCount() > 0) {
 				
 			this.fullAddressCache = new HashMap<String,List<String>>();
 		 			 
