@@ -117,7 +117,7 @@ public class AddressHierarchyAjaxController {
 		}
 		
 		Set<String> names = ahService.searchAddresses(searchString, level);
-		generateAddressHierarchyEntryNamesResponse(response, new ArrayList<String>(names));
+		generateAddressHierarchyEntryNamesResponse(response, new ArrayList<String>(names), searchString);
 	}
     
 	/**
@@ -195,7 +195,7 @@ public class AddressHierarchyAjaxController {
 	/**
 	 * Helper method used to generate the AJAX response the getChildAddressHierarchyEntries and getPossibleAddressHierarchyEntries methods return
 	 */
-	private void generateAddressHierarchyEntryNamesResponse(HttpServletResponse response, List<String> names) throws IOException {
+	private void generateAddressHierarchyEntryNamesResponse(HttpServletResponse response, List<String> names, String exactMatch) throws IOException {
 		response.setContentType("text/json");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
@@ -204,23 +204,38 @@ public class AddressHierarchyAjaxController {
 		out.print("[");
 	
 		if (names != null) {
+			// sort names
 			Collections.sort(names);
 		
+			// if there is an exact match, move it to the front of the list
+			Iterator<String> i = names.iterator();
+			while (i.hasNext()) {
+				String next = i.next();
+				if (next.equalsIgnoreCase(exactMatch)) {
+					i.remove();
+					names.add(0, next);
+					break;
+				}
+			}
+			
 			// add the elements: ie, { "name": "Boston" }
-			Iterator<String> i = names.iterator();			
+			i = names.iterator();			
 			while (i.hasNext()) {
 				out.print("{ \"name\": \"" + i.next() + "\" }");
 				
 				// print comma as a delimiter for all but the last option in the list
 				if (i.hasNext()) {
 					out.print(",");  
-				}
-				
-				}
+				}	
+			}
 		}
 	
 		// close the JSON
 		out.print("]");
+	}
+	
+	private void generateAddressHierarchyEntryNamesResponse(HttpServletResponse response, List<String> names) throws IOException {
+		generateAddressHierarchyEntryNamesResponse(response, names, null);
 	}
 	
 	/**

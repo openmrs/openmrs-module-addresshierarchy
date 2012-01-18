@@ -331,7 +331,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		// find all addresses in the full address cache that contain the first word in the search string
 		// (optionally restricting the search to a single address level in the address cache)
-		Pattern p = Pattern.compile(Pattern.quote(encodeString(encodeStringMethod, words[0], phoneticProcessor)), Pattern.CASE_INSENSITIVE);
+		Pattern p = generateSearchPattern(encodeStringMethod, words[0], phoneticProcessor);
 		for (String address : this.fullAddressCache.keySet()) {
 			if (p.matcher(retrieveSpecifiedLevel(address, levelIndex)).find()) {
 				matchingKeys.add(address);
@@ -343,7 +343,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			for (String word : Arrays.copyOfRange(words, 1, words.length)) {
 				Iterator<String> i = matchingKeys.iterator();
 				
-				p = Pattern.compile(Pattern.quote(encodeString(encodeStringMethod, word, phoneticProcessor)), Pattern.CASE_INSENSITIVE);
+				p = generateSearchPattern(encodeStringMethod, word, phoneticProcessor);
 				while (i.hasNext()) {
 					String address = i.next();
 					if (!p.matcher(retrieveSpecifiedLevel(address, levelIndex)).find()) {
@@ -362,7 +362,22 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			}
 		}
 		
+		// note that we create the results using a List so that we can order them, but then copy back into a LinkedHashSet so we preserve order but remove dups
 		return results;
+	}
+	
+	// utility method used by searchAddress(String, AddressHierarchyLevel)
+	private Pattern generateSearchPattern(Method encodeStringMethod, String searchString, String phoneticProcessor) {
+		// if we aren't doing phonetics matching, pattern is just the string itself
+		if (encodeStringMethod == null || StringUtils.isBlank(phoneticProcessor)) {
+			return Pattern.compile(Pattern.quote(searchString), Pattern.CASE_INSENSITIVE);
+		}
+		// otherwise encode the string to create the pattern
+		else {
+			// note that we want to do only whole entry phonetic matching, so we prepend and append the string with a pattern that matches either
+			// the beginning/end of the string OR a |
+			return Pattern.compile("(^|\\|)" + Pattern.quote(encodeString(encodeStringMethod, searchString, phoneticProcessor)) + "($|\\|)", Pattern.CASE_INSENSITIVE);
+		}	
 	}
 	
 	// utility method used by searchAddress(String, AddressHierarchyLevel)
@@ -634,8 +649,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional(readOnly = true)
 	synchronized public void initializeFullAddressCache() {
 		
-		// only initialize if necessary
-		if (this.fullAddressCacheInitialized == false || this.fullAddressCache == null && this.fullAddressCache.isEmpty()) {
+		// only initialize if necessary (and if we have entries)
+		if (this.fullAddressCacheInitialized == false || this.fullAddressCache == null && this.fullAddressCache.isEmpty() && this.getAddressHierarchyEntryCount() > 0) {
 				
 			this.fullAddressCache = new HashMap<String,List<String>>();
 		 			 
