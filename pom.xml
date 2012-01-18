@@ -15,6 +15,14 @@
 		<developerConnection>scm:svn:http://svn.openmrs.org/openmrs-modules/addresshierarchy/trunk/</developerConnection>
 		<url>http://svn.openmrs.org/openmrs-modules/addresshierarchy/trunk/</url>
 	</scm>
+	
+	<distributionManagement>
+		<repository>
+			<id>openmrs-repo-releases</id>
+			<name>Releases</name>
+			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
 
 	<modules>
 		<module>api</module>
