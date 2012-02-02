@@ -98,12 +98,12 @@
 <tr>
 	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.fileName" />:</nobr></td>
 	<td class="tableCell"><input type="file" name="file" size="50" /></td>
-	<td class="tableCell" width="60%">&nbsp;</td>
+	<td class="tableCell" width="25%">&nbsp;</td>
 </tr>
 
 <tr>
 	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.delimiter" />:</nobr></td>
-	<td class="tableCell"><input type="text" name="delimiter" size="1" value="${delimiter}" /></td>
+	<td class="tableCell"><input type="text" name="delimiter" size="1" value="${delimiter}" /> <spring:message code="addresshierarchy.admin.delimiter.warning" /></td>
 	<td class="tableCell">&nbsp;</td>
 </tr>
 
