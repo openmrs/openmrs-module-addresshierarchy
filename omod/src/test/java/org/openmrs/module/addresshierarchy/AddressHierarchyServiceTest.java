@@ -901,6 +901,29 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
+	@Verifies(value = "should not create AddressToEntryMap if entry not unique", method = "updateAddressToEntryMapsForPerson()")
+	public void updateAddressToEntryMapsForPerson_shouldNotCreateAddressToEntryMapIfEntryNotUnique() {
+	
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// create a person address with non-unique city entry 
+		PersonAddress address = new PersonAddress();
+		address.setCityVillage("scituate");
+		
+		// add this address to an existing patient and persist it
+		Patient patient = Context.getPatientService().getPatient(2);
+		patient.addAddress(address);
+		Context.getPatientService().savePatient(patient);
+		
+		// call the method to update the maps for this patient
+		ahService.updateAddressToEntryMapsForPerson(patient);
+		
+		// make sure that no mapping records have been created
+		List<AddressToEntryMap> addressToEntryList = ahService.getAddressToEntryMapsByPersonAddress(address);
+		Assert.assertEquals(0, addressToEntryList.size());
+	}
+	
+	@Test
 	@Verifies(value = "should create set of AddressToEntryMaps for passed PersonAddress", method = "updateAddressToEntryMapsForPerson()")
 	public void updateAddressToEntryMapsForPatientsWithDateChangedAfter_shouldUpdatePatient() {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
