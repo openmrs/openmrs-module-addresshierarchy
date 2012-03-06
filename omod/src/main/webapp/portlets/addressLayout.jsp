@@ -37,9 +37,17 @@
 
 		// register submit handler for validation as required
 		$j('form:has(div[id=addressPortlet])').submit(function () {
+							
+			// skip validation if this is a voided address
+			<spring:bind path="voided">
+				if ($j('[name=${status.expression}]').is(':checked')) {
+					return true;
+				}
+			</spring:bind>
+			
 			passedValidation = true;
 			var errorMessage = "<spring:message code="addresshierarchy.correctErrors"/>:\n";
-			
+					
 			<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
 				<spring:bind path="${hierarchyLevel.addressField.name}">
 					<c:if test="${hierarchyLevel.required == true}">
