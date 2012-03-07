@@ -52,6 +52,7 @@
 	<properties>
 		<openMRSVersion>1.6.3</openMRSVersion>
 		<openMRSMinorVersion>1.6</openMRSMinorVersion>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 
