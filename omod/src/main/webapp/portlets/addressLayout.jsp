@@ -36,43 +36,52 @@
 		</c:forEach>
 
 		// register submit handler for validation as required
-		$j('form:has(div[id=addressPortlet])').submit(function () {
-							
-			// skip validation if this is a voided address
-			<spring:bind path="voided">
-				if ($j('[name=${status.expression}]').is(':checked')) {
-					return true;
-				}
-			</spring:bind>
-			
-			passedValidation = true;
-			var errorMessage = "<spring:message code="addresshierarchy.correctErrors"/>:\n";
+		if (typeof submitHandlerRegistered === 'undefined') {
+			$j('form:has(div[id=addressPortlet])').submit(function () {
+				
+				var passedValidation = true;
+				var errorMessage = "<spring:message code="addresshierarchy.correctErrors"/>:\n";
+				
+				// iterate through each address portlet on the page
+				// (note that this for some reason ignores the "add another address" div on the patient long form... this is what we want, but I'm not sure why it ignores it)
+				$j.each($j('div[id=addressPortlet]'), function (index,value) {
 					
-			<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
-				<spring:bind path="${hierarchyLevel.addressField.name}">
-					<c:if test="${hierarchyLevel.required == true}">
-						<c:if test="${fn:contains(status.expression,'.')}">  // hacky way to ignore the "add another address" fields on the edit patient long form page 
-							// handle checking that required fields aren't blank
-					  		if ($j('[name=${status.expression}]').val() == null || $j('[name=${status.expression}]').val() == '') {
-								errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/> <spring:message code="addresshierarchy.requiredField"/>\n";
-								passedValidation = false;
-							}
+					// skip validation if this is a voided address
+					if ($j(value).find('[name$=voided]').is(':checked')) {
+						return;
+					}
+					
+					// otherwise, validate
+					<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
+					
+						// handle checking that required fields aren't blank
+						<c:if test="${hierarchyLevel.required == true}">
+						  		if ($j(value).find('[name$=${hierarchyLevel.addressField.name}]').val() == null || ($j(value).find('[name$=${hierarchyLevel.addressField.name}]').val() == '')) {
+									errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/> <spring:message code="addresshierarchy.requiredField"/>\n";
+									passedValidation = false;
+								}
 						</c:if>
-					</c:if>
-					// handle enforcing no free-text entries if free-text disallowed
-				  	if (!allowFreetext && $j('[name=${status.expression}]').hasClass('other')){
-				  		errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/> <spring:message code="addresshierarchy.cannotBeFreetext"/>\n";
-						passedValidation = false;
-				  	}
-				</spring:bind>
-			</c:forEach>
-
-			if (!passedValidation) {
-				alert(errorMessage);
-			}
+						
+						// handle enforcing no free-text entries if free-text disallowed
+					  	if (!allowFreetext && $j(value).find('[name$=${hierarchyLevel.addressField.name}]').hasClass('other')){
+					  		errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/> <spring:message code="addresshierarchy.cannotBeFreetext"/>\n";
+							passedValidation = false;
+					  	}
+					
+					</c:forEach>
+				
+				});
+				
+				if (!passedValidation) {
+					alert(errorMessage);
+				}
+				
+				return passedValidation;
+			});
 			
-			return passedValidation;
-		});
+			// set this global variable so that we don't register the submit handler twice if there are multiple addresses on a page
+			submitHandlerRegistered = true;
+		}
  	});
 </script>
 <!-- END JQUERY -->
