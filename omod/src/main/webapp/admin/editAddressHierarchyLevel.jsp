@@ -73,7 +73,7 @@
 			<c:forEach var="field" items="${addressFields}">
 				<c:if test="${nameMappings[field.name] != null}">
 					<option value="${field.name}" <c:if test="${level.addressField == field}">selected</c:if> >
-						<spring:message code="${nameMappings[field.name]}"/>
+						<spring:message code="${nameMappings[field.name]}"/> (${field.name})
 					</option>
 				</c:if>
 			</c:forEach>

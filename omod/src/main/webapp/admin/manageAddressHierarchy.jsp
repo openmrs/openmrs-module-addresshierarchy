@@ -45,7 +45,7 @@
 			<td class="tableCell">
 				<c:choose>
 					<c:when test="${! empty level.addressField}">
-						<spring:message code="${nameMappings[level.addressField.name]}"/>
+						<spring:message code="${nameMappings[level.addressField.name]}"/> (${level.addressField.name})
 					</c:when>
 					<c:otherwise>
 						(<spring:message code="general.none"/>)
