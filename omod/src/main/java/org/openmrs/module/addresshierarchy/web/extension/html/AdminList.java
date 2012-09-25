@@ -11,7 +11,7 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.addresshierarchy.extension.html;
+package org.openmrs.module.addresshierarchy.web.extension.html;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
