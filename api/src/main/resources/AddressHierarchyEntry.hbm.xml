@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.1//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="org.openmrs.module.addresshierarchy">
+
+	<class name="AddressHierarchyEntry" table="address_hierarchy_entry">
+
+		<id name="addressHierarchyEntryId" type="int" column="address_hierarchy_entry_id"
+			unsaved-value="0">
+			<generator class="native" />
+		</id>
+
+		<property name="name" type="string" column="name"
+			not-null="true" length="255" />
+
+		<many-to-one name="level" class="AddressHierarchyLevel"
+			column="level_id" lazy="false" />
+
+		<many-to-one name="parent" class="AddressHierarchyEntry"
+			column="parent_id" cascade="delete"/>
+
+		<property name="userGeneratedId" type="string" column="user_generated_id" />
+
+		<property name="latitude" type="double" column="latitude" />
+
+		<property name="longitude" type="double" column="longitude" />
+
+		<property name="elevation" type="double" column="elevation" />
+
+		<property name="uuid" type="string" length="38" not-null="true" />
+
+	</class>
+
+</hibernate-mapping>

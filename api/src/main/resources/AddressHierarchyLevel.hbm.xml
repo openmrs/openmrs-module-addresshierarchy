@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.1//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="org.openmrs.module.addresshierarchy">
+
+	<class name="AddressHierarchyLevel" table="address_hierarchy_level">
+
+		<id name="levelId" type="int" column="address_hierarchy_level_id"
+			unsaved-value="0">
+			<generator class="native" />
+		</id>
+
+		<many-to-one name="parent" class="AddressHierarchyLevel"
+			column="parent_level_id" />
+
+		<property name="name" type="string" column="name" length="255" />
+
+		<property name="addressField" column="address_field" length="50">
+			<type name="org.openmrs.module.addresshierarchy.util.HibernateEnumType">
+		    	<param name="enumClassName">org.openmrs.module.addresshierarchy.AddressField</param>
+		    </type>
+		</property>
+		
+		<property name="required" type="java.lang.Boolean" length="1"
+			not-null="true" />
+
+		<property name="uuid" type="string" length="38" not-null="true" />
+		
+	</class>
+
+</hibernate-mapping>
