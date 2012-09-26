@@ -24,7 +24,43 @@
 		</dependency>
 	</dependencies>
 
-	<!-- different profiles for building/testing against different version of openmrs -->
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.txt</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.xml</exclude>
+                    <exclude>**/*.txt</exclude>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+    </build>
+
+    <properties>
+        <MODULE_ID>${project.parent.artifactId}</MODULE_ID>
+        <MODULE_NAME>${project.parent.name}</MODULE_NAME>
+        <MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
+        <MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
+    </properties>
+
+    <!-- different profiles for building/testing against different version of openmrs -->
 	<profiles>
 		<profile>
 			<id>openmrs-1.6</id>

@@ -5,6 +5,8 @@
 
 <hibernate-configuration>
 	<session-factory>
-		${hbmConfig}
+        <mapping resource="AddressHierarchyEntry.hbm.xml" />
+        <mapping resource="AddressHierarchyLevel.hbm.xml" />
+        <mapping resource="AddressToEntryMap.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

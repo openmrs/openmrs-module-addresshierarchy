@@ -34,6 +34,14 @@
 	</privilege>
 	 <!-- /Required Privileges -->
 
+    <!-- Mapping files -->
+     <mappingFiles>
+         AddressHierarchyEntry.hbm.xml
+         AddressHierarchyLevel.hbm.xml
+         AddressToEntryMap.hbm.xml
+     </mappingFiles>
+    <!-- /Mapping files -->
+
 
 	<!-- Required Global Properties -->
 	<globalProperty>
@@ -81,10 +89,7 @@
 		<file>messages_es.properties</file>
 	</messages>-->
 	<!-- /Internationalization -->
-	
-	<mappingFiles>
-		${omodHbmConfig}
-	</mappingFiles>
+
 	
 </module>
 
