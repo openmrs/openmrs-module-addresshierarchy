@@ -54,7 +54,7 @@
 	<bean id="initializeFullAddressCacheTask" class="org.openmrs.module.addresshierarchy.scheduler.InitializeFullAddressCacheTask"/>
 	
 	<bean id="initializeFullAddressCacheTimerTask" class="org.springframework.scheduling.timer.ScheduledTimerTask">
-	    <property name="delay" value="120000" /> <!-- wait 2 minutes before running the first time -->
+	    <property name="delay" value="1200000" /> <!-- wait 20 minutes before running the first time (since we load the cache on startup) -->
 	    <property name="period" value="600000" /> <!-- run every 10 minutes -->
 	    <property name="timerTask" ref="initializeFullAddressCacheTask"/>
 	</bean>
