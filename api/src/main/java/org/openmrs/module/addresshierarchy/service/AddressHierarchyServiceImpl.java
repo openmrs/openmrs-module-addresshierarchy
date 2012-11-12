@@ -1,18 +1,5 @@
 package org.openmrs.module.addresshierarchy.service;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +17,19 @@ import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * The Class AddressHierarchyServiceImpl default implementation of AddressHierarchyService.
@@ -648,31 +648,37 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 
 	@Transactional(readOnly = true)
 	synchronized public void initializeFullAddressCache() {
-		
-		// only initialize if necessary (and if we have entries)
-		if ((this.fullAddressCacheInitialized == false || this.fullAddressCache == null || this.fullAddressCache.isEmpty()) && this.getAddressHierarchyEntryCount() > 0) {
-				
-			this.fullAddressCache = new HashMap<String,List<String>>();
-		 			 
-			for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {	
-				initializeFullAddressCacheHelper(entry);
-			}
-			
-			this.fullAddressCacheInitialized = true;
-		}	
+
+        // generally, this global property should be set to true; it just allows cache load to be disabled to speed startup
+        if (Context.getAdministrationService().getGlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP).equalsIgnoreCase("true")) {
+
+		    // only initialize if necessary (and if we have entries)
+            if ((this.fullAddressCacheInitialized == false || this.fullAddressCache == null || this.fullAddressCache.isEmpty())
+                    && this.getAddressHierarchyEntryCount() > 0) {
+
+                this.fullAddressCache = new HashMap<String,List<String>>();
+
+                // first determine if we are going to do phonetic processing
+                String phoneticProcessor = fetchPhoneticProcessor();
+                Method encodeStringMethod = fetchEncodeStringMethod();
+
+                for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
+                    initializeFullAddressCacheHelper(entry, phoneticProcessor, encodeStringMethod);
+                }
+
+                this.fullAddressCacheInitialized = true;
+            }
+        }
+
 	}
 	
-	private void initializeFullAddressCacheHelper(AddressHierarchyEntry entry) {
+	private void initializeFullAddressCacheHelper(AddressHierarchyEntry entry, String phoneticProcessor, Method encodeStringMethod) {
 		
 		List<AddressHierarchyEntry> entries = getChildAddressHierarchyEntries(entry);
 		
 		// if this is leaf node, then create the full address and add it to the list of addresses to return
 		if (entries == null || entries.isEmpty()) {
-		
-			// first determine if we are going to do phonetic processing
-			String phoneticProcessor = fetchPhoneticProcessor();
-			Method encodeStringMethod = fetchEncodeStringMethod();
-			
+
 			StringBuilder key = new StringBuilder();
 			StringBuilder value = new StringBuilder();
 			
@@ -698,7 +704,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		// if not a leaf node, process it's children recursively
 		else {
 			for (AddressHierarchyEntry currentEntry : entries) {
-				initializeFullAddressCacheHelper(currentEntry);
+				initializeFullAddressCacheHelper(currentEntry, phoneticProcessor, encodeStringMethod);
 			}
 		}
 	}

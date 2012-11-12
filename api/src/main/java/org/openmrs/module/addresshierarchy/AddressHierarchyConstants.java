@@ -13,6 +13,8 @@ public class AddressHierarchyConstants {
 
 	public static final String GLOBAL_PROP_ADDRESS_TO_ENTRY_MAP_UPDATER_LAST_START_TIME = "addresshierarchy.addressToEntryMapUpdaterLastStartTime";
 
+    public static final String GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP = "addresshierarchy.initializeAddressHierarchyCacheOnStartup";
+
 	/* Name of the task that updates the address toe entry map */
 	public static final String TASK_NAME_ADDRESS_TO_ENTRY_MAP_UPDATER = "Address To Entry Map Updater";
 	public static final String TASK_CLASS_ADDRESS_TO_ENTRY_MAP_UPDATER = "org.openmrs.module.addresshierarchy.scheduler.AddressToEntryMapsUpdaterTask";

@@ -72,6 +72,15 @@
 			The module uses this field to store when the AddressToEntryMapUpdater task was last started; DO NOT MODIFY
 		</description>
 	</globalProperty>
+    <globalProperty>
+        <property>addresshierarchy.initializeAddressHierarchyCacheOnStartup</property>
+        <defaultValue>true</defaultValue>
+        <description>
+            Sets whether to initialize the address hierarchy in-memory cache (which is used to speed up address hierarchy searches.
+            Generally, you want to set this to "true", though developers may want to set it to false during development
+            to speed module start-up.
+        </description>
+    </globalProperty>
 	
 	
 	<!-- Internationalization -->
