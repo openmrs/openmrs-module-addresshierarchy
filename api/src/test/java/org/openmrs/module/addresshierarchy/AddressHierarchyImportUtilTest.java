@@ -1,8 +1,5 @@
 package org.openmrs.module.addresshierarchy;
 
-import java.io.InputStream;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,11 +9,16 @@ import org.openmrs.module.addresshierarchy.util.AddressHierarchyImportUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 
+import java.io.InputStream;
+import java.util.List;
+
 
 public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTest {
 	
 	protected static final String CSV_FILE_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleFile.csv";
-	
+
+    protected static final String CSV_FILE__WITH_USER_GENERATED_IDS_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleFileWithUserGeneratedIds.csv";
+
 	protected static final String CSV_LARGE_FILE_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleLargeFile.csv";
 	
 	@Before
@@ -52,7 +54,32 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		Assert.assertTrue(!duplicateSample.get(0).getParent().getName().equals(duplicateSample.get(1).getParent().getName()));
 		
 	}
-	
+
+    @Test
+    @Verifies(value = "should import csv file with user generated ids", method = "importAddressHierarchyFile()")
+    public void importCsvFile_shouldImportCsvFileWithUserGeneratedIds() throws Exception {
+
+        AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+        InputStream file = getClass().getClassLoader().getResourceAsStream(CSV_FILE__WITH_USER_GENERATED_IDS_TO_IMPORT);
+        AddressHierarchyImportUtil.importAddressHierarchyFile(file, "\\|", "%");
+
+        // make sure that the codes
+
+        // verify that a few data points exist
+        List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
+        Assert.assertEquals("BOTHA-BOTHE", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "BOTHA-BOTHE").get(0).getName());
+        Assert.assertEquals("Liqobong Council", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(2), "Liqobong Council").get(0).getName());
+
+        // verify that the codes have been created
+        Assert.assertEquals("12", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "BOTHA-BOTHE").get(0).getUserGeneratedId());
+        Assert.assertEquals("34", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(1), "MECHECHANE").get(0).getUserGeneratedId());
+        Assert.assertEquals("56", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(2), "Makhunoane Council").get(0).getUserGeneratedId());
+        Assert.assertEquals("78", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(3), "Ha Ntereke").get(0).getUserGeneratedId());
+        Assert.assertEquals("654", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(3), "Ha Sefako").get(0).getUserGeneratedId());
+        Assert.assertEquals("212", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(2), "Liqobong Council").get(0).getUserGeneratedId());
+    }
+
 	@Test
 	@Verifies(value = "should import large csv file", method = "importAddressHierarchyFile()")
 	public void importCsvFile_shouldImportLargeCsvFile() throws Exception {

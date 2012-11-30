@@ -1,11 +1,5 @@
 package org.openmrs.module.addresshierarchy.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +26,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -178,7 +177,8 @@ public class ManageAddressHierarchyController {
     @SuppressWarnings("unchecked")
     @RequestMapping("/module/addresshierarchy/admin/uploadAddressHierarchy.form")
 	public ModelAndView processAddressHierarchyUploadForm(@RequestParam("file") MultipartFile file,
-	                                                      @RequestParam("delimiter") String delimiter, 
+	                                                      @RequestParam("delimiter") String delimiter,
+                                                          @RequestParam(value = "userGeneratedIdDelimiter", required = false) String userGeneratedIdDelimiter,
 	                                                      @RequestParam(value = "overwrite", required = false) Boolean overwrite,
 	                                                      ModelMap map) {	
 				
@@ -203,7 +203,7 @@ public class ManageAddressHierarchyController {
 			}
 			
 			// do the actual import
-	        AddressHierarchyImportUtil.importAddressHierarchyFile(file.getInputStream(), delimiter);
+	        AddressHierarchyImportUtil.importAddressHierarchyFile(file.getInputStream(), delimiter, userGeneratedIdDelimiter);
         }
         catch (Exception e) {
 	        log.error("Unable to import address hierarchy file", e);

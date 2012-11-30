@@ -1,5 +1,15 @@
 package org.openmrs.module.addresshierarchy.util;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.io.UnicodeInputStream;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
+import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
+import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
+import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,16 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.io.UnicodeInputStream;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
-import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
-import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
-import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 
 public class AddressHierarchyImportUtil {
@@ -35,7 +35,7 @@ public class AddressHierarchyImportUtil {
 	 * Takes a file of delimited addresses and creates and address hierarchy out of it
 	 * Starting level determines what level of the hierarchy to start at when doing the input
 	 */
-	public static final void importAddressHierarchyFile(InputStream stream, String delimiter, AddressHierarchyLevel startingLevel) {
+	public static final void importAddressHierarchyFile(InputStream stream, String delimiter, String userGeneratedIdDelimiter, AddressHierarchyLevel startingLevel) {
 		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
@@ -83,19 +83,19 @@ public class AddressHierarchyImportUtil {
 	        			if (levels.size() == i) {
 	        				levels.add(ahService.addAddressHierarchyLevel());
 	        			}
-		        		
-	        			String strippedLocation = StringUtils.strip(StringUtils.trim(locations[i]));
-	        			
+
+                        String [] entryNameAndIdPair = splitIntoNameAndUserGeneratedId(StringUtils.trim(locations[i]), userGeneratedIdDelimiter);
+
 	        			AddressHierarchyEntry entry = null;
 	        			AddressHierarchyEntry parent = entryStack.isEmpty() ? null : entryStack.peek();
 	        			
 	        			// first see if this entry already exists in the cache
-	        			if (entryCache.containsKey(parent) && entryCache.get(parent).containsKey(strippedLocation.toLowerCase())) {
-	        				entry = entryCache.get(parent).get(strippedLocation.toLowerCase());
+	        			if (entryCache.containsKey(parent) && entryCache.get(parent).containsKey(entryNameAndIdPair[0].toLowerCase())) {
+	        				entry = entryCache.get(parent).get(entryNameAndIdPair[0].toLowerCase());
 	        			}
 	        			// if it is not in the cache, see if it is in the database if there are existing entries
 	        			else if (hasExistingEntries) {
-	            			entry = ahService.getChildAddressHierarchyEntryByName(parent, strippedLocation);
+	            			entry = ahService.getChildAddressHierarchyEntryByName(parent, entryNameAndIdPair[0]);
 	            			// if we have found an entry, add it to the cache
 	            			if (entry != null) {
 	            				addToCache(entryCache, parent, entry);
@@ -104,18 +104,22 @@ public class AddressHierarchyImportUtil {
 	        			    		
 		        		// if we still haven't found the entry, we need to create it
 		        		if (entry == null) {
-		        			
 		        			// create the new entry and set its name, location and parent
 		        			entry = new AddressHierarchyEntry();
-		        			entry.setName(strippedLocation);
+		        			entry.setName(entryNameAndIdPair[0]);
 		        			entry.setLevel(levels.get(i));
 		        			entry.setParent(parent);
 		        			
 		        			// add the entry to the list to add, and add it to the cache
 		        			entries.add(entry);
 		        			addToCache(entryCache, parent, entry);
-		        			
 		        		}
+
+                        // update/set the user defined id if one has been specified
+                        if (entryNameAndIdPair.length > 1) {
+                            entry.setUserGeneratedId(entryNameAndIdPair[1]);
+                        }
+
 		        		// push this entry onto the stack
 	        			entryStack.push(entry);
 		        	}
@@ -142,31 +146,46 @@ public class AddressHierarchyImportUtil {
 			ahService.saveAddressHierarchyEntries(entries.subList(batchStart, entries.size()));
 		}
 	}
-	
+
+    public static final void importAddressHierarchyFile(InputStream stream, String delimiter, String userGeneratedIdDelimiter) {
+        importAddressHierarchyFile(stream, delimiter, userGeneratedIdDelimiter, null);
+    }
+
 	public static final void importAddressHierarchyFile(InputStream stream, String delimiter) {
 		importAddressHierarchyFile(stream, delimiter, null);
 	}
-	
-	/**
-	 * Takes a CSV file of addresses and creates and address hierarchy out of it
-	 */
-	public static final void importCsvFile(InputStream stream, AddressHierarchyLevel startingLevel) {
-		importAddressHierarchyFile(stream, ",", startingLevel);
-	}
-	
-	public static final void importCsvFile(InputStream stream) {
-		importCsvFile(stream, null);
-	}
-	
+
 	
 	/**
 	 * Utility methods
 	 */
-	public static final void addToCache(Map<AddressHierarchyEntry,Map<String,AddressHierarchyEntry>> entryCache, 
+    private static final String [] splitIntoNameAndUserGeneratedId(String location, String userGeneratedIdDelimiter) {
+
+        // hacky, poor man's pair
+        String [] entryNameAndIdPair = new String[2];
+
+        // only need to split out into name and id if we have a user generated id delimiter
+        if (StringUtils.isNotBlank(userGeneratedIdDelimiter)) {
+            entryNameAndIdPair = location.split(userGeneratedIdDelimiter);
+            entryNameAndIdPair[0] = StringUtils.strip(entryNameAndIdPair[0]);
+
+            if (entryNameAndIdPair.length > 1) {
+                entryNameAndIdPair[1] = StringUtils.strip( entryNameAndIdPair[1]);
+            }
+        }
+        else {
+            entryNameAndIdPair[0] = StringUtils.strip(location);
+        }
+
+        return entryNameAndIdPair;
+    }
+
+	private static final void addToCache(Map<AddressHierarchyEntry,Map<String,AddressHierarchyEntry>> entryCache,
 	                                    AddressHierarchyEntry parent, AddressHierarchyEntry entry) {
 		if (!entryCache.containsKey(parent)) {
 			entryCache.put(parent, new HashMap<String,AddressHierarchyEntry>());
 		}
 		entryCache.get(parent).put(entry.getName().toLowerCase(), entry);
 	}
+
 }

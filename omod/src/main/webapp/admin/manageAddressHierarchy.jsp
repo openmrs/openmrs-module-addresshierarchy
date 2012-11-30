@@ -108,6 +108,12 @@
 </tr>
 
 <tr>
+    <td class="tableCell" style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.userGeneratedIdDelimiter" />:</nobr></td>
+    <td class="tableCell"><input type="text" name="userGeneratedIdDelimiter" size="1" value="${userGeneratedIdDelimiter}" /> <spring:message code="addresshierarchy.admin.userGeneratedIdDelimiter.warning" /></td>
+    <td class="tableCell">&nbsp;</td>
+</tr>
+
+<tr>
 	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.overwrite" />:</nobr></td>
 	<td class="tableCell"><input type="checkbox" name="overwrite" <c:if test="${overwrite}">checked</c:if>/></td>
 	<td class="tableCell">&nbsp;</td>
