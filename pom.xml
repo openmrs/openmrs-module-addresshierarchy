@@ -11,9 +11,9 @@
 	<url>http://openmrs.org</url>
 
 	<scm>
-		<connection>scm:svn:http://svn.openmrs.org/openmrs-modules/addresshierarchy/trunk/</connection>
-		<developerConnection>scm:svn:http://svn.openmrs.org/openmrs-modules/addresshierarchy/trunk/</developerConnection>
-		<url>http://svn.openmrs.org/openmrs-modules/addresshierarchy/trunk/</url>
+		<connection>scm:git:https://github.com/openmrs/openmrs-module-addresshierarchy</connection>
+		<developerConnection>scm:git:https://github.com/openmrs/openmrs-module-addresshierarchy</developerConnection>
+		<url>https://github.com/openmrs/openmrs-module-addresshierarchy</url>
 	</scm>
 	
 	<distributionManagement>
