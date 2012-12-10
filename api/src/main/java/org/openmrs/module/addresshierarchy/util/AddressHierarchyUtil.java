@@ -1,10 +1,5 @@
 package org.openmrs.module.addresshierarchy.util;
 
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
@@ -14,6 +9,13 @@ import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
+
+import java.lang.reflect.Method;
+import java.text.Normalizer;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 
 public class AddressHierarchyUtil {
@@ -139,6 +141,40 @@ public class AddressHierarchyUtil {
 	    	}
 	    }
     }
+
+    /**
+     * (This method is copied from org.apache.commons.lang3.StringUtils -- unfortunately, the lang3 library
+     *  is only included in OpenMRS 1.9; I didn't want to import the class into address hierarchy module
+     *  directly for fear of having classloading issues when running on OpenMRS 1.9; once Address Hierarchy
+     *  switches to only support OpenMRS 1.9+, we can import lang3 and delete this method)
+     *
+     * <p>Removes diacritics (~= accents) from a string. The case will not be altered.</p>
+     * <p>For instance, '&agrave;' will be replaced by 'a'.</p>
+     * <p>Note that ligatures will be left as is.</p>
+     *
+     * <pre>
+     * StringUtils.stripAccents(null)                = null
+     * StringUtils.stripAccents("")                  = ""
+     * StringUtils.stripAccents("control")           = "control"
+     * StringUtils.stripAccents("&eacute;clair")     = "eclair"
+     * </pre>
+     *
+     * @param input String to be stripped
+     * @return input text with diacritics removed
+     *
+     * @since 3.0
+     */
+    // See also Lucene's ASCIIFoldingFilter (Lucene 2.9) that replaces accented characters by their unaccented equivalent (and uncommitted bug fix: https://issues.apache.org/jira/browse/LUCENE-1343?focusedCommentId=12858907&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_12858907).
+    public static String stripAccents(String input) {
+        if(input == null) {
+            return null;
+        }
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");//$NON-NLS-1$
+        String decomposed = Normalizer.normalize(input, Normalizer.Form.NFD);
+        // Note that this doesn't correctly remove ligatures...
+        return pattern.matcher(decomposed).replaceAll("");//$NON-NLS-1$
+    }
+
 }
 
 

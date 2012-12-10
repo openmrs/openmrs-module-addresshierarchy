@@ -32,6 +32,7 @@
     <address_hierarchy_entry address_hierarchy_entry_id="15" name="Scituate" level_id="5" parent_id="14" uuid="42e41146-e162-11df-9195-001e378fb67f"/>
     <address_hierarchy_entry address_hierarchy_entry_id="16" name="China" level_id="1" uuid="42e41146-e162-11df-9295-001e378fb67f"/>
     <address_hierarchy_entry address_hierarchy_entry_id="17" name="New England" level_id="7" parent_id="1" uuid="42e41146-e162-11ef-9295-001e378fb67f"/>
+    <address_hierarchy_entry address_hierarchy_entry_id="18" name="Ãccénts" level_id="5" parent_id="4" uuid="82e66646-e162-11df-9195-001e378eb67f"/>
 
 
     <!-- add some references to a person address -->

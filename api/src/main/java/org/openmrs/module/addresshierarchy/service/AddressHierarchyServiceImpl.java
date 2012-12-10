@@ -314,7 +314,10 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 				}
 			}
 		}
-		
+
+        // remove any accent marks (we have removed accent marks from the cache key as well)
+        searchString = AddressHierarchyUtil.stripAccents(searchString);
+
 		// remove all characters that are not alphanumerics or whitespace
 		// (more specifically, this pattern matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
 		searchString = AddressHierarchyConstants.PATTERN_NON_WORD_AND_NON_WHITESPACE.matcher(searchString).replaceAll("");
@@ -879,10 +882,13 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 	 
 	/**
-	 * Utility method to call the encodeString method via reflection
+	 * Encode the string
 	 */
 	private String encodeString(Method encodeStringMethod, String stringToEncode, String phoneticProcessor) {
-		
+
+        // first strip off any accent marks
+        stringToEncode = AddressHierarchyUtil.stripAccents(stringToEncode);
+
 		// if the phonetics processor hasn't been set, or the string to encode is blank, just return original string
 		if (StringUtils.isBlank(stringToEncode) || StringUtils.isBlank(phoneticProcessor) || encodeStringMethod == null) {
 			return stringToEncode;
