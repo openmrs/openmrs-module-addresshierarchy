@@ -209,6 +209,7 @@ public class ManageAddressHierarchyController {
 	        log.error("Unable to import address hierarchy file", e);
 	        ((List<String>) map.get("messages")).add("addresshierarchy.admin.uploadFailure");
 			map.addAttribute("delimiter", delimiter);
+            map.addAttribute("userGeneratedIdDelimiter", userGeneratedIdDelimiter);
 			map.addAttribute("overwrite", overwrite);
 			return new ModelAndView("/module/addresshierarchy/admin/manageAddressHierarchy", map);
         }
