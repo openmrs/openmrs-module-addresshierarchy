@@ -68,62 +68,64 @@ public class AddressHierarchyImportUtil {
 			
 			// step through the file line by line
 	        while ((line = reader.readLine()) != null) {
-	        	
-	        	// now split the line up by the delimiter
-	        	String [] locations = line.split(delimiter);
-	        	
-	        	if (locations != null) {
-	        	
-	        		Stack<AddressHierarchyEntry> entryStack = new Stack<AddressHierarchyEntry>();
-	        		
-		        	// now cycle through all the locations on this line
-		        	for (int i = 0; i < locations.length; i++) {
-		        	
-		        		// create a new level if we need it
-	        			if (levels.size() == i) {
-	        				levels.add(ahService.addAddressHierarchyLevel());
-	        			}
 
-                        String [] entryNameAndIdPair = splitIntoNameAndUserGeneratedId(StringUtils.trim(locations[i]), userGeneratedIdDelimiter);
+                if (StringUtils.isNotBlank(line)) {
+                    // now split the line up by the delimiter
+                    String [] locations = line.split(delimiter);
 
-	        			AddressHierarchyEntry entry = null;
-	        			AddressHierarchyEntry parent = entryStack.isEmpty() ? null : entryStack.peek();
-	        			
-	        			// first see if this entry already exists in the cache
-	        			if (entryCache.containsKey(parent) && entryCache.get(parent).containsKey(entryNameAndIdPair[0].toLowerCase())) {
-	        				entry = entryCache.get(parent).get(entryNameAndIdPair[0].toLowerCase());
-	        			}
-	        			// if it is not in the cache, see if it is in the database if there are existing entries
-	        			else if (hasExistingEntries) {
-	            			entry = ahService.getChildAddressHierarchyEntryByName(parent, entryNameAndIdPair[0]);
-	            			// if we have found an entry, add it to the cache
-	            			if (entry != null) {
-	            				addToCache(entryCache, parent, entry);
-	            			}
-	        			}
-	        			    		
-		        		// if we still haven't found the entry, we need to create it
-		        		if (entry == null) {
-		        			// create the new entry and set its name, location and parent
-		        			entry = new AddressHierarchyEntry();
-		        			entry.setName(entryNameAndIdPair[0]);
-		        			entry.setLevel(levels.get(i));
-		        			entry.setParent(parent);
-		        			
-		        			// add the entry to the list to add, and add it to the cache
-		        			entries.add(entry);
-		        			addToCache(entryCache, parent, entry);
-		        		}
+                    if (locations != null) {
 
-                        // update/set the user defined id if one has been specified
-                        if (entryNameAndIdPair.length > 1) {
-                            entry.setUserGeneratedId(entryNameAndIdPair[1]);
+                        Stack<AddressHierarchyEntry> entryStack = new Stack<AddressHierarchyEntry>();
+
+                        // now cycle through all the locations on this line
+                        for (int i = 0; i < locations.length; i++) {
+
+                            // create a new level if we need it
+                            if (levels.size() == i) {
+                                levels.add(ahService.addAddressHierarchyLevel());
+                            }
+
+                            String [] entryNameAndIdPair = splitIntoNameAndUserGeneratedId(StringUtils.trim(locations[i]), userGeneratedIdDelimiter);
+
+                            AddressHierarchyEntry entry = null;
+                            AddressHierarchyEntry parent = entryStack.isEmpty() ? null : entryStack.peek();
+
+                            // first see if this entry already exists in the cache
+                            if (entryCache.containsKey(parent) && entryCache.get(parent).containsKey(entryNameAndIdPair[0].toLowerCase())) {
+                                entry = entryCache.get(parent).get(entryNameAndIdPair[0].toLowerCase());
+                            }
+                            // if it is not in the cache, see if it is in the database if there are existing entries
+                            else if (hasExistingEntries) {
+                                entry = ahService.getChildAddressHierarchyEntryByName(parent, entryNameAndIdPair[0]);
+                                // if we have found an entry, add it to the cache
+                                if (entry != null) {
+                                    addToCache(entryCache, parent, entry);
+                                }
+                            }
+
+                            // if we still haven't found the entry, we need to create it
+                            if (entry == null) {
+                                // create the new entry and set its name, location and parent
+                                entry = new AddressHierarchyEntry();
+                                entry.setName(entryNameAndIdPair[0]);
+                                entry.setLevel(levels.get(i));
+                                entry.setParent(parent);
+
+                                // add the entry to the list to add, and add it to the cache
+                                entries.add(entry);
+                                addToCache(entryCache, parent, entry);
+                            }
+
+                            // update/set the user defined id if one has been specified
+                            if (entryNameAndIdPair.length > 1) {
+                                entry.setUserGeneratedId(entryNameAndIdPair[1]);
+                            }
+
+                            // push this entry onto the stack
+                            entryStack.push(entry);
                         }
-
-		        		// push this entry onto the stack
-	        			entryStack.push(entry);
-		        	}
-	        	}
+                    }
+                }
 	        }  
         }
         catch (IOException e) { 

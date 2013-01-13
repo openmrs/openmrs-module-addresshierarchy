@@ -35,7 +35,10 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		
 		InputStream file = getClass().getClassLoader().getResourceAsStream(CSV_FILE_TO_IMPORT);
 		AddressHierarchyImportUtil.importAddressHierarchyFile(file, "\\|");
-		
+
+        // make sure the right number of entries have been imported (particularly to double-check that no blank entries have been created)
+        Assert.assertEquals(new Integer(39), ahService.getAddressHierarchyEntryCount());
+
 		// verify that a few data points exist	
 		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
 		Assert.assertEquals("BOTHA-BOTHE", ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "BOTHA-BOTHE").get(0).getName());
