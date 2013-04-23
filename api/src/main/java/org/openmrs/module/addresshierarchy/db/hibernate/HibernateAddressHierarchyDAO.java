@@ -126,8 +126,19 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		criteria.createCriteria("parent").add(Restrictions.eq("addressHierarchyEntryId", entry.getId()));
 		criteria.add(Restrictions.eq("name", childName).ignoreCase());  // do a case-insensitive match
-		// this will throw an exception if we don't get a unique result--entries should always be unique on parent and name
-		return (AddressHierarchyEntry) criteria.uniqueResult();    
+
+		List <AddressHierarchyEntry> entries = (List <AddressHierarchyEntry>) criteria.list();
+
+        if (entries == null || entries.size() == 0) {
+            return null;
+        }
+
+        // if there are multiple entries with the same name, log this as an error, but just return the first result
+        if (entries.size() > 1) {
+            log.error("Duplicate address hierarchy entries: " + entries.get(0).getName());
+        }
+
+        return entries.get(0);
 	}
 	
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah) {
