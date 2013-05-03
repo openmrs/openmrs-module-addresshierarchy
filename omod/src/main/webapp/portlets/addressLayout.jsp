@@ -1,6 +1,5 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 
-<openmrs:htmlInclude file="/scripts/jquery/jquery-1.3.2.min.js"/>
 <openmrs:htmlInclude file="/moduleResources/addresshierarchy/addressHierarchy.js"/>
 
 <!-- JQUERY FOR THIS PAGE -->
