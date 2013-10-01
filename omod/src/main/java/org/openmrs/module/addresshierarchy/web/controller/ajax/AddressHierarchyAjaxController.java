@@ -27,6 +27,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Handles all the AJAX requests for this module
@@ -119,7 +120,48 @@ public class AddressHierarchyAjaxController {
 		Set<String> names = ahService.searchAddresses(searchString, level);
 		generateAddressHierarchyEntryNamesResponse(response, new ArrayList<String>(names), searchString);
 	}
-    
+
+    @RequestMapping("/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form")
+    @ResponseBody
+    public ArrayList<ModelMap> getPossibleAddressHierarchyEntriesWithParents(@RequestParam("searchString") String searchString,
+                                                                             @RequestParam("addressField") String addressFieldString,
+                                                                             @RequestParam("limit") int limit) throws IOException {
+
+        if (StringUtils.isBlank(searchString) || StringUtils.isBlank(addressFieldString)) {
+            log.error("Must specify both an address field and a search string");
+            return new ArrayList<ModelMap>();
+        }
+
+        AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+        // find the address hierarchy level associated with the given address field
+        AddressHierarchyLevel level = ahService.getAddressHierarchyLevelByAddressField(AddressField.getByName(addressFieldString));
+
+        if (level == null) {
+            log.error("Invalid address field or address field has no associated address hierarchy level");
+            return new ArrayList<ModelMap>();
+        }
+
+        List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesByLevelAndLikeName(level, searchString, limit);
+
+        ArrayList<ModelMap> addresses = new ArrayList<ModelMap>();
+
+        for (AddressHierarchyEntry entry : entries) {
+            addresses.add(getAddressAndParents(entry));
+        }
+        return addresses;
+    }
+
+    private ModelMap getAddressAndParents(AddressHierarchyEntry entry) {
+        ModelMap address = new ModelMap();
+        address.addAttribute("name", entry.getName());
+        AddressHierarchyEntry parent = entry.getParent();
+        if (parent != null) {
+            address.addAttribute("parent", getAddressAndParents(parent));
+        }
+        return address;
+    }
+
 	/**
 	 * Returns a list of full addresses that contain address hierarchy entries with the specified name at the specified hierarchy level
 	 * 
