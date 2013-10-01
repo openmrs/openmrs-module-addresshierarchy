@@ -12,6 +12,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Patient;
@@ -463,6 +464,15 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		return allAddresses;
 	}
 
+    @Override
+    public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeName(AddressHierarchyLevel level, String name, int limit) {
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
+        criteria.createCriteria("level").add(Restrictions.eq("levelId", level.getId()));
+        criteria.add(Restrictions.ilike("name", name, MatchMode.START));
+        criteria.setMaxResults(limit);
+        return criteria.list();
+    }
 
 
 }
