@@ -155,4 +155,5 @@ public interface AddressHierarchyDAO {
 	@Deprecated
 	public List<Object[]> getAllAddresses(int page);
 
+    List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeName(AddressHierarchyLevel level, String name, int limit);
 }

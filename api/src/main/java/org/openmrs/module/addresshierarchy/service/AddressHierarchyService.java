@@ -499,4 +499,5 @@ public interface AddressHierarchyService{
 	@Deprecated
 	public AddressHierarchyLevel getHierarchyType(int levelId);
 
+    List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeName(AddressHierarchyLevel level, String searchString, int limit);
 }
