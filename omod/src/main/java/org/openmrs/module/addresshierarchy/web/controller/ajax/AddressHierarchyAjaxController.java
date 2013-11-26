@@ -229,6 +229,25 @@ public class AddressHierarchyAjaxController {
 			generateFullAddressResponse(response, addresses, separator);
 		}
 	}
+
+    /**
+     * Returns ordered array of hierarchy levels.
+     */
+    @RequestMapping("/module/addresshierarchy/ajax/getOrderedAddressHierarchyLevels.form")
+    @ResponseBody
+    public ArrayList<ModelMap> getOrderedAddressHierarchyLevels() throws Exception {
+        AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+        List<AddressHierarchyLevel> hierarchyLevels = ahService.getOrderedAddressHierarchyLevels();
+        ArrayList<ModelMap> map = new ArrayList<ModelMap>();
+        for (AddressHierarchyLevel hierarchyLevel : hierarchyLevels) {
+            ModelMap modelMap = new ModelMap();
+            modelMap.addAttribute("name", hierarchyLevel.getName());
+            String fieldName = (hierarchyLevel.getAddressField() != null) ? hierarchyLevel.getAddressField().getName() : null;
+            modelMap.addAttribute("addressField", fieldName);
+            map.add(modelMap);
+        }
+        return map;
+    }
 	
 	/**
 	 * Utility methods
