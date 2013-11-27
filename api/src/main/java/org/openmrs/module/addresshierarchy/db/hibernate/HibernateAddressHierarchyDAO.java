@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import freemarker.template.utility.StringUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -11,10 +13,12 @@ import org.hibernate.Hibernate;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.SimpleExpression;
 import org.openmrs.Patient;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.db.DAOException;
@@ -99,17 +103,21 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		criteria.createCriteria("level").add(Restrictions.eq("levelId", addressHierarchyLevel.getId()));
-		criteria.add(Restrictions.eq("name", name).ignoreCase());
+		criteria.add(getNameCriteria(name));
 		return criteria.list();
 	}
-	
-	@SuppressWarnings("unchecked")
+
+    private Criterion getNameCriteria(String name) {
+        return name == null ? Restrictions.isNull("name") : Restrictions.eq("name", name).ignoreCase();
+    }
+
+    @SuppressWarnings("unchecked")
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel addressHierarchyLevel, String name, AddressHierarchyEntry parent) {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		criteria.createCriteria("level").add(Restrictions.eq("levelId", addressHierarchyLevel.getId()));
 		criteria.createCriteria("parent").add(Restrictions.eq("addressHierarchyEntryId", parent.getId()));
-		criteria.add(Restrictions.eq("name", name).ignoreCase());
+		criteria.add(getNameCriteria(name));
 		return criteria.list();
 	}
 	
@@ -126,7 +134,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		Session session = sessionFactory.getCurrentSession();
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		criteria.createCriteria("parent").add(Restrictions.eq("addressHierarchyEntryId", entry.getId()));
-		criteria.add(Restrictions.eq("name", childName).ignoreCase());  // do a case-insensitive match
+		criteria.add(getNameCriteria(childName));  // do a case-insensitive match
 
 		List <AddressHierarchyEntry> entries = (List <AddressHierarchyEntry>) criteria.list();
 
