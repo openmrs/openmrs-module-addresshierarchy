@@ -1051,4 +1051,17 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertTrue(entries.contains(Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(15)));	
 	}
 
+    @Test
+    @Verifies(value = "should allow saving address hierarchy entry without name", method = "saveAddressHierarchyEntry()")
+    public void saveAddressHierarchyEntryWithoutName() {
+        AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+        AddressHierarchyEntry entry = new AddressHierarchyEntry();
+        entry.setName(null);
+        entry.setUserGeneratedId("IdForAddressHierarchyEntryWithoutName");
+
+        ahService.saveAddressHierarchyEntry(entry);
+
+        Assert.assertNotNull(ahService.getAddressHierarchyEntryByUserGenId("IdForAddressHierarchyEntryWithoutName"));
+    }
+
 }

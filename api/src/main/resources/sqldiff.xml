@@ -372,5 +372,16 @@
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		</sql>
 	</diff>
-	
+
+    <diff>
+        <version>2.9.0</version>
+        <author>Deepak N</author>
+        <date>November 27 2013</date>
+        <description>
+            Remove not null constraint on address_hierarchy_entry.name
+        </description>
+        <sql>
+            ALTER TABLE address_hierarchy_entry MODIFY name varchar(160) NULL;
+        </sql>
+    </diff>
 </sqldiff>
