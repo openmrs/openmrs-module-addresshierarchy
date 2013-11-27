@@ -244,6 +244,7 @@ public class AddressHierarchyAjaxController {
             modelMap.addAttribute("name", hierarchyLevel.getName());
             String fieldName = (hierarchyLevel.getAddressField() != null) ? hierarchyLevel.getAddressField().getName() : null;
             modelMap.addAttribute("addressField", fieldName);
+            modelMap.addAttribute("required", hierarchyLevel.getRequired());
             map.add(modelMap);
         }
         return map;
