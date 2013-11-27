@@ -80,11 +80,12 @@ public class ManageAddressHierarchyController {
 	}
 	
 	@ModelAttribute("sampleEntries")
-	public List<List<String>> getSampleEntries(@ModelAttribute("levels") List<AddressHierarchyLevel> levels) {
-		
+	public List<List<String>> getSampleEntries() {
+
 		List<List<String>> sampleEntries = new ArrayList<List<String>>();
-		
-		for (AddressHierarchyLevel level : levels) {
+        List<AddressHierarchyLevel> levels = getOrderedAddressHierarchyLevels();
+
+        for (AddressHierarchyLevel level : levels) {
 			List<String> sampleEntry = new ArrayList<String>();
 			List<AddressHierarchyEntry> entries = Context.getService(AddressHierarchyService.class).getAddressHierarchyEntriesByLevel(level);
 			if(entries != null && entries.size() > 0) {
