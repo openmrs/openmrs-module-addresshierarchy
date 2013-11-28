@@ -415,7 +415,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertEquals(3, results.size());
 		Assert.assertTrue(results.contains("Rhode Island"));
 		Assert.assertTrue(results.contains("Massachusetts"));
-		Assert.assertTrue(results.contains("State 20"));
+		Assert.assertTrue(results.contains("Hawaii"));
 
 		// test that the search is case insensitive
 		address = new PersonAddress();
@@ -424,7 +424,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertEquals(3, results.size());
 		Assert.assertTrue(results.contains("Rhode Island"));
 		Assert.assertTrue(results.contains("Massachusetts"));
-        Assert.assertTrue(results.contains("State 20"));
+        Assert.assertTrue(results.contains("Hawaii"));
 
         // how about the "null" case?
 		address = new PersonAddress();
@@ -597,7 +597,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 			Assert.assertEquals(3, results.size());
 			Assert.assertTrue(results.contains("Rhode Island"));
 			Assert.assertTrue(results.contains("Massachusetts"));
-            Assert.assertTrue(results.contains("State 20"));
+            Assert.assertTrue(results.contains("Hawaii"));
 
 			// now try a two-level search
 			addressMap = new HashMap<String,String>();
@@ -632,7 +632,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		// try a entry with blank parent (BlankRegion)
 		results = ahService.getPossibleFullAddresses(ahService.getAddressHierarchyEntry(20));
 		Assert.assertEquals(1, results.size());
-		Assert.assertTrue(results.contains("United States||State 20"));
+		Assert.assertTrue(results.contains("United States||Hawaii"));
 
 		// try a top-level entry (China)
 		results = ahService.getPossibleFullAddresses(ahService.getAddressHierarchyEntry(16));
