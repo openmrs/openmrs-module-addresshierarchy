@@ -432,7 +432,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel level, String name) {
-		if (level == null || StringUtils.isBlank(name)) {
+		if (level == null) {
 			return null;
 		}
 		
@@ -441,7 +441,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent) {
-		if (level == null || StringUtils.isBlank(name) || parent == null) {
+		if (level == null || parent == null) {
 			return null;
 		}
 		
