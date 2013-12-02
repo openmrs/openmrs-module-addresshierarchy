@@ -67,7 +67,7 @@ public class ManageAddressHierarchyController {
 	public List<AddressHierarchyLevel> getOrderedAddressHierarchyLevels() {
 		// before getting the levels, we first make sure the parents are set properly (mainly to handle any migration from the 1.2 model)
 		Context.getService(AddressHierarchyService.class).setAddressHierarchyLevelParents();
-		return Context.getService(AddressHierarchyService.class).getAddressHierarchyLevels();
+		return Context.getService(AddressHierarchyService.class).getOrderedAddressHierarchyLevels();
 	}
 	
 	@ModelAttribute("messages")
