@@ -384,4 +384,16 @@
             ALTER TABLE address_hierarchy_entry MODIFY name varchar(160) NULL;
         </sql>
     </diff>
+
+    <diff>
+        <version>2.10.0</version>
+        <author>Mark Goodrich</author>
+        <date>December 22 2014</date>
+        <description>
+            Add index to address_hierarchy_entry.name
+        </description>
+        <sql>
+            CREATE INDEX address_hierarchy_entry_name_idx ON address_hierarchy_entry (name(10));
+        </sql>
+    </diff>
 </sqldiff>

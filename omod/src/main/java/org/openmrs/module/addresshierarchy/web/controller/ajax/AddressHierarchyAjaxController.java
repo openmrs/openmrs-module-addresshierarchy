@@ -1,17 +1,5 @@
 package org.openmrs.module.addresshierarchy.web.controller.ajax;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +17,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Handles all the AJAX requests for this module
  */
@@ -41,7 +40,7 @@ public class AddressHierarchyAjaxController {
 	/**
 	 * Returns a list of child address hierarchy entries in JSON format
 	 * 
-	 * The parent entry is specified by a string in the format "UNITED STATES|MASSACHUSETTES|PLYMOUTH COUNTY"
+	 * The parent entry is specified by a string in the format "UNITED STATES|MASSACHUSETTS|PLYMOUTH COUNTY"
 	 */
 	@RequestMapping("/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form")
 	 public void getChildAddressHierarchyEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
