@@ -46,7 +46,11 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
 				// get the ordered address hierarchy levels and add them to the map
 				List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);
 				mav.getModelMap().addAttribute("hierarchyLevels", levels);
-				
+
+				// Do not enforce required field validation when editing an address on the location admin page
+				boolean validateRequiredFields = !(request.getServletPath().equals("/WEB-INF/view/admin/locations/locationForm.jsp"));
+				mav.getModelMap().addAttribute("validateRequiredFields", validateRequiredFields);
+
 				// figure out at what point we need to switch to free text entry by iterating backwards
 				// through the levels until we find a level with entries
 				Integer i;

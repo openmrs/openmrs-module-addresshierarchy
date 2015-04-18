@@ -52,13 +52,17 @@
 					
 					// otherwise, validate
 					<c:forEach var="hierarchyLevel" items="${hierarchyLevels}" varStatus="i">
-					
-						// handle checking that required fields aren't blank
-						<c:if test="${hierarchyLevel.required == true}">
-						  		if ($j(value).find('[name$=${hierarchyLevel.addressField.name}]').val() == null || ($j(value).find('[name$=${hierarchyLevel.addressField.name}]').val() == '')) {
-									errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/> <spring:message code="addresshierarchy.requiredField"/>\n";
-									passedValidation = false;
-								}
+
+						<c:if test="${validateRequiredFields}">
+
+							// handle checking that required fields aren't blank
+							<c:if test="${hierarchyLevel.required == true}">
+									if ($j(value).find('[name$=${hierarchyLevel.addressField.name}]').val() == null || ($j(value).find('[name$=${hierarchyLevel.addressField.name}]').val() == '')) {
+										errorMessage = errorMessage + "<spring:message code="${model.layoutTemplate.nameMappings[hierarchyLevel.addressField.name]}"/> <spring:message code="addresshierarchy.requiredField"/>\n";
+										passedValidation = false;
+									}
+							</c:if>
+
 						</c:if>
 						
 						// handle enforcing no free-text entries if free-text disallowed
