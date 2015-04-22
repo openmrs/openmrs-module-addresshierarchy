@@ -1,11 +1,5 @@
 package org.openmrs.module.addresshierarchy.db.hibernate;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import freemarker.template.utility.StringUtil;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -18,7 +12,6 @@ import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.SimpleExpression;
 import org.openmrs.Patient;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.db.DAOException;
@@ -27,6 +20,10 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.AddressToEntryMap;
 import org.openmrs.module.addresshierarchy.db.AddressHierarchyDAO;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * The Class HibernateAddressHierarchyDAO which links to the tables address_hierarchy,
