@@ -3,7 +3,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>addresshierarchy</artifactId>
-	<version>2.6-SNAPSHOT</version>
+	<version>2.6</version>
 	<packaging>pom</packaging>
 	<name>Address Hierarchy</name>
 	<description>Parent project for Address Hierarchy</description>
