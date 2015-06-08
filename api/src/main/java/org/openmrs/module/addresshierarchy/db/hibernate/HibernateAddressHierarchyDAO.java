@@ -118,6 +118,16 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		return criteria.list();
 	}
 	
+    @SuppressWarnings("unchecked")
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel addressHierarchyLevel, String name, AddressHierarchyEntry parent) {
+		Session session = sessionFactory.getCurrentSession();
+		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
+		criteria.createCriteria("level").add(Restrictions.eq("levelId", addressHierarchyLevel.getId()));
+		criteria.createCriteria("parent").add(Restrictions.eq("addressHierarchyEntryId", parent.getId()));
+		criteria.add(Restrictions.ilike("name", name, MatchMode.START));
+		return criteria.list();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<AddressHierarchyEntry> getChildAddressHierarchyEntries(AddressHierarchyEntry entry) {
 		Session session = sessionFactory.getCurrentSession();

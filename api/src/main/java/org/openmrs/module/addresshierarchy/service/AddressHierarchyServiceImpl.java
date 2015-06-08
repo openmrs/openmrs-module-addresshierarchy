@@ -448,7 +448,16 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	    return dao.getAddressHierarchyEntriesByLevelAndNameAndParent(level, name, parent);
     }
 	
-	
+	@Transactional(readOnly = true)
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent) {
+		if (level == null || parent == null) {
+			return null;
+		}
+
+	    return dao.getAddressHierarchyEntriesByLevelAndLikeNameAndParent(level, name, parent);
+    }
+
+
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesAtTopLevel() {
 		return getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel());

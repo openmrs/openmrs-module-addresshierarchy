@@ -51,7 +51,9 @@ public interface AddressHierarchyDAO {
 	 * Gets all address hierarchy entries associated with the a certain level that have the specified name and the specified parent
 	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
-	
+
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
+
 	/**
 	 * Gets all the address hierarchy entries that are children of the specified entry
 	 */
