@@ -449,12 +449,12 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
     }
 	
 	@Transactional(readOnly = true)
-	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent) {
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel level, String searchString, AddressHierarchyEntry parent) {
 		if (level == null || parent == null) {
 			return null;
 		}
 
-	    return dao.getAddressHierarchyEntriesByLevelAndLikeNameAndParent(level, name, parent);
+	    return dao.getAddressHierarchyEntriesByLevelAndLikeNameAndParent(level, searchString, parent);
     }
 
 

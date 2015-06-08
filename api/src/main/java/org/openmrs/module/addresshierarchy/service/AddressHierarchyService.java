@@ -182,7 +182,17 @@ public interface AddressHierarchyService{
 	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
 
-	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
+    /**
+     * Returns all address hierarchy entries at the given level who have the specified parent and the specified search string in their name
+     * (name match is case-insensitive)
+     *
+     * @param level
+     * @param searchString
+     * @param parent
+     * @return a list of all address hierarchy entries at the given level that have the specified name
+     * @should return null if level, name, or parent is blank or empty
+     */
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel level, String searchString, AddressHierarchyEntry parent);
 
 	/**
 	 * Returns all address hierarchy entries at the top level in the hierarchy
