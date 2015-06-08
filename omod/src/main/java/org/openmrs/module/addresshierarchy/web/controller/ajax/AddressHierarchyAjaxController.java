@@ -122,9 +122,11 @@ public class AddressHierarchyAjaxController {
 
     @RequestMapping("/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form")
     @ResponseBody
-    public ArrayList<ModelMap> getPossibleAddressHierarchyEntriesWithParents(@RequestParam("searchString") String searchString,
-                                                                             @RequestParam("addressField") String addressFieldString,
-                                                                             @RequestParam("limit") int limit) throws IOException {
+    public ArrayList<ModelMap> getPossibleAddressHierarchyEntriesWithParents(@RequestParam(value = "searchString") String searchString,
+                                                                             @RequestParam(value = "addressField") String addressFieldString,
+                                                                             @RequestParam(value = "parentField", required = false) String parentField,
+                                                                             @RequestParam(value = "parentName", required = false) String parentName,
+                                                                             @RequestParam(value = "limit") int limit) throws IOException {
 
         if (StringUtils.isBlank(searchString) || StringUtils.isBlank(addressFieldString)) {
             log.error("Must specify both an address field and a search string");
@@ -140,18 +142,32 @@ public class AddressHierarchyAjaxController {
             log.error("Invalid address field or address field has no associated address hierarchy level");
             return new ArrayList<ModelMap>();
         }
+        List<AddressHierarchyEntry> entries = new ArrayList<AddressHierarchyEntry>();
+        if (parentField != null && parentName != null){
+            AddressHierarchyLevel parentLevel = ahService.getAddressHierarchyLevelByAddressField(AddressField.getByName(parentField));
+			
+            List<AddressHierarchyEntry> parentEntry = ahService.getAddressHierarchyEntriesByLevelAndName(parentLevel, parentName);
 
-        List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesByLevelAndLikeName(level, searchString, limit);
-
-        ArrayList<ModelMap> addresses = new ArrayList<ModelMap>();
-
-        for (AddressHierarchyEntry entry : entries) {
-            addresses.add(getAddressAndParents(entry));
+			if (parentEntry != null && parentEntry.size() > 0) {
+				entries = ahService.getAddressHierarchyEntriesByLevelAndLikeNameAndParent(level, searchString, parentEntry.get(0));
+			}
+        } else {
+            entries = ahService.getAddressHierarchyEntriesByLevelAndLikeName(level, searchString, limit);
         }
-        return addresses;
+
+		return getAddresses(entries);
     }
 
-    private ModelMap getAddressAndParents(AddressHierarchyEntry entry) {
+	private ArrayList<ModelMap> getAddresses(List<AddressHierarchyEntry> entries) {
+		ArrayList<ModelMap> addresses = new ArrayList<ModelMap>();
+
+		for (AddressHierarchyEntry entry : entries) {
+            addresses.add(getAddressAndParents(entry));
+        }
+		return addresses;
+	}
+
+	private ModelMap getAddressAndParents(AddressHierarchyEntry entry) {
         ModelMap address = new ModelMap();
         address.addAttribute("name", entry.getName());
         AddressHierarchyEntry parent = entry.getParent();

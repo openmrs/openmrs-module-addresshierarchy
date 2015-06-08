@@ -181,7 +181,9 @@ public interface AddressHierarchyService{
 	 * @should return null if level, name, or parent is blank or empty
 	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
-	
+
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
+
 	/**
 	 * Returns all address hierarchy entries at the top level in the hierarchy
 	 * 
