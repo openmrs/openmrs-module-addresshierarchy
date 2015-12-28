@@ -512,9 +512,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional
 	public void saveAddressHierarchyEntries(List<AddressHierarchyEntry> entries) {
 		for (AddressHierarchyEntry entry : entries) {
-			dao.saveAddressHierarchyEntry(entry);
+			saveAddressHierarchyEntry(entry);
 		}
-		resetFullAddressCache();
 	}
 	
 	@Transactional
