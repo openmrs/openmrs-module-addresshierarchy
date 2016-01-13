@@ -124,7 +124,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
 		criteria.createCriteria("level").add(Restrictions.eq("levelId", addressHierarchyLevel.getId()));
 		criteria.createCriteria("parent").add(Restrictions.eq("addressHierarchyEntryId", parent.getId()));
-		criteria.add(Restrictions.ilike("name", name, MatchMode.START));
+		criteria.add(Restrictions.ilike("name", name, MatchMode.ANYWHERE));
 		return criteria.list();
 	}
 
@@ -489,5 +489,11 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
         return criteria.list();
     }
 
-
+	@Override
+	public AddressHierarchyEntry getAddressHierarchyEntryByUuid(String uuid) {
+		return (AddressHierarchyEntry) sessionFactory.getCurrentSession()
+				.createQuery("from AddressHierarchyEntry where uuid = :uuid")
+				.setParameter("uuid", uuid)
+				.uniqueResult();
+	}
 }

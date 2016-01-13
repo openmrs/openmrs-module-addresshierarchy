@@ -20,6 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+
 public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest {
 	
 	protected final Log log = LogFactory.getLog(getClass());
@@ -1097,4 +1102,45 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 
         Assert.assertFalse(ahService.getAddressHierarchyEntriesByLevelAndLikeName(ahService.getAddressHierarchyLevel(7), "", 10).isEmpty());
     }
+
+	@Test
+	@Verifies(value = "should retrieve address hierarchy entry by uuid", method = "getAddressHierarchyEntryByUuid()")
+	public void getAddressHierarchyEntryByUuid_shouldRetrieveAddressHierarchyEntryByUuid() {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+		String uuid = "82e41146-e162-11df-9195-001e378eb67f";
+		AddressHierarchyEntry entry = ahService.getAddressHierarchyEntryByUuid(uuid);
+		assertThat(entry.getUuid(), is(equalTo(uuid)));
+	}
+
+	@Test
+	@Verifies(value = "should return null when uuid not present in database", method = "getAddressHierarchyEntryByUuid()")
+	public void getAddressHierarchyEntryByUuid_shouldReturnNullWhenUuidNotPresentInDatabase() {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+		assertThat(ahService.getAddressHierarchyEntryByUuid("non-existent-uuid"), is(nullValue()));
+	}
+
+	@Test
+	@Verifies(value = "should return null when uuid is null", method = "getAddressHierarchyEntryByUuid()")
+	public void getAddressHierarchyEntryByUuid_shouldReturnNullWhenUuidIsNull() {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+		assertThat(ahService.getAddressHierarchyEntryByUuid(null), is(nullValue()));
+	}
+
+	@Test
+	@Verifies(value = "should search anywhere within the address name", method = "getAddressHierarchyEntriesByLevelAndLikeNameAndParent()")
+	public void getAddressHierarchyEntriesByLevelAndLikeNameAndParent_shouldSearchAnywhereWithinTheAddressName() {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		AddressHierarchyEntry parent = ahService.getAddressHierarchyEntryByUuid("52e41146-e162-11df-9195-001e378eb67f");
+		AddressHierarchyLevel level = ahService.getAddressHierarchyLevel(5);
+
+		List<AddressHierarchyEntry> result = ahService.getAddressHierarchyEntriesByLevelAndLikeNameAndParent(level, "mouth", parent);
+
+		assertThat(result.size(), is(equalTo(1)));
+		AddressHierarchyEntry plymouth = result.get(0);
+		assertThat(plymouth.getName(), is(equalTo("Plymouth")));
+	}
+
 }

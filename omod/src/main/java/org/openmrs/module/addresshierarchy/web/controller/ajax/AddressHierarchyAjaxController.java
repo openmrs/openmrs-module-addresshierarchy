@@ -35,21 +35,21 @@ import javax.servlet.http.HttpServletResponse;
 public class AddressHierarchyAjaxController {
 
 	protected final Log log = LogFactory.getLog(getClass());
-	
-	
+
+
 	/**
 	 * Returns a list of child address hierarchy entries in JSON format
-	 * 
+	 *
 	 * The parent entry is specified by a string in the format "UNITED STATES|MASSACHUSETTS|PLYMOUTH COUNTY"
 	 */
 	@RequestMapping("/module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form")
-	 public void getChildAddressHierarchyEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
+	 public void getChildAddressHierarchyEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response,
 					                             @RequestParam(value = "searchString", required = false) String searchString) throws Exception {
-		
+
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
-		
+
 		List<String> childEntryNames = new ArrayList<String>();
-	
+
 		// if the search parameter is empty, we just want all items at in the top mapped level
 		if (StringUtils.isBlank(searchString)) {
 			List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);
@@ -63,7 +63,7 @@ public class AddressHierarchyAjaxController {
 			// other, create the appropriate PersonAddress object and then perform the search
 			PersonAddress address = new PersonAddress();
 			List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);  // note that we only want the mapped hierarchy levels
-			
+
 			int i = 0;
 			// iterate through all the names in the search string to form the PersonAddress object
 			for (String name : searchString.split("\\|")) {
@@ -76,46 +76,46 @@ public class AddressHierarchyAjaxController {
 					}
 				}
 				i++;
-			}			
-			
+			}
+
 			// now do the actual search
 			childEntryNames = ahService.getPossibleAddressValues(address, levels.get(i).getAddressField());
-				
+
 		}
-		
-		generateAddressHierarchyEntryNamesResponse(response, childEntryNames); 
+
+		generateAddressHierarchyEntryNamesResponse(response, childEntryNames);
 	}
-		
+
 	/**
 	 * Given an search string and an AddressField, returns all the entries at the level mapped to the address field that
 	 * contain the search string
-	 * 
+	 *
 	 * If Name Phonetics module has been configured, does a soundex match instead of a straight string match
      *
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@RequestMapping("/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntries.form")
 	public void getPossibleAddressHierarchyEntries(ModelMap model, HttpServletRequest request, HttpServletResponse response,
 	                                               	@RequestParam("searchString") String searchString,
 						                            @RequestParam("addressField") String addressFieldString) throws IOException {
-		
+
 		if (StringUtils.isBlank(searchString) || StringUtils.isBlank(addressFieldString)) {
 			log.error("Must specify both an address field and a search string");
 			// return an empty response
 			generateAddressHierarchyEntryNamesResponse(response, null);
 		}
-		
+
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
-		
+
 		// find the address hierarchy level associated with the given address field
 		AddressHierarchyLevel level = ahService.getAddressHierarchyLevelByAddressField(AddressField.getByName(addressFieldString));
-		
+
 		if (level == null) {
 			log.error("Invalid address field or address field has no associated address hierarchy level");
 			// return an empty response
 			generateAddressHierarchyEntryNamesResponse(response, null);
 		}
-		
+
 		Set<String> names = ahService.searchAddresses(searchString, level);
 		generateAddressHierarchyEntryNamesResponse(response, new ArrayList<String>(names), searchString);
 	}
@@ -124,12 +124,17 @@ public class AddressHierarchyAjaxController {
     @ResponseBody
     public ArrayList<ModelMap> getPossibleAddressHierarchyEntriesWithParents(@RequestParam(value = "searchString") String searchString,
                                                                              @RequestParam(value = "addressField") String addressFieldString,
-                                                                             @RequestParam(value = "parentField", required = false) String parentField,
-                                                                             @RequestParam(value = "parentName", required = false) String parentName,
-                                                                             @RequestParam(value = "limit") int limit) throws IOException {
+                                                                             @RequestParam(value = "parentUuid", required = false) String parentUuid,
+                                                                             @RequestParam(value = "userGeneratedIdForParent", required = false) String userGeneratedIdForParent,
+                                                                             @RequestParam(value = "limit", required = false, defaultValue = "20") int limit) throws IOException {
 
         if (StringUtils.isBlank(searchString) || StringUtils.isBlank(addressFieldString)) {
             log.error("Must specify both an address field and a search string");
+            return new ArrayList<ModelMap>();
+        }
+
+        if (limit <= 0) {
+            log.error("Limit should be greater than zero");
             return new ArrayList<ModelMap>();
         }
 
@@ -142,23 +147,26 @@ public class AddressHierarchyAjaxController {
             log.error("Invalid address field or address field has no associated address hierarchy level");
             return new ArrayList<ModelMap>();
         }
-        List<AddressHierarchyEntry> entries = new ArrayList<AddressHierarchyEntry>();
-        if (parentField != null && parentName != null){
-            AddressHierarchyLevel parentLevel = ahService.getAddressHierarchyLevelByAddressField(AddressField.getByName(parentField));
-			
-            List<AddressHierarchyEntry> parentEntry = ahService.getAddressHierarchyEntriesByLevelAndName(parentLevel, parentName);
+		AddressHierarchyEntry parentEntry = ahService.getAddressHierarchyEntryByUuid(parentUuid);
+		if (parentEntry == null) {
+			parentEntry = ahService.getAddressHierarchyEntryByUserGenId(userGeneratedIdForParent);
+		}
 
-			if (parentEntry != null && parentEntry.size() > 0) {
-				entries = ahService.getAddressHierarchyEntriesByLevelAndLikeNameAndParent(level, searchString, parentEntry.get(0));
-			}
-        } else {
-            entries = ahService.getAddressHierarchyEntriesByLevelAndLikeName(level, searchString, limit);
-        }
-
-		return getAddresses(entries);
+		return getAddresses(retrieveAddressHierarchyEntries(ahService, level, searchString, parentEntry, limit));
     }
 
-	private ArrayList<ModelMap> getAddresses(List<AddressHierarchyEntry> entries) {
+	private List<AddressHierarchyEntry> retrieveAddressHierarchyEntries(AddressHierarchyService ahService, AddressHierarchyLevel level, String searchString, AddressHierarchyEntry parentEntry, int limit) {
+		if (parentEntry != null) {
+			return limit(ahService.getAddressHierarchyEntriesByLevelAndLikeNameAndParent(level, searchString, parentEntry), limit);
+		}
+		return ahService.getAddressHierarchyEntriesByLevelAndLikeName(level, searchString, limit);
+	}
+
+    private <T>List<T> limit(List<T> list, int limit) {
+        return limit > list.size()? list: list.subList(0, limit);
+    }
+
+    private ArrayList<ModelMap> getAddresses(List<AddressHierarchyEntry> entries) {
 		ArrayList<ModelMap> addresses = new ArrayList<ModelMap>();
 
 		for (AddressHierarchyEntry entry : entries) {
@@ -170,6 +178,8 @@ public class AddressHierarchyAjaxController {
 	private ModelMap getAddressAndParents(AddressHierarchyEntry entry) {
         ModelMap address = new ModelMap();
         address.addAttribute("name", entry.getName());
+        address.addAttribute("uuid", entry.getUuid());
+        address.addAttribute("userGeneratedId", entry.getUserGeneratedId());
         AddressHierarchyEntry parent = entry.getParent();
         if (parent != null) {
             address.addAttribute("parent", getAddressAndParents(parent));
@@ -179,17 +189,17 @@ public class AddressHierarchyAjaxController {
 
 	/**
 	 * Returns a list of full addresses that contain address hierarchy entries with the specified name at the specified hierarchy level
-	 * 
+	 *
 	 * Specify a separator if you want the full address strings returned to be delimited by something other than the pipe (|)
 	 */
-	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddressesForAddressHierarchyEntry.form") 
+	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddressesForAddressHierarchyEntry.form")
 	public void getPossibleFullAddressesForAddressHierarchyEntry(ModelMap model, HttpServletRequest request, HttpServletResponse response,
 					                             @RequestParam(value = "entryName", required = false) String entryName,
 					                             @RequestParam(value = "addressField", required = false) String addressField,
 					                             @RequestParam(value = "separator", required = false) String separator) throws Exception {
-		
+
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
-		
+
 		if (StringUtils.isBlank(entryName) || StringUtils.isBlank(addressField)) {
 			log.error("Must specify both an address field and a entry name");
 			// return an empty response
@@ -198,40 +208,40 @@ public class AddressHierarchyAjaxController {
 		else {
 			// do the exact-match search
 			AddressHierarchyLevel level = ahService.getAddressHierarchyLevelByAddressField(AddressField.getByName(addressField));
-			
+
 			if (level == null) {
 				log.error("Invalid address field passed to getPossbleFullAddressEntries");
 			}
-			
+
 			// find all the entries for the matching level and name
 			List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesByLevelAndName(level, entryName);
-			
+
 			// now generate all the possible addresses for these entries
 			Set<String> addresses = new HashSet<String>();
 			for (AddressHierarchyEntry entry : entries) {
 				addresses.addAll(ahService.getPossibleFullAddresses(entry));
 			}
-			
+
 			// generate the response
 			generateFullAddressResponse(response, addresses, separator);
 		}
 	}
-	
+
 	/**
 	 * Returns a list of full addresses in string format that match the given search string;
-	 * 
+	 *
 	 * If Name Phonetics module has been configured, does a soundex match instead of a straight string match
 	 * Specify a separator if you want the full address strings returned to be delimited by something other than the pipe (|)
-	 * 
+	 *
 	 * (See docs on the underlying getPossibleFullAddresses(String) method for more information
 	 */
-	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddresses.form") 
-	public void getPossibleFullAddresses(ModelMap model, HttpServletRequest request, HttpServletResponse response, 
+	@RequestMapping("/module/addresshierarchy/ajax/getPossibleFullAddresses.form")
+	public void getPossibleFullAddresses(ModelMap model, HttpServletRequest request, HttpServletResponse response,
 					                             @RequestParam(value = "searchString", required = false) String searchString,
 					                             @RequestParam(value = "separator", required = false) String separator) throws Exception {
-		
+
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
-		
+
 		// determine what kind of a search to do based on parameters specified
 		if (StringUtils.isBlank(searchString)) {
 			log.error("Must specific a search string");
@@ -264,11 +274,11 @@ public class AddressHierarchyAjaxController {
         }
         return map;
     }
-	
+
 	/**
 	 * Utility methods
 	 */
-	
+
 	/**
 	 * Helper method used to generate the AJAX response the getChildAddressHierarchyEntries and getPossibleAddressHierarchyEntries methods return
 	 */
@@ -276,14 +286,14 @@ public class AddressHierarchyAjaxController {
 		response.setContentType("text/json");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
-	
+
 		// start the JSON
 		out.print("[");
-	
+
 		if (names != null) {
 			// sort names
 			Collections.sort(names);
-		
+
 			// if there is an exact match, move it to the front of the list
 			Iterator<String> i = names.iterator();
 			while (i.hasNext()) {
@@ -294,65 +304,65 @@ public class AddressHierarchyAjaxController {
 					break;
 				}
 			}
-			
+
 			// add the elements: ie, { "name": "Boston" }
-			i = names.iterator();			
+			i = names.iterator();
 			while (i.hasNext()) {
 				out.print("{ \"name\": \"" + i.next() + "\" }");
-				
+
 				// print comma as a delimiter for all but the last option in the list
 				if (i.hasNext()) {
-					out.print(",");  
-				}	
+					out.print(",");
+				}
 			}
 		}
-	
+
 		// close the JSON
 		out.print("]");
 	}
-	
+
 	private void generateAddressHierarchyEntryNamesResponse(HttpServletResponse response, List<String> names) throws IOException {
 		generateAddressHierarchyEntryNamesResponse(response, names, null);
 	}
-	
+
 	/**
 	 * Helper method used to generate the AJAX response the getPossibleFullAddressEntries method returns
 	 */
 	private void generateFullAddressResponse(HttpServletResponse response, Set<String> addresses, String separator) throws IOException {
-		
-		String delimiter = null;		
+
+		String delimiter = null;
 		if(!StringUtils.equals(separator, "|")){
 			delimiter = separator;
 		}
-		
+
 		response.setContentType("text/json");
     	response.setCharacterEncoding("UTF-8");
     	PrintWriter out = response.getWriter();
-    	
+
     	out.print("[");
-    	
+
 		if (addresses != null && addresses.size() > 0) {
 			Iterator<String> i = addresses.iterator();
 			if(StringUtils.isNotBlank(delimiter)){
-				while (i.hasNext()) {						
-					out.print("{ \"address\": \"" + StringUtils.replace(i.next(), "|", delimiter) + "\" }");				
+				while (i.hasNext()) {
+					out.print("{ \"address\": \"" + StringUtils.replace(i.next(), "|", delimiter) + "\" }");
 					// print comma between entries for all but the last option in the list
 					if (i.hasNext()) {
-						out.print(",");  
+						out.print(",");
 					}
 				}
 			}
 			else{
-				while (i.hasNext()) {	
-					out.print("{ \"address\": \"" + i.next() + "\" }");				
+				while (i.hasNext()) {
+					out.print("{ \"address\": \"" + i.next() + "\" }");
 					// print comma between entries for all but the last option in the list
 					if (i.hasNext()) {
-						out.print(",");  
+						out.print(",");
 					}
 				}
 			}
 		}
-		
+
     	out.print("]");
 	}
 }
