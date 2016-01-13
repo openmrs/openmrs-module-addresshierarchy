@@ -1079,7 +1079,14 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 
     @Override
+	@Transactional(readOnly = true)
     public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeName(AddressHierarchyLevel level, String name, int limit) {
         return dao.getAddressHierarchyEntriesByLevelAndLikeName(level, name, limit);    }
+
+	@Override
+	@Transactional(readOnly = true)
+	public AddressHierarchyEntry getAddressHierarchyEntryByUuid(String uuid) {
+		return dao.getAddressHierarchyEntryByUuid(uuid);
+	}
 
 }
