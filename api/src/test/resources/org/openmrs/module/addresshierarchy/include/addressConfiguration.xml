@@ -1,0 +1,47 @@
+<addressConfiguration>
+    <wipe>false</wipe>
+    <addressComponents>
+        <addressComponent>
+            <field>COUNTRY</field>
+            <nameMapping>Country</nameMapping>
+            <sizeMapping>40</sizeMapping>
+            <elementDefault>Sierra Leone</elementDefault>
+            <requiredInHierarchy>true</requiredInHierarchy>
+        </addressComponent>
+        <addressComponent>
+            <field>STATE_PROVINCE</field>
+            <nameMapping>Province/Area</nameMapping>
+            <sizeMapping>40</sizeMapping>
+            <requiredInHierarchy>true</requiredInHierarchy>
+        </addressComponent>
+        <addressComponent>
+            <field>COUNTY_DISTRICT</field>
+            <nameMapping>District</nameMapping>
+            <sizeMapping>40</sizeMapping>
+            <requiredInHierarchy>false</requiredInHierarchy>
+        </addressComponent>
+        <addressComponent>
+            <field>CITY_VILLAGE</field>
+            <nameMapping>Chiefdom</nameMapping>
+            <sizeMapping>40</sizeMapping>
+            <requiredInHierarchy>false</requiredInHierarchy>
+        </addressComponent>
+        <addressComponent>
+            <field>ADDRESS_1</field>
+            <nameMapping>Address</nameMapping>
+            <sizeMapping>80</sizeMapping>
+            <requiredInHierarchy>false</requiredInHierarchy>
+        </addressComponent>
+    </addressComponents>
+    <lineByLineFormat>
+        <string>address1</string>
+        <string>cityVillage</string>
+        <string>countyDistrict, stateProvince</string>
+        <string>country</string>
+    </lineByLineFormat>
+    <addressHierarchyFile>
+        <filename>address-hierarchy-entries.csv</filename>
+        <entryDelimiter>|</entryDelimiter>
+        <identifierDelimiter>^</identifierDelimiter>
+    </addressHierarchyFile>
+</addressConfiguration>
