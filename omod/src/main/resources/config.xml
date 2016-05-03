@@ -2,7 +2,7 @@
 <!--   <!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.0.dtd"> -->
 
 <module configVersion="1.0">
-	
+
 	<!-- Base Module Properties -->
 	<id>@MODULE_ID@</id>
 	<name>@MODULE_NAME@</name>
@@ -10,41 +10,41 @@
 	<package>@MODULE_PACKAGE@</package>
 	<author>Sri Prasanna, John DeRiggi, Mark Goodrich</author>
 	<description>
-			Allows for the entry of structured addresses.
+		Allows for the entry of structured addresses.
 	</description>
 
 	<activator>org.openmrs.module.addresshierarchy.AddressHierarchyActivator</activator>
-	
+
 	<updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL>
-	
+
 	<!-- /Base Module Properties -->
-	
+
 	<require_version>1.9.0</require_version>
-	
+
 	<aware_of_modules>
-	    <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
+		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
 	</aware_of_modules>
-	
+
 	<!-- Extensions -->
 	<extension>
 		<point>org.openmrs.admin.list</point>
 		<class>org.openmrs.module.addresshierarchy.web.extension.html.AdminList</class>
 	</extension>
-	
+
 	<!-- Required Privileges -->
 	<privilege>
 		<name>Manage Address Hierarchy</name>
 		<description>Allows user to access/modify the defined address hierarchy</description>
 	</privilege>
-	 <!-- /Required Privileges -->
+	<!-- /Required Privileges -->
 
-    <!-- Mapping files -->
-     <mappingFiles>
-         AddressHierarchyEntry.hbm.xml
-         AddressHierarchyLevel.hbm.xml
-         AddressToEntryMap.hbm.xml
-     </mappingFiles>
-    <!-- /Mapping files -->
+	<!-- Mapping files -->
+	<mappingFiles>
+		AddressHierarchyEntry.hbm.xml
+		AddressHierarchyLevel.hbm.xml
+		AddressToEntryMap.hbm.xml
+	</mappingFiles>
+	<!-- /Mapping files -->
 
 
 	<!-- Required Global Properties -->
@@ -76,17 +76,17 @@
 			The module uses this field to store when the AddressToEntryMapUpdater task was last started; DO NOT MODIFY
 		</description>
 	</globalProperty>
-    <globalProperty>
-        <property>addresshierarchy.initializeAddressHierarchyCacheOnStartup</property>
-        <defaultValue>true</defaultValue>
-        <description>
-            Sets whether to initialize the address hierarchy in-memory cache (which is used to speed up address hierarchy searches.
-            Generally, you want to set this to "true", though developers may want to set it to false during development
-            to speed module start-up.
-        </description>
-    </globalProperty>
-	
-	
+	<globalProperty>
+		<property>addresshierarchy.initializeAddressHierarchyCacheOnStartup</property>
+		<defaultValue>true</defaultValue>
+		<description>
+			Sets whether to initialize the address hierarchy in-memory cache (which is used to speed up address hierarchy searches.
+			Generally, you want to set this to "true", though developers may want to set it to false during development
+			to speed module start-up.
+		</description>
+	</globalProperty>
+
+
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
 	<messages>
@@ -98,11 +98,10 @@
 		<file>messages_fr.properties</file>
 	</messages>  
 <!--  	<messages>
-		<lang>es</lang>
-		<file>messages_es.properties</file>
-	</messages>-->
-	<!-- /Internationalization -->
+<lang>es</lang>
+<file>messages_es.properties</file>
+</messages>-->
+<!-- /Internationalization -->
 
-	
+
 </module>
-

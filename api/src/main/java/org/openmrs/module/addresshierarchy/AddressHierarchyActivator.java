@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 /**
@@ -28,21 +29,18 @@ public class AddressHierarchyActivator extends BaseModuleActivator implements Mo
 
 	private Log log = LogFactory.getLog(this.getClass());
 
-	/**
-	 * @see org.openmrs.module.Activator#startup()
-	 */
-	public void startup() {
-		log.info("Starting AddressHierarchy Module");
-
-	}
-	
-	/**
-	 *  @see org.openmrs.module.Activator#shutdown()
-	 */
-	public void shutdown() {
-		log.info("Shutting down AddressHierarchy Module");
+	@Override
+	public void started() {
+		log.info("AddressHierarchy Module Started");
+		AddressConfigurationLoader.loadAddressConfiguration();
 	}
 
+	@Override
+	public void stopped() {
+		log.info("AddressHierarchy Module Stopped");
+	}
+
+	@Override
     public void contextRefreshed() {
         // initialize the full address cache on module startup
         Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
