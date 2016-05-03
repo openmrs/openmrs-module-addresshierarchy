@@ -19,7 +19,7 @@
 	
 	<!-- /Base Module Properties -->
 	
-	<require_version>1.7</require_version>
+	<require_version>1.9</require_version>
 	
 	<!-- Extensions -->
 	<extension>
