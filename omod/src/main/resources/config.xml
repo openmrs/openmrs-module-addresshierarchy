@@ -19,7 +19,11 @@
 	
 	<!-- /Base Module Properties -->
 	
-	<require_version>1.7</require_version>
+	<require_version>1.9.0</require_version>
+	
+	<aware_of_modules>
+	    <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
+	</aware_of_modules>
 	
 	<!-- Extensions -->
 	<extension>

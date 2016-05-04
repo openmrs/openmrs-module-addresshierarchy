@@ -8,8 +8,6 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ContextAuthenticationException;
 
-import org.openmrs.scheduler.SchedulerConstants;
-
 /**
  * Used as a base class for tasks we configure via build-in Spring scheduling
  */
@@ -30,9 +28,6 @@ public abstract class AbstractAddressHierarchyTask extends TimerTask {
 	public final void run() {
 		try {
 			Context.openSession();
-			if (!Context.isAuthenticated()) {
-				authenticate();
-			}
 			execute();
 		}
 		catch (Exception e) {
@@ -51,8 +46,8 @@ public abstract class AbstractAddressHierarchyTask extends TimerTask {
 	protected void authenticate() {
 		try {
 			AdministrationService adminService = Context.getAdministrationService();
-			String userName = adminService.getGlobalProperty(SchedulerConstants.SCHEDULER_USERNAME_PROPERTY);
-			String password = adminService.getGlobalProperty(SchedulerConstants.SCHEDULER_PASSWORD_PROPERTY);
+			String userName = adminService.getGlobalProperty("scheduler.username");
+			String password = adminService.getGlobalProperty("scheduler.password");
 			Context.authenticate(userName, password);
 		}
 		catch (ContextAuthenticationException e) {

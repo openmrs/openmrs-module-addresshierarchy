@@ -860,7 +860,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		address.setStateProvince("massachusetts");
 		address.setCountyDistrict("suffolk county");
 		// skip a level
-		address.setNeighborhoodCell("jamaica plain");
+		address.setAddress3("jamaica plain");
 		
 		// add this address to an existing patient and persist it
 		Patient patient = Context.getPatientService().getPatient(2);
@@ -900,7 +900,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		address.setStateProvince("massachusetts");
 		address.setCountyDistrict("suffolk county");
 		// skip a level
-		address.setNeighborhoodCell("jamaica plain");
+		address.setAddress3("jamaica plain");
 		
 		// add this address to an existing patient and persist it
 		Patient patient = Context.getPatientService().getPatient(2);
@@ -961,7 +961,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		PersonAddress address = new PersonAddress();
 		address.setStateProvince("massachusetts");
 		address.setCountyDistrict("suffolk county");
-		address.setNeighborhoodCell("jamaica plain");
+		address.setAddress3("jamaica plain");
 		
 		// add this address to an existing patient and persist it
 		Patient patient = Context.getPatientService().getPatient(2);
@@ -999,7 +999,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		PersonAddress address = new PersonAddress();
 		address.setStateProvince("massachusetts");
 		address.setCountyDistrict("suffolk county");
-		address.setNeighborhoodCell("jamaica plain");
+		address.setAddress3("jamaica plain");
 		
 		// add this address to an existing patient and persist it
 		Patient patient = Context.getPatientService().getPatient(2);
@@ -1029,7 +1029,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		address.setStateProvince("massachusetts");
 		address.setCountyDistrict("suffolk county");
 		// skip a level
-		address.setNeighborhoodCell("jamaica plain");
+		address.setAddress3("jamaica plain");
 		
 		// add this address to an existing patient and persist it
 		Patient patient = Context.getPatientService().getPatient(2);
@@ -1043,7 +1043,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		address.setStateProvince("rhode island");
 		address.setCountyDistrict("providence county");
 		address.setCityVillage("scituate");
-		address.setNeighborhoodCell("");
+		address.setAddress3("");
 		
 		// resave the patient and re-call the method to update the address entry maps for this patient
 		Context.getPatientService().savePatient(patient);

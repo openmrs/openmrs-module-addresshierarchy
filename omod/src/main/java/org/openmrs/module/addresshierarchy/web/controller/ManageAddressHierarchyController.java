@@ -3,8 +3,8 @@ package org.openmrs.module.addresshierarchy.web.controller;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.beanutils.MethodUtils;
 import org.openmrs.api.context.Context;
-import org.openmrs.layout.web.address.AddressSupport;
 import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
@@ -60,7 +60,28 @@ public class ManageAddressHierarchyController {
 	
 	@ModelAttribute("nameMappings")
 	public Map<String,String> getAddressNameMappings() {
-		return (AddressSupport.getInstance() != null && AddressSupport.getInstance().getDefaultLayoutTemplate() != null) ? AddressSupport.getInstance().getDefaultLayoutTemplate().getNameMappings() : null;
+		try {
+			Class<?> addressSupportClass = null;
+			try {
+				addressSupportClass = Context.loadClass("org.openmrs.layout.web.address.AddressSupport");
+			}
+			catch (ClassNotFoundException ex) {
+				addressSupportClass = Context.loadClass("org.openmrs.layout.address.AddressSupport");
+			}
+	         
+	        Object addressSupport = addressSupportClass.getMethod("getInstance").invoke(null);
+	        if (addressSupport != null) {
+	        	Object addressTemplate = MethodUtils.invokeExactMethod(addressSupport, "getDefaultLayoutTemplate", null);
+	        	if (addressTemplate != null) {
+	        		return (Map<String,String>) MethodUtils.invokeExactMethod(addressTemplate, "getNameMappings", null);
+	        	}
+	        }
+		}
+		catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+		}
+         
+        return null;
 	}
 	
 	@ModelAttribute("levels")

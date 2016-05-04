@@ -2,7 +2,6 @@ package org.openmrs.module.addresshierarchy.db;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.openmrs.Patient;
 import org.openmrs.PersonAddress;

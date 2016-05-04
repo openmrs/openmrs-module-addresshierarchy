@@ -18,8 +18,9 @@
 		<property name="name" type="string" column="name" length="255" />
 
 		<property name="addressField" column="address_field" length="50">
-			<type name="org.openmrs.module.addresshierarchy.util.HibernateEnumType">
-		    	<param name="enumClassName">org.openmrs.module.addresshierarchy.AddressField</param>
+			<type name="org.hibernate.type.EnumType">
+		    	<param name="enumClass">org.openmrs.module.addresshierarchy.AddressField</param>
+		    	<param name="type">12</param>
 		    </type>
 		</property>
 		

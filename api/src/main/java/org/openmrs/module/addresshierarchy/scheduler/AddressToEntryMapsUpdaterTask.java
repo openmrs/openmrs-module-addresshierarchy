@@ -29,9 +29,6 @@ public class AddressToEntryMapsUpdaterTask extends AbstractTask {
 		Context.openSession();
 		log.info("Starting update of AddressToEntryMaps... ");
 		try {
-			if (Context.isAuthenticated() == false) {
-				authenticate();
-			}
 			
 			// get the last time this task started (which we are storing in a global property)
 			lastStartTimeGlobalProp = Context.getAdministrationService().getGlobalPropertyObject(AddressHierarchyConstants.GLOBAL_PROP_ADDRESS_TO_ENTRY_MAP_UPDATER_LAST_START_TIME);

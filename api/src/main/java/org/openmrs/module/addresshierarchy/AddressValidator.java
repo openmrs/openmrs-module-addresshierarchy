@@ -37,7 +37,7 @@ public class AddressValidator {
 			if((matchingLocationId = getMatchingLocation(pa.getStateProvince(),ahs.getNextComponent(matchingLocationId))) != -1){
 				if((matchingLocationId = getMatchingLocation(pa.getCountyDistrict(),ahs.getNextComponent(matchingLocationId))) != -1){
 					if((matchingLocationId = getMatchingLocation(pa.getCityVillage(),ahs.getNextComponent(matchingLocationId))) != -1){
-						if((matchingLocationId = getMatchingLocation(pa.getNeighborhoodCell(),ahs.getNextComponent(matchingLocationId))) != -1){
+						if((matchingLocationId = getMatchingLocation(pa.getAddress3(),ahs.getNextComponent(matchingLocationId))) != -1){
 							if((matchingLocationId = getMatchingLocation(pa.getAddress1(),ahs.getNextComponent(matchingLocationId))) != -1){
 								structured = true;
 							}
@@ -75,7 +75,7 @@ public class AddressValidator {
 					badDistrict = false;
 					if((matchingLocationId = getMatchingLocation(pa.getCityVillage(),ahs.getNextComponent(matchingLocationId))) != -1){
 						badSector = false;
-						if((matchingLocationId = getMatchingLocation(pa.getNeighborhoodCell(),ahs.getNextComponent(matchingLocationId))) != -1){
+						if((matchingLocationId = getMatchingLocation(pa.getAddress3(),ahs.getNextComponent(matchingLocationId))) != -1){
 							badCell = false;
 							if((matchingLocationId = getMatchingLocation(pa.getAddress1(),ahs.getNextComponent(matchingLocationId))) != -1){
 								badUmudugudu = false;
