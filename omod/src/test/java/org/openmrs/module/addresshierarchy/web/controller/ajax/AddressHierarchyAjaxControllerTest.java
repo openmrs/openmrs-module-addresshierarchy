@@ -11,9 +11,11 @@ import org.springframework.ui.ModelMap;
 
 import java.util.ArrayList;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.matchers.JUnitMatchers.hasItem;
+
 
 public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensitiveTest {
 
@@ -32,31 +34,31 @@ public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensiti
     @Test
     public void getPossibleAddressHierarchyEntries_shouldReturnEmptyMapWhenAddressFieldNameIsWrong() throws Exception {
         ArrayList<ModelMap> result = controller.getPossibleAddressHierarchyEntriesWithParents("unions ", "incorrect-address-field", null, null, 10);
-        assertTrue(result.size() == 0);
+        assertThat(result.size(), is(equalTo(0)));
     }
 
     @Test
     public void getPossibleAddressHierarchyEntries_shouldReturnEmptyLimitForWrongLimit() throws Exception {
         ArrayList<ModelMap> result = controller.getPossibleAddressHierarchyEntriesWithParents("unions ", "cityVillage", null, null, -1);
-        assertTrue(result.size() == 0);
+        assertThat(result.size(), is(equalTo(0)));
     }
 
     @Test
     public void getPossibleAddressHierarchyEntries_shouldHonourLimit() throws Exception {
         ArrayList<ModelMap> result = controller.getPossibleAddressHierarchyEntriesWithParents("unions ", "cityVillage", null, null, 1);
-        assertTrue(result.size() == 1);
+        assertThat(result.size(), is(equalTo(1)));
 
         result = controller.getPossibleAddressHierarchyEntriesWithParents("Unions ", "cityVillage", "66e41146-e162-11df-9195-001e378eb67f", null, 2);
-        assertTrue(result.size() == 1);
+        assertThat(result.size(), is(equalTo(1)));
 
         result = controller.getPossibleAddressHierarchyEntriesWithParents("non-existent-address", "cityVillage", "66e41146-e162-11df-9195-001e378eb67f", null, 1);
-        assertTrue(result.size() == 0);
+        assertThat(result.size(), is(equalTo(0)));
     }
 
     @Test
     public void getPossibleAddressHierarchyEntries_shouldRetrieveAddressHierarchyEntriesWhenParentNotSpecified() throws Exception {
         ArrayList<ModelMap> result = controller.getPossibleAddressHierarchyEntriesWithParents("Unions ", "cityVillage", null, null, 10);
-        assertTrue(result.size() == 2);
+        assertThat(result.size(), is(equalTo(2)));
         assertThat(result, hasItem(modelMapWithValue("name", "Unions Of Kaliganj Upazila")));
         assertThat(result, hasItem(modelMapWithValue("uuid", "88e41146-e162-11df-9195-001e378eb67f")));
         assertThat(result, hasItem(modelMapWithValue("uuid", "dde41146-e162-11df-9195-001e378eb67f")));
@@ -65,7 +67,7 @@ public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensiti
     @Test
     public void getPossibleAddressHierarchyEntries_shouldRetrieveAddressHierarchyEntriesWhenParentSpecified() throws Exception {
         ArrayList<ModelMap> result = controller.getPossibleAddressHierarchyEntriesWithParents("Unions ", "cityVillage", "66e41146-e162-11df-9195-001e378eb67f", null, 10);
-        assertTrue(result.size() == 1);
+        assertThat(result.size(), is(equalTo(1)));
         assertThat(result, hasItem(modelMapWithValue("name", "Unions Of Kaliganj Upazila")));
         assertThat(result, hasItem(modelMapWithValue("uuid", "88e41146-e162-11df-9195-001e378eb67f")));
     }
@@ -73,7 +75,7 @@ public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensiti
     @Test
     public void getPossibleAddressHierarchyEntries_shouldReturnAllEntriesWhenParentUuidIsWrong() throws Exception {
         ArrayList<ModelMap> result = controller.getPossibleAddressHierarchyEntriesWithParents("unions ", "cityVillage", "incorrect-parent-uuid", null, 10);
-        assertTrue(result.size() == 2);
+        assertThat(result.size(), is(equalTo(2)));
         assertThat(result, hasItem(modelMapWithValue("name", "Unions Of Kaliganj Upazila")));
     }
 
