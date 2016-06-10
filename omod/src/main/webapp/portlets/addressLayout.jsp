@@ -26,7 +26,7 @@
 
 					  // only display selection this for list level if a) the previous level in the hierarchy has a value, b) the level itself has a value, or c) this is the top level in the hierarchy
 					<c:if test="${!empty previousValue || !empty status.value || i.count == 1}">
-						updateOptions($j('select[name=${status.expression}]'), "${searchString}", "${value}");  // use double quotes here so as not conflict with ' in location names			
+						updateOptions($j('select[name="${status.expression}"]'), "${searchString}", "${value}");  // use double quotes here so as not conflict with ' in location names			
 					</c:if>
 						
 				<c:set var="searchString">${searchString}${!empty value ? value : '*'}|</c:set>
