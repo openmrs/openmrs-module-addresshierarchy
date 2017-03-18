@@ -25,5 +25,8 @@
 		</property>
 		<!--  default properties must be set in the hibernate.default.properties -->
 	</bean>
+
+	<bean id="uiUtils" class="org.openmrs.ui.framework.BasicUiUtils" init-method="init"/>
+  <bean id="conversionService" class="org.openmrs.module.uiframework.UiFrameworkConversionServiceFactoryBean"/>
 	
 </beans>

@@ -1,5 +1,17 @@
 package org.openmrs.module.addresshierarchy.web.controller.ajax;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,22 +23,12 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
+import org.openmrs.ui.framework.UiUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Handles all the AJAX requests for this module
@@ -126,9 +128,10 @@ public class AddressHierarchyAjaxController {
                                                                              @RequestParam(value = "addressField") String addressFieldString,
                                                                              @RequestParam(value = "parentUuid", required = false) String parentUuid,
                                                                              @RequestParam(value = "userGeneratedIdForParent", required = false) String userGeneratedIdForParent,
-                                                                             @RequestParam(value = "limit", required = false, defaultValue = "20") int limit) throws IOException {
+                                                                             @RequestParam(value = "limit", required = false, defaultValue = "20") int limit/*,
+                                                                             UiUtils ui*/) throws IOException {
 
-        if (StringUtils.isBlank(searchString) || StringUtils.isBlank(addressFieldString)) {
+    	if (StringUtils.isBlank(searchString) || StringUtils.isBlank(addressFieldString)) {
             log.error("Must specify both an address field and a search string");
             return new ArrayList<ModelMap>();
         }
