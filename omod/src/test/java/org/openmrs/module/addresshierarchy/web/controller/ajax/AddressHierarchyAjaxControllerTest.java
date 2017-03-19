@@ -1,20 +1,22 @@
 package org.openmrs.module.addresshierarchy.web.controller.ajax;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.util.ArrayList;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.ui.framework.UiUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.ModelMap;
-
-import java.util.ArrayList;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 
 public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensitiveTest {
@@ -23,6 +25,10 @@ public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensiti
 
     @Autowired
     private AddressHierarchyAjaxController controller;
+    
+    @Autowired
+    @Qualifier("uiUtils")
+    private UiUtils ui;
 
     @Before
     public void setupDatabase() throws Exception {
