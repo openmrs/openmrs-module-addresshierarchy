@@ -78,9 +78,11 @@
 	</dependencyManagement>
 
 	<properties>
-		<openMRSVersion>1.10.0</openMRSVersion>
+		<openMRSVersion>1.10.6-SNAPSHOT</openMRSVersion>
 		<openMRSMinorVersion>1.10</openMRSMinorVersion>
+		<openMRSRuntimeVersion>1.9.12-SNAPSHOT</openMRSRuntimeVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<exti18nVersion>1.0.0</exti18nVersion>
 	</properties>
 
 	<build>
@@ -172,7 +174,7 @@
 			<id>openmrs-1.10</id>
 			
 			<properties>
-				<openMRSVersion>1.10.0</openMRSVersion>
+				<openMRSVersion>1.10.6-SNAPSHOT</openMRSVersion>
 				<openMRSMinorVersion>1.10</openMRSMinorVersion>
 			</properties>
 		</profile>

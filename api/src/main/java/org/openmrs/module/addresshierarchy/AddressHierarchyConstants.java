@@ -10,7 +10,7 @@ public class AddressHierarchyConstants {
 
 	/* Address Hierarchy Global Properties */
 	public static final String GLOBAL_PROP_SOUNDEX_PROCESSER = "addresshierarchy.soundexProcessor";
-
+	
 	public static final String GLOBAL_PROP_ADDRESS_TO_ENTRY_MAP_UPDATER_LAST_START_TIME = "addresshierarchy.addressToEntryMapUpdaterLastStartTime";
 
     public static final String GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP = "addresshierarchy.initializeAddressHierarchyCacheOnStartup";
