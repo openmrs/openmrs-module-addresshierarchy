@@ -370,7 +370,7 @@ public interface AddressHierarchyService{
 	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
 	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
 	 * 
-	 * In the standard implemention, the keys are the same as the values.  However, if the Name Phonetics module
+	 * In the standard implementation, the keys are the same as the values.  However, if the Name Phonetics module
 	 * has been installed, and the addresshierarchy.soundexProcessor global property has been configured, the keys
 	 * will be the same pipe-delimited string, but with each entry name transformed via the specified soundex processor
 	 * 
