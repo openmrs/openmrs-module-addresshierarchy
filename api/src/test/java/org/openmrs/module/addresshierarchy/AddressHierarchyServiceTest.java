@@ -1,17 +1,9 @@
 package org.openmrs.module.addresshierarchy;
 
-import junit.framework.Assert;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.openmrs.Patient;
-import org.openmrs.PersonAddress;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
-import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.test.Verifies;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,10 +12,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.openmrs.Patient;
+import org.openmrs.PersonAddress;
+import org.openmrs.api.context.Context;
+import org.openmrs.messagesource.PresentationMessage;
+import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
+import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.Verifies;
 
 public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest {
 	
@@ -36,6 +37,9 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		initializeInMemoryDatabase();
 		authenticate();
 		executeDataSet(XML_DATASET_PACKAGE_PATH);
+		
+		PresentationMessage msgPlymouth = new PresentationMessage("ah.5.plymouth", Context.getLocale(), "Plymouth", "no desc.");
+		Context.getMessageSourceService().getActiveMessageSource().addPresentation(msgPlymouth);
 	}
 	
 	@Test

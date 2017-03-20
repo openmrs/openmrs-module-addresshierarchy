@@ -700,7 +700,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			StringBuilder value = new StringBuilder();
 			
 			// set the key to the encoded name of the entry, and the value to the actual name
-			String entryName = Context.getMessageSourceService().getMessage(entry.getName());
+			String entryName = Context.getMessageSourceService().getMessage(entry.getName(), null, Context.getLocale());
 			key.append(encodeString(encodeStringMethod, entryName, phoneticProcessor));
 			value.append(entryName);
 			
@@ -709,7 +709,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			// follow back up the tree to the top level and concatenate the names to create the full address string
 			while (tempEntry.getParent() != null) {
 				tempEntry = tempEntry.getParent();
-				String tempEntryName = Context.getMessageSourceService().getMessage(tempEntry.getName());
+				String tempEntryName = Context.getMessageSourceService().getMessage(tempEntry.getName(), null, Context.getLocale());
 				key.insert(0, encodeString(encodeStringMethod, tempEntryName, phoneticProcessor) + "|");		
 				value.insert(0, tempEntryName + "|");	
 			}
