@@ -1,12 +1,15 @@
 package org.openmrs.module.addresshierarchy.config;
 
-import org.openmrs.layout.web.address.AddressTemplate;
-import org.openmrs.util.OpenmrsUtil;
-
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.beanutils.MethodUtils;
+import org.openmrs.api.APIException;
+import org.openmrs.api.context.Context;
+import org.openmrs.util.OpenmrsUtil;
 
 /**
  * Simple component for representing the configuration options when starting up the address hierarchy module.
@@ -67,9 +70,24 @@ public class AddressConfiguration {
 
     /**
      * @return a new AddressTemplate instance for the given configuration
+     * @see https://github.com/dkayiwa/openmrs-module-aijar/blob/2b85d2f8d4ab15d0e151504513d7aa8f6b2d103f/api/src/main/java/org/openmrs/module/aijar/api/deploy/bundle/AddressMetadataBundle.java#L75-L113
      */
-    public AddressTemplate getAddressTemplate() {
-        AddressTemplate addressTemplate = new AddressTemplate("");
+    public Object getAddressTemplate() {
+        Object addressTemplate = null;
+        try {
+        	Constructor<?> constructor = Context.loadClass("org.openmrs.layout.web.address.AddressTemplate").getConstructor(String.class);
+			addressTemplate = constructor.newInstance("");
+        }
+        catch (Exception e) {
+        	try {
+        		Constructor<?> constructor = Context.loadClass("org.openmrs.layout.address.AddressTemplate").getConstructor(String.class);
+        		addressTemplate = constructor.newInstance("");
+			}
+			catch (Exception ex) {
+				throw new APIException("Error while getting address template", ex);
+			}
+        }
+        
         Map<String, String> nameMappings = new HashMap<String, String>();
         Map<String, String> sizeMappings = new HashMap<String, String>();
         Map<String, String> elementDefaults = new HashMap<String, String>();
@@ -80,10 +98,17 @@ public class AddressConfiguration {
                 elementDefaults.put(c.getField().getName(), c.getElementDefault());
             }
         }
-        addressTemplate.setNameMappings(nameMappings);
-        addressTemplate.setSizeMappings(sizeMappings);
-        addressTemplate.setElementDefaults(elementDefaults);
-        addressTemplate.setLineByLineFormat(getLineByLineFormat());
+        
+        try {
+			MethodUtils.invokeExactMethod(addressTemplate, "setNameMappings", new Object[]{ nameMappings }, new Class[] { Map.class });
+			MethodUtils.invokeExactMethod(addressTemplate, "setSizeMappings", new Object[]{ sizeMappings }, new Class[] { Map.class });
+	        MethodUtils.invokeExactMethod(addressTemplate, "setElementDefaults", new Object[]{ elementDefaults }, new Class[] { Map.class });
+	        MethodUtils.invokeExactMethod(addressTemplate, "setLineByLineFormat", new Object[]{ getLineByLineFormat() }, new Class[] { List.class });
+		}
+		catch (Exception e) {
+			throw new APIException("Error while getting address template", e);
+		}
+
         return addressTemplate;
     }
 
