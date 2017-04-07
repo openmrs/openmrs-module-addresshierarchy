@@ -1,7 +1,12 @@
 package org.openmrs.module.addresshierarchy.config;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -15,12 +20,10 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyImportUtil;
 import org.openmrs.util.OpenmrsConstants;
+import org.openmrs.util.OpenmrsUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Responsible for loading the address configuration appropriately
@@ -80,6 +83,8 @@ public class AddressConfigurationLoader {
             AddressHierarchyLevel lastLevel = null;
             for (AddressComponent component : addressComponents) {
                 AddressHierarchyLevel level = new AddressHierarchyLevel();
+                String name = component.getField().toString() + " | " + component.getNameMapping();
+                level.setName(name);
                 level.setAddressField(component.getField());
                 level.setRequired(component.isRequiredInHierarchy());
                 level.setParent(lastLevel);
@@ -164,7 +169,7 @@ public class AddressConfigurationLoader {
      */
     public static File getConfigFile(String name) {
         StringBuilder path = new StringBuilder();
-        path.append(OpenmrsConstants.APPLICATION_DATA_DIRECTORY).append(File.separator);
+        path.append(OpenmrsUtil.getApplicationDataDirectory()).append(File.separator);
         path.append("configuration").append(File.separator).append("addresshierarchy").append(File.separator);
         path.append(name);
         return new File(path.toString());
@@ -211,6 +216,17 @@ public class AddressConfigurationLoader {
         catch (Exception e) {
             log.warn("Error writing hash of address hierarchy entries to file", e);
         }
+    }
+    
+    /**
+     * Deletes the checksum file
+     */
+    public static void deleteChecksum() {
+    	try {
+			Files.deleteIfExists(getConfigFile(LATEST_LOADED_ENTRIES).toPath());
+		} catch (IOException e) {
+			log.warn("Error deleting hash of address hierarchy entries to file", e);
+		}
     }
 
     /**
