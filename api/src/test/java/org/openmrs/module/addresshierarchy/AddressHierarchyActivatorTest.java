@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
+import org.openmrs.module.addresshierarchy.config.ConfigLoaderUtil;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
@@ -44,7 +45,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 	
 	@After
 	public void deleteChecksums() {
-		AddressConfigurationLoader.deleteChecksums();
+		ConfigLoaderUtil.deleteChecksums(AddressConfigurationLoader.getSubdirConfigPath(), true);
 	}
 
 	@Test
@@ -93,7 +94,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 
 		// Setup
 		AddressHierarchyService ahs = Context.getService(AddressHierarchyService.class);
-		AddressConfigurationLoader.deleteChecksums();
+		deleteChecksums();
 
 		// Replay
 		activator.started();

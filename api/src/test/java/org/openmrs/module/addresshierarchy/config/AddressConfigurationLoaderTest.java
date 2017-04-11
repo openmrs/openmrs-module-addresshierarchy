@@ -1,4 +1,4 @@
-package org.openmrs.module.addresshierarchy;
+package org.openmrs.module.addresshierarchy.config;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,11 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.module.addresshierarchy.config.AddressComponent;
-import org.openmrs.module.addresshierarchy.config.AddressConfiguration;
-import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
-import org.openmrs.module.addresshierarchy.config.AddressHierarchyFile;
-import org.openmrs.test.Verifies;
+import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.util.OpenmrsClassLoader;
 
 public class AddressConfigurationLoaderTest {
@@ -62,29 +58,5 @@ public class AddressConfigurationLoaderTest {
 		file.setIdentifierDelimiter("^");
 		configuration.setAddressHierarchyFile(file);
 		return configuration;
-	}
-
-	@Test
-	@Verifies(value = "should read the latest written checksum and handle invalid checksum situations", method = "writeChecksum(String configFileName, String checksum)")
-	public void writeChecksum_shouldHandleValidAndInvalidChecksums() {
-		String configFileName = "foo.config";
-
-		String checksum = "ad6821757a52c";
-		AddressConfigurationLoader.writeChecksum(configFileName, checksum);
-		Assert.assertEquals(checksum, AddressConfigurationLoader.readLatestChecksum(configFileName));
-		
-		checksum = AddressConfigurationLoader.NOT_COMPUTABLE_CHECKSUM;
-		AddressConfigurationLoader.writeChecksum(configFileName, checksum);
-		Assert.assertEquals(AddressConfigurationLoader.NOT_READABLE_CHECKSUM, AddressConfigurationLoader.readLatestChecksum(configFileName));
-	}
-	
-	@Test
-	@Verifies(value = "should", method = "getChecksumFileName(String configFileName)")
-	public void getChecksumFileName_should() {
-		Assert.assertEquals("foo." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName("foo.config"));
-		Assert.assertEquals("foo." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName("foo"));
-		Assert.assertEquals("foo.bar." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName("foo.bar.config"));
-		Assert.assertEquals("foo bar." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName("foo bar.config"));
-		Assert.assertEquals(" foo bar  ." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName(" foo bar  .config"));
 	}
 }
