@@ -77,4 +77,14 @@ public class AddressConfigurationLoaderTest {
 		AddressConfigurationLoader.writeChecksum(configFileName, checksum);
 		Assert.assertEquals(AddressConfigurationLoader.NOT_READABLE_CHECKSUM, AddressConfigurationLoader.readLatestChecksum(configFileName));
 	}
+	
+	@Test
+	@Verifies(value = "should", method = "getChecksumFileName(String configFileName)")
+	public void getChecksumFileName_should() {
+		Assert.assertEquals("foo." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName("foo.config"));
+		Assert.assertEquals("foo." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName("foo"));
+		Assert.assertEquals("foo.bar." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName("foo.bar.config"));
+		Assert.assertEquals("foo bar." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName("foo bar.config"));
+		Assert.assertEquals(" foo bar  ." + AddressConfigurationLoader.CHECKSUM_FILE_EXT, AddressConfigurationLoader.getChecksumFileName(" foo bar  .config"));
+	}
 }

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +39,7 @@ public class AddressConfigurationLoader {
   public static final String NOT_COMPUTABLE_CHECKSUM = "not_computable_checksum";
   public static final String NOT_READABLE_CHECKSUM = "not_readadble_checksum";
 
-  protected static final String CHECKSUM_FILE_EXT = "crc32";
+  public static final String CHECKSUM_FILE_EXT = "checksum";
 
   protected static Log log = LogFactory.getLog(AddressConfigurationLoader.class);
 
@@ -222,10 +223,10 @@ public class AddressConfigurationLoader {
   
   /**
    * @param configFileName The config file name, eg. "addressConfiguration.xml"
-   * @return The checksum fime name, eg. "addressConfiguration.crc32"
+   * @return The checksum fime name, eg. "addressConfiguration.checksum"
    */
   public static String getChecksumFileName(String configFileName) {
-    // addressConfiguration.xml -> addressConfiguration.crc32 
+    // addressConfiguration.xml -> addressConfiguration.checksum 
     return FilenameUtils.getBaseName(configFileName) + "." + CHECKSUM_FILE_EXT;
   }
   
@@ -264,7 +265,10 @@ public class AddressConfigurationLoader {
     File file = getConfigFile(configFileName);
     if (file.exists()) {
       try {
-        checksum = Long.toHexString( FileUtils.checksumCRC32(file) );
+        // checksum = Long.toHexString( FileUtils.checksumCRC32(file) );
+        FileInputStream fis = new FileInputStream(file);
+        checksum = DigestUtils.md5Hex(fis);
+        fis.close();
       }
       catch (Exception e) {
         log.warn("Error computing checksum of config. file: " + configFileName, e);
@@ -274,7 +278,7 @@ public class AddressConfigurationLoader {
   }
 
   /**
-   * Writes the the checksum of a config. file to the corresponding .crc32 file.
+   * Writes the the checksum of a config. file to the corresponding .checksum file.
    * 
    * @param configFileName The config. file name.
    * @param checksum The hash of the config. file.
@@ -297,7 +301,7 @@ public class AddressConfigurationLoader {
   }
 
   /**
-   * Deletes the the .crc32 checksum file of a config. file.
+   * Deletes the the .checksum checksum file of a config. file.
    * 
    * @param configFileName The config. file name.
    */
@@ -312,7 +316,7 @@ public class AddressConfigurationLoader {
   }
   
   /**
-   * Removes all the checksum .crc32 files from the configuration directory.
+   * Removes all the checksum .checksum files from the configuration directory.
    */
   public static void deleteChecksums() {
     final File[] hashFiles = new File(getConfigDirPath()).listFiles(new FilenameFilter() {
