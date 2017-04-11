@@ -1,10 +1,12 @@
 package org.openmrs.module.addresshierarchy;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +32,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 
 		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP, "true"));
 
-		String path = getClass().getClassLoader().getResource(APP_DATA_TEST_DIRECTORY).getPath();
+		String path = getClass().getClassLoader().getResource(APP_DATA_TEST_DIRECTORY).getPath() + File.separator;
 
 		OpenmrsConstants.APPLICATION_DATA_DIRECTORY = path;	// The 1.9 way
 		Properties prop = new Properties();
@@ -39,6 +41,11 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 
 		Assert.assertTrue(CollectionUtils.isEmpty(Context.getService(AddressHierarchyService.class).getAddressHierarchyLevels()));
 	}
+	
+	@After
+	public void deleteChecksums() {
+		AddressConfigurationLoader.deleteChecksums();
+	}
 
 	@Test
 	@Verifies(value = "should load new address hierarchy configuration from configuration/addresshierarchy", method = "started()")
@@ -46,7 +53,6 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 
 		// Setup
 		AddressHierarchyService ahs = Context.getService(AddressHierarchyService.class);
-		AddressConfigurationLoader.deleteChecksum();
 
 		// Replay
 		activator.started();
@@ -74,7 +80,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 		Assert.assertNotNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.COUNTRY));
 		Assert.assertNotNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.COUNTY_DISTRICT));
 		Assert.assertNotNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.CITY_VILLAGE));
-	
+
 		// Other levels should not be there
 		Assert.assertNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.ADDRESS_1));
 		Assert.assertNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.ADDRESS_2));
@@ -87,7 +93,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 
 		// Setup
 		AddressHierarchyService ahs = Context.getService(AddressHierarchyService.class);
-		AddressConfigurationLoader.deleteChecksum();
+		AddressConfigurationLoader.deleteChecksums();
 
 		// Replay
 		activator.started();
@@ -95,7 +101,6 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 		// Editing and re-saving an entry
 		AddressHierarchyLevel level = ahs.getAddressHierarchyLevelByAddressField(AddressField.NEIGHBORHOOD_CELL);
 		List<AddressHierarchyEntry> entries = ahs.getAddressHierarchyEntriesByLevelAndName(level, "Jamaica Plain");
-		entries = ahs.getAddressHierarchyEntriesByLevelAndLikeName(level, "Jamaica Plain", 2);	// TODO the above may return 0, to investigate
 		Assert.assertEquals(1, entries.size());
 		AddressHierarchyEntry entry = entries.get(0);
 		entry.setName("Havana Plain");
@@ -104,7 +109,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 
 		// Reloading the activator without deleting the checksum file
 		activator.started();
-		
+
 		// Verifying that the edited entry hasn't been touched
 		entry = ahs.getAddressHierarchyEntryByUuid(uuid);
 		Assert.assertEquals("Havana Plain", entry.getName());
