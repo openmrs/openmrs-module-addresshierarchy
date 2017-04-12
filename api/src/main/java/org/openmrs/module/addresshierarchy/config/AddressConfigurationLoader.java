@@ -13,10 +13,10 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.layout.web.address.AddressTemplate;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyImportUtil;
+import org.openmrs.serialization.SerializationException;
 import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.util.OpenmrsUtil;
 
@@ -104,13 +104,12 @@ public class AddressConfigurationLoader {
 	/**
 	 * Installs the configured address template by updating the global property
 	 */
-	public static void installAddressTemplate(AddressTemplate template) {
+	public static void installAddressTemplate(AddressTemplateCompatibility addressTemplate) {
 		try {
 			log.info("Installing Address Template");
-			String xml = Context.getSerializationService().getDefaultSerializer().serialize(template);
-			setGlobalProperty(OpenmrsConstants.GLOBAL_PROPERTY_ADDRESS_TEMPLATE, xml);
+			setGlobalProperty(OpenmrsConstants.GLOBAL_PROPERTY_ADDRESS_TEMPLATE, addressTemplate.asXml());
 		}
-		catch (Exception e) {
+		catch (SerializationException e) {
 			throw new IllegalArgumentException("Unable to serialize and save address template", e);
 		}
 	}
@@ -204,6 +203,7 @@ public class AddressConfigurationLoader {
 		xs.alias("addressConfiguration", AddressConfiguration.class);
 		xs.alias("addressComponent", AddressComponent.class);
 		xs.alias("addressHierarchyFile", AddressHierarchyFile.class);
+		xs.processAnnotations(AddressConfiguration.class);
 		return xs;
 	}
 

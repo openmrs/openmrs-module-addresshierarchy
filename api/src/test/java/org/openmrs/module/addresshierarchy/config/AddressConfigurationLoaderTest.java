@@ -1,14 +1,10 @@
 package org.openmrs.module.addresshierarchy.config;
 
-import java.io.IOException;
-import java.nio.file.Files;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.util.OpenmrsClassLoader;
@@ -18,11 +14,6 @@ public class AddressConfigurationLoaderTest {
 	protected final Log log = LogFactory.getLog(getClass());
 
 	public static final String CONFIG_RESOURCE = "org/openmrs/module/addresshierarchy/include/addressConfiguration.xml";
-
-	@Before
-	public void setup() throws IOException {
-		System.setProperty("user.home", Files.createTempDirectory(null).toString()); // see OpenmrsUtil.getApplicationDataDirectory()
-	}
 
 	@Test
 	public void should_writeToString() throws Exception {
