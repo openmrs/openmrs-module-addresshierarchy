@@ -14,8 +14,8 @@
 		<connection>scm:git:https://github.com/openmrs/openmrs-module-addresshierarchy</connection>
 		<developerConnection>scm:git:https://github.com/openmrs/openmrs-module-addresshierarchy</developerConnection>
 		<url>https://github.com/openmrs/openmrs-module-addresshierarchy</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 	
 	<distributionManagement>
 		<repository>
@@ -23,13 +23,12 @@
 			<name>Modules</name>
 			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/modules/</url>
 		</repository>
-        <snapshotRepository>
-            <id>openmrs-repo-snapshots</id>
-            <name>OpenMRS Snapshots</name>
-            <url>http://mavenrepo.openmrs.org/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-
-    </distributionManagement>
+		<snapshotRepository>
+			<id>openmrs-repo-snapshots</id>
+			<name>OpenMRS Snapshots</name>
+			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<modules>
 		<module>api</module>
@@ -78,13 +77,11 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<!-- default property values, required for eclipse build path configuration -->
 	<properties>
 		<openMRSVersion>1.10.0</openMRSVersion>
 		<openMRSMinorVersion>1.10</openMRSMinorVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
 
 	<build>
 		<pluginManagement>
@@ -95,7 +92,7 @@
 					<configuration>
 						<target>1.6</target>
 						<source>1.6</source>
-                        <encoding>UTF-8</encoding>
+						<encoding>UTF-8</encoding>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -103,14 +100,14 @@
 					<artifactId>maven-openmrs-plugin</artifactId>
 					<version>1.0.1</version>
 				</plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.3.2</version>
-                    <configuration>
-                        <pushChanges>false</pushChanges>
-                    </configuration>
-                </plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.3.2</version>
+					<configuration>
+						<pushChanges>false</pushChanges>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -136,81 +133,49 @@
 	
 	<!-- different profiles for building/testing against different version of openmrs -->
 	<profiles>
-
 		<profile>
 			<id>openmrs-1.9</id>
-		    
-		    <properties>
+			
+			<properties>
 				<openMRSVersion>1.9.1</openMRSVersion>
 				<openMRSMinorVersion>1.9</openMRSMinorVersion>
 				<logicVersion>0.5</logicVersion>
 			</properties>
-		    
-		    <dependencyManagement>
-			    <dependencies>
+			
+			<dependencyManagement>
+				<dependencies>
 					<dependency>
-					    <groupId>org.openmrs.api</groupId>
-					    <artifactId>openmrs-api</artifactId>
-					    <version>${openMRSVersion}</version>
-					    <type>test-jar</type>
-					    <scope>test</scope>
+						<groupId>org.openmrs.api</groupId>
+						<artifactId>openmrs-api</artifactId>
+						<version>${openMRSVersion}</version>
+						<type>test-jar</type>
+						<scope>test</scope>
 					</dependency>
 					<dependency>
-					    <groupId>org.openmrs.web</groupId>
-					    <artifactId>openmrs-web</artifactId>
-					    <version>${openMRSVersion}</version>
-					    <type>test-jar</type>
-					    <scope>test</scope>
+						<groupId>org.openmrs.web</groupId>
+						<artifactId>openmrs-web</artifactId>
+						<version>${openMRSVersion}</version>
+						<type>test-jar</type>
+						<scope>test</scope>
 					</dependency>
 					<dependency>
-					    <groupId>org.openmrs.test</groupId>
-					    <artifactId>openmrs-test</artifactId>
-					    <version>${openMRSVersion}</version>
-					    <type>pom</type>
-					    <scope>test</scope>
+						<groupId>org.openmrs.test</groupId>
+						<artifactId>openmrs-test</artifactId>
+						<version>${openMRSVersion}</version>
+						<type>pom</type>
+						<scope>test</scope>
 					</dependency>
 				</dependencies>
 			</dependencyManagement>
 		</profile>
-	
 		<profile>
 			<id>openmrs-1.10</id>
 			
-		    <properties>
-				<openMRSVersion>1.10.0-SNAPSHOT</openMRSVersion>
+			<properties>
+				<openMRSVersion>1.10.0</openMRSVersion>
 				<openMRSMinorVersion>1.10</openMRSMinorVersion>
-				<logicVersion>0.5</logicVersion>
 			</properties>
-		    
-		    <dependencyManagement>
-			    <dependencies>
-					<dependency>
-					    <groupId>org.openmrs.api</groupId>
-					    <artifactId>openmrs-api</artifactId>
-					    <version>${openMRSVersion}</version>
-					    <type>test-jar</type>
-					    <scope>test</scope>
-					</dependency>
-					<dependency>
-					    <groupId>org.openmrs.web</groupId>
-					    <artifactId>openmrs-web</artifactId>
-					    <version>${openMRSVersion}</version>
-					    <type>test-jar</type>
-					    <scope>test</scope>
-					</dependency>
-					<dependency>
-					    <groupId>org.openmrs.test</groupId>
-					    <artifactId>openmrs-test</artifactId>
-					    <version>${openMRSVersion}</version>
-					    <type>pom</type>
-					    <scope>test</scope>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
 		</profile>
-	
-
-		
 	</profiles>
 
 </project>
