@@ -1,5 +1,20 @@
 package org.openmrs.module.addresshierarchy.service;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,19 +33,6 @@ import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleExcep
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 /**
  * The Class AddressHierarchyServiceImpl default implementation of AddressHierarchyService.
  */
@@ -40,7 +42,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	
 	private AddressHierarchyDAO dao;
 	
-	private Map<String,List<String>> fullAddressCache;
+	private Map<Locale, Map<String,List<String>> > fullAddressCache;
 	private Boolean fullAddressCacheInitialized = false;
 	
 	public void setAddressHierarchyDAO(AddressHierarchyDAO dao) {
@@ -331,11 +333,12 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		}
 		
 		List<String> matchingKeys = new ArrayList<String>();
+		Locale locale = Context.getLocale();
 		
 		// find all addresses in the full address cache that contain the first word in the search string
 		// (optionally restricting the search to a single address level in the address cache)
 		Pattern p = generateSearchPattern(encodeStringMethod, words[0], phoneticProcessor);
-		for (String address : this.fullAddressCache.keySet()) {
+		for (String address : this.fullAddressCache.get(locale).keySet()) {
 			if (p.matcher(retrieveSpecifiedLevel(address, levelIndex)).find()) {
 				matchingKeys.add(address);
 			}
@@ -360,7 +363,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		// the results are the values for the matching keys
 		for (String key : matchingKeys) {
-			for (String address : fullAddressCache.get(key)) {
+			for (String address : fullAddressCache.get(locale).get(key)) {
 				results.add(retrieveSpecifiedLevel(address, levelIndex));
 			}
 		}
@@ -657,7 +660,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			}
 		}
 	}
-
+	
 	@Transactional(readOnly = true)
 	synchronized public void initializeFullAddressCache() {
 
@@ -665,17 +668,19 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
         if (Context.getAdministrationService().getGlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP).equalsIgnoreCase("true")) {
 
 		    // only initialize if necessary (and if we have entries)
-            if ((this.fullAddressCacheInitialized == false || this.fullAddressCache == null || this.fullAddressCache.isEmpty())
+            if ((this.fullAddressCacheInitialized == false || MapUtils.isEmpty(this.fullAddressCache))
                     && this.getAddressHierarchyEntryCount() > 0) {
-
-                this.fullAddressCache = new HashMap<String,List<String>>();
-
+            	
+            	this.fullAddressCache = new HashMap<Locale, Map<String,List<String>> >();
+            	Locale locale = Context.getLocale();
+            	this.fullAddressCache.put(locale, new HashMap<String,List<String>>());
+        		
                 // first determine if we are going to do phonetic processing
                 String phoneticProcessor = fetchPhoneticProcessor();
                 Method encodeStringMethod = fetchEncodeStringMethod();
 
                 for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
-                    initializeFullAddressCacheHelper(entry, phoneticProcessor, encodeStringMethod);
+                    initializeFullAddressCacheHelper(locale, entry, phoneticProcessor, encodeStringMethod);
                 }
 
                 this.fullAddressCacheInitialized = true;
@@ -684,7 +689,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 
 	}
 	
-	private void initializeFullAddressCacheHelper(AddressHierarchyEntry entry, String phoneticProcessor, Method encodeStringMethod) {
+	private void initializeFullAddressCacheHelper(Locale locale, AddressHierarchyEntry entry, String phoneticProcessor, Method encodeStringMethod) {
 		
 		List<AddressHierarchyEntry> entries = getChildAddressHierarchyEntries(entry);
 		
@@ -695,28 +700,30 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			StringBuilder value = new StringBuilder();
 			
 			// set the key to the encoded name of the entry, and the value to the actual name
-			key.append(encodeString(encodeStringMethod, entry.getName(), phoneticProcessor));
-			value.append(entry.getName());
+			String entryName = Context.getMessageSourceService().getMessage(entry.getName(), null, Context.getLocale());
+			key.append(encodeString(encodeStringMethod, entryName, phoneticProcessor));
+			value.append(entryName);
 			
 			AddressHierarchyEntry tempEntry = entry;
 			
 			// follow back up the tree to the top level and concatenate the names to create the full address string
 			while (tempEntry.getParent() != null) {
-				tempEntry = tempEntry.getParent();		
-				key.insert(0, encodeString(encodeStringMethod, tempEntry.getName(), phoneticProcessor) + "|");		
-				value.insert(0, tempEntry.getName() + "|");	
+				tempEntry = tempEntry.getParent();
+				String tempEntryName = Context.getMessageSourceService().getMessage(tempEntry.getName(), null, Context.getLocale());
+				key.insert(0, encodeString(encodeStringMethod, tempEntryName, phoneticProcessor) + "|");		
+				value.insert(0, tempEntryName + "|");	
 			}
 			
 			// add it to the cache
-			if (!this.fullAddressCache.containsKey(key.toString())) {
-				this.fullAddressCache.put(key.toString(), new ArrayList<String>());
+			if (!this.fullAddressCache.get(locale).containsKey(key.toString())) {
+				this.fullAddressCache.get(locale).put(key.toString(), new ArrayList<String>());
 			}
-			this.fullAddressCache.get(key.toString()).add(value.toString());
+			this.fullAddressCache.get(locale).get(key.toString()).add(value.toString());
 		}
 		// if not a leaf node, process it's children recursively
 		else {
 			for (AddressHierarchyEntry currentEntry : entries) {
-				initializeFullAddressCacheHelper(currentEntry, phoneticProcessor, encodeStringMethod);
+				initializeFullAddressCacheHelper(locale, currentEntry, phoneticProcessor, encodeStringMethod);
 			}
 		}
 	}
