@@ -39,20 +39,27 @@ public class AddressConfigurationLoader {
 	/**
 	 * @return The path to the configuration subdirectory.
 	 */
-	public static String getSubdirConfigPath() {
+	public static String getConfigPath() {
 		return new StringBuilder()
 				.append(OpenmrsUtil.getApplicationDataDirectory())
-				.append("configuration").append(File.separator).append("addresshierarchy")
+				.append("configuration")
+				.toString();
+	}
+	
+	public static String getChecksumsPath() {
+		return new StringBuilder()
+				.append(OpenmrsUtil.getApplicationDataDirectory())
+				.append("configuration_checksums")
 				.toString();
 	}
 
 	public static void loadAddressConfiguration() {
 
-		final ConfigLoaderUtil configUtil = new ConfigLoaderUtil(getSubdirConfigPath());
+		final ConfigDirUtil configUtil = new ConfigDirUtil(getConfigPath(), getChecksumsPath(), "addresshierarchy");
 
 		String xmlConfigFileName = ADDR_CONFIG_FILE_NAME;
 
-		File configFile = configUtil.getFile(xmlConfigFileName);
+		File configFile = configUtil.getConfigFile(xmlConfigFileName);
 		if (!configFile.exists()) {
 			log.warn("Address hierarchy configuration file appears invalid, skipping the loading process: " + xmlConfigFileName);
 			return;
@@ -109,7 +116,7 @@ public class AddressConfigurationLoader {
 		}
 		else {
 			log.info("Address hierarchy entries CSV file has changed, reloading it: " + csvEntriesFileName);
-			installAddressHierarchyEntries(addressConfiguration.getAddressHierarchyFile(), forceReloadEntries);
+			installAddressHierarchyEntries(configUtil, addressConfiguration.getAddressHierarchyFile(), forceReloadEntries);
 			configUtil.writeChecksum(csvEntriesFileName, checksum);
 
 			log.info("Entries loaded, re-initializing address cache");
@@ -192,7 +199,7 @@ public class AddressConfigurationLoader {
 	/**
 	 * Install the address hierarchy entries as defined by the AddressHierarchyFile configuration
 	 */
-	public static void installAddressHierarchyEntries(AddressHierarchyFile file, boolean deleteEntries) {
+	public static void installAddressHierarchyEntries(ConfigDirUtil configDirUtil, AddressHierarchyFile file, boolean deleteEntries) {
 		log.info("Installing address hierarchy entries");
 		if (deleteEntries) {
 			log.warn("Deleting existing address hierarchy entries");
@@ -201,7 +208,7 @@ public class AddressConfigurationLoader {
 		
 		InputStream is = null;
 		try {
-			is = new FileInputStream( ConfigLoaderUtil.getFile(getSubdirConfigPath(), file.getFilename()) );
+			is = new FileInputStream(configDirUtil.getConfigFile(file.getFilename()));
 			AddressHierarchyImportUtil.importAddressHierarchyFile(is, file.getEntryDelimiter(), file.getIdentifierDelimiter());
 		}
 		catch (Exception e) {
