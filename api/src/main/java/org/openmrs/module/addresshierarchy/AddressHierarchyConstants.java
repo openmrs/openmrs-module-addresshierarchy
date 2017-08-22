@@ -10,6 +10,8 @@ public class AddressHierarchyConstants {
 
 	/* Address Hierarchy Global Properties */
 	public static final String GLOBAL_PROP_SOUNDEX_PROCESSER = "addresshierarchy.soundexProcessor";
+	
+	public static final String MODULE_EXTI18N_ARTIFACT_ID = "exti18n";
 
 	public static final String GLOBAL_PROP_ADDRESS_TO_ENTRY_MAP_UPDATER_LAST_START_TIME = "addresshierarchy.addressToEntryMapUpdaterLastStartTime";
 
