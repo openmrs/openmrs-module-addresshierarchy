@@ -23,9 +23,6 @@
 
 	<aware_of_modules>
 		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
-		<aware_of_module version="${exti18nVersion}">
-			org.openmrs.module.exti18n
-		</aware_of_module>
 	</aware_of_modules>
 
 	<!-- Extensions -->
@@ -48,6 +45,7 @@
 		AddressToEntryMap.hbm.xml
 	</mappingFiles>
 	<!-- /Mapping files -->
+
 
 	<!-- Required Global Properties -->
 	<globalProperty>
@@ -87,6 +85,7 @@
 			to speed module start-up.
 		</description>
 	</globalProperty>
+
 
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->

@@ -370,7 +370,7 @@ public interface AddressHierarchyService{
 	 * For example, the full address for the Beacon Hill neighborhood in the city of Boston might be:
 	 * "United States|Massachusetts|Suffolk County|Boston|Beacon Hill"
 	 * 
-	 * In the standard implementation, the keys are the same as the values.  However, if the Name Phonetics module
+	 * In the standard implemention, the keys are the same as the values.  However, if the Name Phonetics module
 	 * has been installed, and the addresshierarchy.soundexProcessor global property has been configured, the keys
 	 * will be the same pipe-delimited string, but with each entry name transformed via the specified soundex processor
 	 * 
@@ -451,38 +451,6 @@ public interface AddressHierarchyService{
 	 * @param date
 	 */
 	public List<Patient> findAllPatientsWithDateChangedAfter(Date date);
-
-    public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeName(AddressHierarchyLevel level, String searchString, int limit);
-
-	public AddressHierarchyEntry getAddressHierarchyEntryByUuid(String uuid);
-	
-	/*
-	 * I18N reverse cache convenience API
-	 */
-
-	/**
-	 * Initializes the I18N reverse cache based on the allowed locales.
-	 */
-	public void initI18nCache();
-	
-	/**
-	 * Resets the I18N reverse cache based on the allowed locales.
-	 */
-	public void resetI18nCache();
-	
-	/**
-	 * Convenience method to retrieve a internationalized address from the I18N reverse cache.
-	 * @param address The localized address
-	 * @return The internationalized address
-	 */
-	public PersonAddress getI18nPersonAddress(PersonAddress address);
-	
-	/**
-	 * Convenience method to retrieve a localized message from the I18N reverse cache.
-	 * @param key The I18N message key.
-	 * @return The localized message, or the key if none is found.
-	 */
-	public String getL10nMessage(String key);
 	
 	/**
 	 * Deprecated methods
@@ -542,4 +510,8 @@ public interface AddressHierarchyService{
 	
 	@Deprecated
 	public AddressHierarchyLevel getHierarchyType(int levelId);
+
+    public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeName(AddressHierarchyLevel level, String searchString, int limit);
+
+	public AddressHierarchyEntry getAddressHierarchyEntryByUuid(String uuid);
 }
