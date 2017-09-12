@@ -55,7 +55,7 @@ public class AddressHierarchyAjaxController {
 			List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);
 			if (levels != null && levels.size() > 0) {
 				for (AddressHierarchyEntry entry : ahService.getAddressHierarchyEntriesByLevel(levels.get(0))) {
-					childEntryNames.add(entry.getLocalizedName());
+					childEntryNames.add(entry.getName());
 				}
 			}
 		}
@@ -177,7 +177,7 @@ public class AddressHierarchyAjaxController {
 
 	private ModelMap getAddressAndParents(AddressHierarchyEntry entry) {
         ModelMap address = new ModelMap();
-        address.addAttribute("name", entry.getLocalizedName());
+        address.addAttribute("name", entry.getName());
         address.addAttribute("uuid", entry.getUuid());
         address.addAttribute("userGeneratedId", entry.getUserGeneratedId());
         AddressHierarchyEntry parent = entry.getParent();

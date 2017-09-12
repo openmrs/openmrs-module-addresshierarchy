@@ -42,8 +42,8 @@ public class AddressHierarchyActivator extends BaseModuleActivator implements Mo
 
 	@Override
     public void contextRefreshed() {
-        // initialize the caches on module startup
+        // initialize the full address cache on module startup
         Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
-        Context.getService(AddressHierarchyService.class).initI18nCache();
     }
+	
 }

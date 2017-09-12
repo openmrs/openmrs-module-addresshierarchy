@@ -26,10 +26,6 @@
 		<!--  default properties must be set in the hibernate.default.properties -->
 	</bean>
 
-	<!-- Ext I18N Interceptors (Spring + Hibernate) -->
-	<bean id="exti18n.addressValuesHibernateInterceptor" class="org.openmrs.module.exti18n.icpt.AddressValuesHibernateInterceptor" primary="true"/>
-	<bean id="exti18n.addressValuesAOPInterceptor" class="org.openmrs.module.exti18n.icpt.AddressValuesAOPInterceptor"/>
-
 	<bean id="addressHierarchyActivator" class="org.openmrs.module.addresshierarchy.AddressHierarchyActivator"/>
 	
 </beans>
