@@ -48,7 +48,7 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
 				mav.getModelMap().addAttribute("hierarchyLevels", levels);
 
 				// Do not enforce required field validation when editing an address on the location admin page
-				boolean validateRequiredFields = !(request.getServletPath().equals("/WEB-INF/view/admin/locations/locationForm.jsp"));
+				boolean validateRequiredFields = !(request.getServletPath().equals("/WEB-INF/view/admin/locations/locationForm.jsp") || request.getServletPath().equals("/WEB-INF/view/module/legacyui/admin/locations/locationForm.jsp"));
 				mav.getModelMap().addAttribute("validateRequiredFields", validateRequiredFields);
 
 				// figure out at what point we need to switch to free text entry by iterating backwards
