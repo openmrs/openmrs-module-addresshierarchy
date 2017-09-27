@@ -1,6 +1,8 @@
 package org.openmrs.module.addresshierarchy;
 
 import org.openmrs.BaseOpenmrsObject;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 /**
  * Represents a single entry in the Address Hierarchy (ie., like "United States", or "Massachusetts", or "Boston")
@@ -58,6 +60,15 @@ public class AddressHierarchyEntry extends BaseOpenmrsObject implements Comparab
 	}
 	
 	/**
+	 * Use this method to take i18n into account when requesting the entry name.
+	 * 
+	 * @return The localized entry name
+	 */
+	public String getLocalizedName() {
+		return Context.getService(AddressHierarchyService.class).getL10nMessage(getName());
+    }
+	
+	/**
 	 * Getters and Setters
 	 */
 	
@@ -66,7 +77,7 @@ public class AddressHierarchyEntry extends BaseOpenmrsObject implements Comparab
     }
 
 	public String getName() {
-	    return name;
+		return name;
     }
 	
 	public Double getLatitude() {
