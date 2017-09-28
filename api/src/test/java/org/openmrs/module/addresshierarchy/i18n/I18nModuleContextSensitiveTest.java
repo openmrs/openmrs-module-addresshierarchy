@@ -17,12 +17,10 @@ import org.openmrs.module.exti18n.api.AOPModuleContextSensitiveTest;
 import org.openmrs.module.exti18n.api.TestWithAOP;
 import org.openmrs.module.exti18n.api.TestsMessageSource;
 import org.openmrs.module.exti18n.icpt.AddressValuesAOPInterceptor;
-import org.springframework.test.annotation.DirtiesContext;
 
 /**
  * Extend this class to run context sensitive tests with i18n enabled, including Spring AOP.
  */
-@DirtiesContext
 abstract public class I18nModuleContextSensitiveTest extends AOPModuleContextSensitiveTest {
 	
 	protected final Log log = LogFactory.getLog(getClass());

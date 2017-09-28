@@ -1,15 +1,5 @@
 package org.openmrs.module.addresshierarchy.i18n;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +15,19 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.exti18n.ExtI18nConstants;
 import org.openmrs.test.Verifies;
+import org.springframework.test.annotation.DirtiesContext;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+
+@DirtiesContext
 public class AddressValuesAOPInterceptorTest extends I18nModuleContextSensitiveTest {
 	
 	private Patient patient;
