@@ -8,11 +8,12 @@ import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyImportUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.InputStream;
 import java.util.List;
 
-
+@DirtiesContext
 public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTest {
 	
 	protected static final String CSV_FILE_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleFile.csv";

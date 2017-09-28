@@ -1,9 +1,6 @@
 package org.openmrs.module.addresshierarchy;
 
-import java.util.List;
-
 import junit.framework.Assert;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
@@ -12,8 +9,11 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
+import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.List;
 
+@DirtiesContext
 public class AddressHierarchyMigrationTest extends BaseModuleContextSensitiveTest {
 	
 	protected final Log log = LogFactory.getLog(getClass());

@@ -1,11 +1,5 @@
 package org.openmrs.module.addresshierarchy;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -19,8 +13,16 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.CollectionUtils;
 
+import java.io.File;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+@DirtiesContext
 public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTest {
 
   private static String APP_DATA_TEST_DIRECTORY = "testAppDataDir";
