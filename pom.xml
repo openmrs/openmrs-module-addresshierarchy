@@ -11,8 +11,8 @@
 	<url>http://openmrs.org</url>
 
 	<scm>
-		<connection>scm:git:https://github.com/openmrs/openmrs-module-addresshierarchy</connection>
-		<developerConnection>scm:git:https://github.com/openmrs/openmrs-module-addresshierarchy</developerConnection>
+		<connection>scm:git:git@github.com:openmrs/openmrs-module-addresshierarchy.git</connection>
+		<developerConnection>scm:git:git@github.com:openmrs/openmrs-module-addresshierarchy.git</developerConnection>
 		<url>https://github.com/openmrs/openmrs-module-addresshierarchy</url>
 		<tag>HEAD</tag>
 	</scm>
