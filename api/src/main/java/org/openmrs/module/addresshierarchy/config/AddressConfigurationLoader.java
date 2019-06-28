@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -40,17 +41,13 @@ public class AddressConfigurationLoader {
 	 * @return The path to the configuration subdirectory.
 	 */
 	public static String getConfigPath() {
-		return new StringBuilder()
-				.append(OpenmrsUtil.getApplicationDataDirectory())
-				.append("configuration")
-				.toString();
+		return Paths.get(OpenmrsUtil.getApplicationDataDirectory(),
+			"configuration").toString();
 	}
 	
 	public static String getChecksumsPath() {
-		return new StringBuilder()
-				.append(OpenmrsUtil.getApplicationDataDirectory())
-				.append("configuration_checksums")
-				.toString();
+		return Paths.get(OpenmrsUtil.getApplicationDataDirectory(),
+				"configuration_checksums").toString();
 	}
 
 	public static void loadAddressConfiguration() {
@@ -59,9 +56,14 @@ public class AddressConfigurationLoader {
 
 		String xmlConfigFileName = ADDR_CONFIG_FILE_NAME;
 
+		File domainDir = new File(configUtil.domainDirPath);
+		if (!domainDir.exists()) {
+			log.info("Address hierarchy domain folder appears not present, skipping the loading process: " + domainDir.getPath());
+			return;
+		}
 		File configFile = configUtil.getConfigFile(xmlConfigFileName);
 		if (!configFile.exists()) {
-			log.warn("Address hierarchy configuration file appears invalid, skipping the loading process: " + xmlConfigFileName);
+			log.error("Address hierarchy configuration file appears invalid, skipping the loading process: " + configFile.getPath());
 			return;
 		}
 
