@@ -4,9 +4,8 @@ import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.context.Context;
-import org.openmrs.api.context.ContextAuthenticationException;
+import org.openmrs.api.context.Daemon;
+import org.openmrs.module.DaemonToken;
 
 /**
  * Used as a base class for tasks we configure via build-in Spring scheduling
@@ -15,43 +14,53 @@ public abstract class AbstractAddressHierarchyTask extends TimerTask {
 
 	private static Log log = LogFactory.getLog(AbstractAddressHierarchyTask.class);
 	
+	private static DaemonToken daemonToken;
+	
+	private static boolean enabled = false;
+	
 	/**
 	 * Sub-classes should override this method instead of the run method to implement their logic
 	 * The run method takes care of exception handling and authentication to the Context for you
 	 */
-	public abstract void execute();
+	
+	private Class<? extends AbstractAddressHierarchyTask> taskClass;
 	
 	/**
 	 * @see TimerTask#run()
 	 */
 	@Override
 	public final void run() {
-		try {
-			Context.openSession();
-			execute();
-		}
-		catch (Exception e) {
-			log.error("An error occurred while running scheduled address hierarchy task", e);
-		}
-		finally {
-			if (Context.isSessionOpen()) {
-				Context.closeSession();
-			}
+		if (daemonToken != null && enabled) {
+			createAndRunTask();
+		} else {
+			log.warn("Not running scheduled task. DaemonToken = " + daemonToken + "; enabled = " + enabled);
 		}
 	}
 	
-	/**
-	 * Authenticate the context so the task can call service layer.
-	 */
-	protected void authenticate() {
+	public synchronized void createAndRunTask() {
 		try {
-			AdministrationService adminService = Context.getAdministrationService();
-			String userName = adminService.getGlobalProperty("scheduler.username");
-			String password = adminService.getGlobalProperty("scheduler.password");
-			Context.authenticate(userName, password);
-		}
-		catch (ContextAuthenticationException e) {
-			log.error("Error authenticating user. Please ensure you scheduler username and password are configured correctly in your global properties", e);
+			log.info("Running AddressHierarchy Sheduler task: " + getClass().getSimpleName());;
+			Daemon.runInDaemonThread(getRunnableTask(), daemonToken);
+		} catch (Exception e) {
+			log.error("An error occurred while running scheduled Address Hierarchy task", e);
 		}
 	}
+	
+	public abstract Runnable getRunnableTask();
+	
+	/**
+	 * Sets the daemon token
+	 */
+	public static void setDaemonToken(DaemonToken token) {
+		daemonToken = token;
+	}
+	
+	public static boolean isEnabled() {
+		return enabled;
+	}
+	
+	public static void setEnabled(boolean enabled) {
+		AbstractAddressHierarchyTask.enabled = enabled;
+	}
+	
 }

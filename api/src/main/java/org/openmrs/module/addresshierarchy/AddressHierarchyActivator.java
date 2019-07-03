@@ -17,15 +17,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
-import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.DaemonTokenAware;
 import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
+import org.openmrs.module.addresshierarchy.scheduler.AbstractAddressHierarchyTask;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 /**
  * This class contains the logic that is run every time this module
  * is either started or shutdown
  */
-public class AddressHierarchyActivator extends BaseModuleActivator implements ModuleActivator {
+public class AddressHierarchyActivator extends BaseModuleActivator implements DaemonTokenAware {
 
 	private Log log = LogFactory.getLog(this.getClass());
 
@@ -46,4 +48,9 @@ public class AddressHierarchyActivator extends BaseModuleActivator implements Mo
         Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
         Context.getService(AddressHierarchyService.class).initI18nCache();
     }
+	
+	@Override
+ 	public void setDaemonToken(DaemonToken token) {
+		AbstractAddressHierarchyTask.setDaemonToken(token);
+ 	}
 }
