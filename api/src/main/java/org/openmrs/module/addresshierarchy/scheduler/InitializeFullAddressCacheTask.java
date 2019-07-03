@@ -9,8 +9,17 @@ import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
  */
 public class InitializeFullAddressCacheTask extends AbstractAddressHierarchyTask {
 	
+	
 	@Override
-    public void execute() {
-		Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
-    }
+	public Runnable getRunnableTask() {
+		return new RunnableTask();
+	}
+	
+	private class RunnableTask implements Runnable {
+		
+		@Override
+		public void run() {
+			Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
+		}
+	}
 }
