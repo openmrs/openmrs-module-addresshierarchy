@@ -1,12 +1,7 @@
 package org.openmrs.module.addresshierarchy.config;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Paths;
-import java.util.List;
-
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -20,8 +15,12 @@ import org.openmrs.module.addresshierarchy.util.AddressHierarchyImportUtil;
 import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.util.OpenmrsUtil;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Responsible for loading the address configuration appropriately
@@ -44,7 +43,7 @@ public class AddressConfigurationLoader {
 		return Paths.get(OpenmrsUtil.getApplicationDataDirectory(),
 			"configuration").toString();
 	}
-	
+
 	public static String getChecksumsPath() {
 		return Paths.get(OpenmrsUtil.getApplicationDataDirectory(),
 				"configuration_checksums").toString();
@@ -83,9 +82,9 @@ public class AddressConfigurationLoader {
 			log.info("Address hierarchy configuration file is unchanged, skipping it: " + xmlConfigFileName);
 		}
 		else {
-			
+
 			log.info("Address hierarchy configuration file has changed, reloading it: " + xmlConfigFileName);
-			
+
 			if (!isMatchableLevelConfig(addressConfiguration.getAddressComponents()) && !addressConfiguration.mustWipe()) {
 				log.warn("The address hierarchy configuration was not loaded because of a mismatch between the exisiting and provided address hierarchy levels.");
 				return;
@@ -118,7 +117,7 @@ public class AddressConfigurationLoader {
 		}
 		else {
 			log.info("Address hierarchy entries CSV file has changed, reloading it: " + csvEntriesFileName);
-			installAddressHierarchyEntries(configUtil, addressConfiguration.getAddressHierarchyFile(), forceReloadEntries);
+			installAddressHierarchyEntries(configUtil, addressConfiguration.getAddressHierarchyFile(), forceReloadEntries || addressConfiguration.mustWipe());
 			configUtil.writeChecksum(csvEntriesFileName, checksum);
 
 			log.info("Entries loaded, re-initializing address cache");
@@ -133,7 +132,7 @@ public class AddressConfigurationLoader {
 	public static void wipeAddressHierarchy() {
 
 		getService().deleteAllAddressHierarchyEntries();
-		
+
 		while (getService().getAddressHierarchyLevelsCount() > 0) {
 			getService().deleteAddressHierarchyLevel( getService().getBottomAddressHierarchyLevel() );
 		}
@@ -207,7 +206,7 @@ public class AddressConfigurationLoader {
 			log.warn("Deleting existing address hierarchy entries");
 			getService().deleteAllAddressHierarchyEntries();
 		}
-		
+
 		InputStream is = null;
 		try {
 			is = new FileInputStream(configDirUtil.getConfigFile(file.getFilename()));
