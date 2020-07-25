@@ -10,6 +10,9 @@
 		<id name="addressToEntryMapId" type="int" column="address_to_entry_map_id"
 			unsaved-value="0">
 			<generator class="native">
+				<!-- Due to limit on max length of sequence on PostgreSQL, the table name gets sliced from the end
+				Original Sequence Name as Expected - address_hierarchy_address_to_entry_map_address_to_entry_map_id_seq
+				Current Sequence Name for PostgreSQL - address_hierarchy_address_to_entry__address_to_entry_map_id_seq -->
 				<param name="sequence">address_hierarchy_address_to_entry__address_to_entry_map_id_seq</param>
 			</generator>
 		</id>
