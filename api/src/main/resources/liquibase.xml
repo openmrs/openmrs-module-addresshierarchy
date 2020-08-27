@@ -1,5 +1,10 @@
-<?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.7.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+		
     <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-1">
         <createTable tableName="address_hierarchy_entry">
             <column autoIncrement="true" name="address_hierarchy_entry_id" type="INT">
@@ -86,18 +91,18 @@
         </createIndex>
     </changeSet>
     <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-7">
-        <addForeignKeyConstraint baseColumnNames="level_id" baseTableName="address_hierarchy_entry" constraintName="level_to_level" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_level_id" referencedTableName="address_hierarchy_level" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="level_id" baseTableName="address_hierarchy_entry" constraintName="level_to_level" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_level_id" referencedTableName="address_hierarchy_level" />
     </changeSet>
     <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-8">
-        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="address_hierarchy_entry" constraintName="parent-to-parent" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_entry_id" referencedTableName="address_hierarchy_entry" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="address_hierarchy_entry" constraintName="parent-to-parent" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_entry_id" referencedTableName="address_hierarchy_entry" />
     </changeSet>
     <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-9">
-        <addForeignKeyConstraint baseColumnNames="parent_level_id" baseTableName="address_hierarchy_level" constraintName="parent_level" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_level_id" referencedTableName="address_hierarchy_level" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="parent_level_id" baseTableName="address_hierarchy_level" constraintName="parent_level" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_level_id" referencedTableName="address_hierarchy_level" />
     </changeSet>
     <changeSet author="aman (generated)" id="address_hierarchy-1595832956041-516">
-        <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="address_hierarchy_address_to_entry_map" constraintName="address_id_to_person_address_table" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="person_address_id" referencedTableName="person_address" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="address_hierarchy_address_to_entry_map" constraintName="address_id_to_person_address_table" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="person_address_id" referencedTableName="person_address" />
     </changeSet>
     <changeSet author="aman (generated)" id="address_hierarchy-1595832956041-625">
-        <addForeignKeyConstraint baseColumnNames="entry_id" baseTableName="address_hierarchy_address_to_entry_map" constraintName="entry_id_to_address_hierarchy_table" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_entry_id" referencedTableName="address_hierarchy_entry" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="entry_id" baseTableName="address_hierarchy_address_to_entry_map" constraintName="entry_id_to_address_hierarchy_table" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_entry_id" referencedTableName="address_hierarchy_entry" />
     </changeSet>
 </databaseChangeLog>
