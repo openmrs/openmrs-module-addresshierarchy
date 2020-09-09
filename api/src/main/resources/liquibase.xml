@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+
+    <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="address_hierarchy_entry"/>
+            </not>
+        </preConditions>
+        <createTable tableName="address_hierarchy_entry">
+            <column autoIncrement="true" name="address_hierarchy_entry_id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(160)"/>
+            <column name="level_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="INT"/>
+            <column name="user_generated_id" type="VARCHAR(11)"/>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+            <column name="elevation" type="DOUBLE"/>
+            <column name="uuid" type="CHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="address_hierarchy_level"/>
+            </not>
+        </preConditions>
+        <createTable tableName="address_hierarchy_level">
+            <column autoIncrement="true" name="address_hierarchy_level_id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(160)"/>
+            <column name="parent_level_id" type="INT">
+                <constraints unique="true"/>
+            </column>
+            <column name="address_field" type="VARCHAR(50)"/>
+            <column name="uuid" type="CHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="0" name="required" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595832956041-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="address_hierarchy_address_to_entry_map"/>
+            </not>
+        </preConditions>
+        <createTable tableName="address_hierarchy_address_to_entry_map">
+            <column autoIncrement="true" name="address_to_entry_map_id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="address_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entry_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uuid" type="CHAR(38)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="address_field_unique"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="address_field_unique" tableName="address_hierarchy_level">
+            <column name="address_field"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="address_hierarchy_entry_name_idx"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="address_hierarchy_entry_name_idx" tableName="address_hierarchy_entry">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="level_name"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="level_name" tableName="address_hierarchy_entry">
+            <column name="level_id"/>
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="parent_name"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="parent_name" tableName="address_hierarchy_entry">
+            <column name="parent_id"/>
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595832956041-116">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="address_id_to_person_address_table"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="address_id_to_person_address_table" tableName="address_hierarchy_address_to_entry_map">
+            <column name="address_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595832956041-229">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="entry_id_to_address_hierarchy_table"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="entry_id_to_address_hierarchy_table" tableName="address_hierarchy_address_to_entry_map">
+            <column name="entry_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="level_to_level" />
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="level_id" baseTableName="address_hierarchy_entry" constraintName="level_to_level" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_level_id" referencedTableName="address_hierarchy_level" />
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="parent-to-parent" />
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="address_hierarchy_entry" constraintName="parent-to-parent" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_entry_id" referencedTableName="address_hierarchy_entry" />
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="parent_level" />
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="parent_level_id" baseTableName="address_hierarchy_level" constraintName="parent_level" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_level_id" referencedTableName="address_hierarchy_level" />
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595832956041-516">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="address_id_to_person_address_table" />
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="address_hierarchy_address_to_entry_map" constraintName="address_id_to_person_address_table" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="person_address_id" referencedTableName="person_address" />
+    </changeSet>
+    <changeSet author="aman (generated)" id="address_hierarchy-1595832956041-625">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="entry_id_to_address_hierarchy_table" />
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="entry_id" baseTableName="address_hierarchy_address_to_entry_map" constraintName="entry_id_to_address_hierarchy_table" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_entry_id" referencedTableName="address_hierarchy_entry" />
+    </changeSet>
+</databaseChangeLog>
