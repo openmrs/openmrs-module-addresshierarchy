@@ -34,6 +34,8 @@
     <address_hierarchy_entry address_hierarchy_entry_id="18" name="Ãccénts" level_id="5" parent_id="4" uuid="82e66646-e162-11df-9195-001e378eb67f"/>
     <address_hierarchy_entry address_hierarchy_entry_id="19" name="" user_generated_id="BlankRegion" level_id="7" parent_id="1" uuid="92e66646-e162-11df-9195-001e378eb67f"/>
     <address_hierarchy_entry address_hierarchy_entry_id="20" name="Hawaii" level_id="4" parent_id="19" uuid="93e66646-e162-11df-9195-001e378eb67f"/>
+    <address_hierarchy_entry address_hierarchy_entry_id="21" name="កម្ពុជា (Cambodia)" level_id="1" uuid="e477d1f6-e162-11df-9195-001e378eb67f"/>
+    <address_hierarchy_entry address_hierarchy_entry_id="22" name="ខេត្តឧត្ដរមានជ័យ (Oddar Meanchey)" level_id="2" parent_id="21" uuid="8ebb5bcd-e162-11ef-9295-001e378fb67f"/>
 
 
     <!-- add some references to a person address -->
