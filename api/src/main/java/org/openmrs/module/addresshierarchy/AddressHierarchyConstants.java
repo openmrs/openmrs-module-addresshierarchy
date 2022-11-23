@@ -21,7 +21,7 @@ public class AddressHierarchyConstants {
 	public static final Long TASK_PARAMETER_ADDRESS_ENTRY_MAP_DEFAULT_REPEAT_INTERVAL = new Long(86400);   // default repeat interval is once every 24 hours (24 hours = 86400 seconds)
 	
 	/* Precompile some standard Patterns that we are using */
-	public static final Pattern PATTERN_NON_WORD_AND_NON_WHITESPACE = Pattern.compile("[\\W&&\\S]+");   // matches sets of 1 or more characters that are both non-word (\W) and non-whitespace (\S))
+	public static final Pattern PATTERN_NON_WORD_AND_NON_WHITESPACE = Pattern.compile("[\\/\\\\\"'`~@#$%^&*()+{}\\[\\]<>,.!?-]+");   // matches sets of 1 or more of the characters: /\"'`~@#$%^&*()+{}[]<>,.!?-
 	public static final Pattern PATTERN_ANY_DIGIT = Pattern.compile("[\\d]+");  // matches one or more digits (0-9)
 	
 	// TODO: add some other global property that are currently directly referenced within the code

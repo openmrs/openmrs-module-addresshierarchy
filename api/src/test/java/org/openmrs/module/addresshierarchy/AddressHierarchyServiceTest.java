@@ -249,8 +249,8 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	public void getAddressHierarchyEntryCountByLevel_shouldGetCountOfAddressHierarchyEntries() throws Exception {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		Assert.assertEquals(new Integer(2), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(1)));
-		Assert.assertEquals(new Integer(3), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(2)));
+		Assert.assertEquals(new Integer(3), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(1)));
+		Assert.assertEquals(new Integer(4), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(2)));
 		Assert.assertEquals(new Integer(2), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(3)));
 		Assert.assertEquals(new Integer(3), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(4)));
 		Assert.assertEquals(new Integer(8), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(5)));
@@ -353,7 +353,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		
 		List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesAtTopLevel();
 		
-		Assert.assertEquals(2, entries.size());
+		Assert.assertEquals(3, entries.size());
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(1)));
 		Assert.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(16)));
 		
@@ -438,9 +438,10 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
         // how about the "null" case?
 		address = new PersonAddress();
 		results = ahService.getPossibleAddressValues(address, "country");
-		Assert.assertEquals(2, results.size());
+		Assert.assertEquals(3, results.size());
 		Assert.assertTrue(results.contains("United States"));
 		Assert.assertTrue(results.contains("China"));
+		Assert.assertTrue(results.contains("កម្ពុជា (Cambodia)"));
 		
 		// how about an unmapped address field?
 		address = new PersonAddress();
@@ -653,8 +654,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		results = ahService.getPossibleFullAddresses(nullTest);
 		Assert.assertEquals(0,results.size());
 	}
-	
-	
+
 	@Test
 	@Verifies(value = "should find possible full addresses that match search string", method = "getPossibleFullAddresses(String)")
 	public void searchAddresses_shouldFindPossibleFullAddressesThatMatchSearchString() throws Exception {
@@ -721,12 +721,14 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
         results = ahService.searchAddresses("Accents", null);
         Assert.assertEquals(1,results.size());
         Assert.assertTrue(results.contains("United States|New England|Massachusetts|Plymouth County|Ãccénts"));
+        
+        // test that non-alphanumeric worded addresses are search-able
+        results = ahService.searchAddresses("កម្ពុជា", null);
+        Assert.assertEquals(1,results.size());
+        Assert.assertTrue(results.contains("កម្ពុជា (Cambodia)|ខេត្តឧត្ដរមានជ័យ (Oddar Meanchey)"));
 		
 	}
 	
-
-
-
 	@Test
 	@Verifies(value = "should find possible full addresses that match search string", method = "getPossibleFullAddresses(String)")
 	public void searchAddresses_shouldRestrictSearchToSpecifiedLevel() throws Exception {
