@@ -721,6 +721,9 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	}
 
 	private synchronized Map<String,List<String>> getAddressesForLocale(Locale locale) {
+		if (this.fullAddressCache == null) {
+			this.fullAddressCache = new HashMap<Locale, Map<String,List<String>> >();
+		}
 		Map<String,List<String>> ret = this.fullAddressCache.get(locale);
 		if (ret == null) {
 			ret = new HashMap<String,List<String>>();
