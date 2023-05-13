@@ -350,7 +350,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		// find all addresses in the full address cache that contain the first word in the search string
 		// (optionally restricting the search to a single address level in the address cache)
 		Pattern p = generateSearchPattern(encodeStringMethod, words[0], phoneticProcessor);
-		for (String address : this.fullAddressCache.get(locale).keySet()) {
+		for (String address : getAddressesForLocale(locale).keySet()) {
 			if (p.matcher(retrieveSpecifiedLevel(address, levelIndex)).find()) {
 				matchingKeys.add(address);
 			}
@@ -375,7 +375,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 
 		// the results are the values for the matching keys
 		for (String key : matchingKeys) {
-			for (String address : fullAddressCache.get(locale).get(key)) {
+			for (String address : getAddressesForLocale(locale).get(key)) {
 				results.add(retrieveSpecifiedLevel(address, levelIndex));
 			}
 		}
@@ -713,20 +713,30 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 
 				this.fullAddressCache = new HashMap<Locale, Map<String,List<String>> >();
 				Locale locale = i18nCache.getLocaleForFullAddressCache();
-				this.fullAddressCache.put(locale, new HashMap<String,List<String>>());
-
-				// first determine if we are going to do phonetic processing
-				String phoneticProcessor = fetchPhoneticProcessor();
-				Method encodeStringMethod = fetchEncodeStringMethod();
-
-				for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
-					initializeFullAddressCacheHelper(locale, entry, phoneticProcessor, encodeStringMethod);
-				}
-
+				getAddressesForLocale(locale);
 				this.fullAddressCacheInitialized = true;
 			}
 		}
 
+	}
+
+	private synchronized Map<String,List<String>> getAddressesForLocale(Locale locale) {
+		if (this.fullAddressCache == null) {
+			this.fullAddressCache = new HashMap<Locale, Map<String,List<String>> >();
+		}
+		Map<String,List<String>> ret = this.fullAddressCache.get(locale);
+		if (ret == null) {
+			ret = new HashMap<String,List<String>>();
+			this.fullAddressCache.put(locale, ret);
+			// first determine if we are going to do phonetic processing
+			String phoneticProcessor = fetchPhoneticProcessor();
+			Method encodeStringMethod = fetchEncodeStringMethod();
+
+			for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
+				initializeFullAddressCacheHelper(locale, entry, phoneticProcessor, encodeStringMethod);
+			}
+		}
+		return ret;
 	}
 
 	private void initializeFullAddressCacheHelper(Locale locale, AddressHierarchyEntry entry, String phoneticProcessor, Method encodeStringMethod) {
