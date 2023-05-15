@@ -1,15 +1,15 @@
 package org.openmrs.module.addresshierarchy.config;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.beanutils.MethodUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.util.OpenmrsUtil;
+
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Simple component for representing the configuration options when starting up the address hierarchy module.
@@ -92,9 +92,9 @@ public class AddressConfiguration {
 			}
         }
         
-        Map<String, String> nameMappings = new HashMap<String, String>();
-        Map<String, String> sizeMappings = new HashMap<String, String>();
-        Map<String, String> elementDefaults = new HashMap<String, String>();
+        Map<String, String> nameMappings = new LinkedHashMap<String, String>();
+        Map<String, String> sizeMappings = new LinkedHashMap<String, String>();
+        Map<String, String> elementDefaults = new LinkedHashMap<String, String>();
         for (AddressComponent c : getAddressComponents()) {
             nameMappings.put(c.getField().getName(), c.getNameMapping());
             sizeMappings.put(c.getField().getName(), Integer.toString(c.getSizeMapping()));
