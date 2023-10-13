@@ -139,7 +139,7 @@
     <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-7">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="level_to_level" />
+                <foreignKeyConstraintExists foreignKeyTableName="address_hierarchy_entry" foreignKeyName="level_to_level" />
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="level_id" baseTableName="address_hierarchy_entry" constraintName="level_to_level" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_level_id" referencedTableName="address_hierarchy_level" />
@@ -147,7 +147,7 @@
     <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-8">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="parent-to-parent" />
+                <foreignKeyConstraintExists foreignKeyTableName="address_hierarchy_entry" foreignKeyName="parent-to-parent" />
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="address_hierarchy_entry" constraintName="parent-to-parent" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_entry_id" referencedTableName="address_hierarchy_entry" />
@@ -155,7 +155,7 @@
     <changeSet author="aman (generated)" id="address_hierarchy-1595797202649-9">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="parent_level" />
+                <foreignKeyConstraintExists foreignKeyTableName="address_hierarchy_level" foreignKeyName="parent_level" />
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="parent_level_id" baseTableName="address_hierarchy_level" constraintName="parent_level" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_level_id" referencedTableName="address_hierarchy_level" />
@@ -163,7 +163,7 @@
     <changeSet author="aman (generated)" id="address_hierarchy-1595832956041-516">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="address_id_to_person_address_table" />
+                <foreignKeyConstraintExists foreignKeyTableName="address_hierarchy_address_to_entry_map" foreignKeyName="address_id_to_person_address_table" />
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="address_id" baseTableName="address_hierarchy_address_to_entry_map" constraintName="address_id_to_person_address_table" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="person_address_id" referencedTableName="person_address" />
@@ -171,7 +171,7 @@
     <changeSet author="aman (generated)" id="address_hierarchy-1595832956041-625">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="entry_id_to_address_hierarchy_table" />
+                <foreignKeyConstraintExists foreignKeyTableName="address_hierarchy_address_to_entry_map" foreignKeyName="entry_id_to_address_hierarchy_table" />
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="entry_id" baseTableName="address_hierarchy_address_to_entry_map" constraintName="entry_id_to_address_hierarchy_table" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="address_hierarchy_entry_id" referencedTableName="address_hierarchy_entry" />
