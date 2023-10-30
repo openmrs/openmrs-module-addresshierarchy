@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -48,11 +49,10 @@ public class AddressConfigurationLoader {
 		return Paths.get(OpenmrsUtil.getApplicationDataDirectory(),
 				"configuration_checksums").toString();
 	}
-
-	public static void loadAddressConfiguration() {
-
-		final ConfigDirUtil configUtil = new ConfigDirUtil(getConfigPath(), getChecksumsPath(), "addresshierarchy");
-
+	
+	public static void loadAddressConfiguration(Path configPath, Path checksumsPath, String domain) {
+		final ConfigDirUtil configUtil = new ConfigDirUtil(configPath.toString(), checksumsPath.toString(), domain);
+		
 		String xmlConfigFileName = ADDR_CONFIG_FILE_NAME;
 
 		File domainDir = new File(configUtil.domainDirPath);
@@ -123,6 +123,10 @@ public class AddressConfigurationLoader {
 			log.info("Entries loaded, re-initializing address cache");
 			getService().initializeFullAddressCache();
 		}
+	}
+
+	public static void loadAddressConfiguration() {
+		loadAddressConfiguration(Paths.get(getConfigPath()), Paths.get(getChecksumsPath()), "addresshierarchy");
 	}
 
 	/**

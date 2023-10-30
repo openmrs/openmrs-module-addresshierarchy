@@ -32,7 +32,6 @@ public class AddressHierarchyActivator extends BaseModuleActivator implements Mo
 	@Override
 	public void started() {
 		log.info("AddressHierarchy Module Started");
-		AddressConfigurationLoader.loadAddressConfiguration();
 	}
 
 	@Override
@@ -40,10 +39,4 @@ public class AddressHierarchyActivator extends BaseModuleActivator implements Mo
 		log.info("AddressHierarchy Module Stopped");
 	}
 
-	@Override
-    public void contextRefreshed() {
-        // initialize the caches on module startup
-        Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
-        Context.getService(AddressHierarchyService.class).initI18nCache();
-    }
 }
