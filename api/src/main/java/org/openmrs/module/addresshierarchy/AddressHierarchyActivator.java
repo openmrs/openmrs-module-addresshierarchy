@@ -15,11 +15,8 @@ package org.openmrs.module.addresshierarchy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
-import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
-import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 /**
  * This class contains the logic that is run every time this module
