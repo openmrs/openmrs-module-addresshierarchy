@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyImportUtil;
@@ -50,8 +51,8 @@ public class AddressConfigurationLoader {
 				"configuration_checksums").toString();
 	}
 	
-	public static void loadAddressConfiguration(Path configPath, Path checksumsPath, String domain) {
-		final ConfigDirUtil configUtil = new ConfigDirUtil(configPath.toString(), checksumsPath.toString(), domain);
+	public static void loadAddressConfiguration(Path configPath, Path checksumsPath) {
+		final ConfigDirUtil configUtil = new ConfigDirUtil(configPath.toString(), checksumsPath.toString(), AddressHierarchyConstants.ADDRESS_HIERARCHY_DOMAIN);
 		
 		String xmlConfigFileName = ADDR_CONFIG_FILE_NAME;
 
@@ -123,10 +124,11 @@ public class AddressConfigurationLoader {
 			log.info("Entries loaded, re-initializing address cache");
 			getService().initializeFullAddressCache();
 		}
+		getService().initI18nCache();
 	}
 
 	public static void loadAddressConfiguration() {
-		loadAddressConfiguration(Paths.get(getConfigPath()), Paths.get(getChecksumsPath()), "addresshierarchy");
+		loadAddressConfiguration(Paths.get(getConfigPath()), Paths.get(getChecksumsPath()));
 	}
 
 	/**

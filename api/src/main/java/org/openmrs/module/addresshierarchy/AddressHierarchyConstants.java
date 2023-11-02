@@ -24,5 +24,8 @@ public class AddressHierarchyConstants {
 	public static final Pattern PATTERN_NON_WORD_AND_NON_WHITESPACE = Pattern.compile("[\\/\\\\\"'`~@#$%^&*()+{}\\[\\]<>,.!?-]+");   // matches sets of 1 or more of the characters: /\"'`~@#$%^&*()+{}[]<>,.!?-
 	public static final Pattern PATTERN_ANY_DIGIT = Pattern.compile("[\\d]+");  // matches one or more digits (0-9)
 	
+	/* Configuration domain for the Address Hierarchy */
+	public static final String ADDRESS_HIERARCHY_DOMAIN = "addresshierarchy";
+	
 	// TODO: add some other global property that are currently directly referenced within the code
 }

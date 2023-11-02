@@ -15,8 +15,11 @@ package org.openmrs.module.addresshierarchy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
+import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 /**
  * This class contains the logic that is run every time this module
@@ -29,6 +32,7 @@ public class AddressHierarchyActivator extends BaseModuleActivator implements Mo
 	@Override
 	public void started() {
 		log.info("AddressHierarchy Module Started");
+		AddressConfigurationLoader.loadAddressConfiguration();
 	}
 
 	@Override
@@ -36,4 +40,10 @@ public class AddressHierarchyActivator extends BaseModuleActivator implements Mo
 		log.info("AddressHierarchy Module Stopped");
 	}
 
+	@Override
+    public void contextRefreshed() {
+        // initialize the caches on module startup
+        Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
+        Context.getService(AddressHierarchyService.class).initI18nCache();
+    }
 }
