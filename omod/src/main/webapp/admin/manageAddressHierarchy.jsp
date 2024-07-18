@@ -40,12 +40,12 @@
 	<c:forEach items="${levels}" var="level" varStatus="i">
 		<tr>
 			<td class="tableCell">${i.count}</td>
-			<td class="tableCell">${level.name}</td>
-			<td class="tableCell">${sampleEntries[i.count-1][0]} (${sampleEntries[i.count-1][1]} <spring:message code="addresshierarchy.admin.totalEntries"/>)</td>
+			<td class="tableCell"><c:out value='${level.name}'/></td>
+			<td class="tableCell"><c:out value='${sampleEntries[i.count-1][0]}'/> (<c:out value='${sampleEntries[i.count-1][1]}'/> <spring:message code="addresshierarchy.admin.totalEntries"/>)</td>
 			<td class="tableCell">
 				<c:choose>
 					<c:when test="${! empty level.addressField}">
-						<spring:message code="${nameMappings[level.addressField.name]}"/> (${level.addressField.name})
+						<spring:message code="${nameMappings[level.addressField.name]}"/> (<c:out value="${level.addressField.name}"/>)
 					</c:when>
 					<c:otherwise>
 						(<spring:message code="general.none"/>)
@@ -61,13 +61,13 @@
 				</c:if>
 			</td>
 			<td class="tableCell">
-				<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form?levelId=${level.id}">
+				<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form?levelId=<c:out value='${level.id}'/>">
 				   <spring:message code="general.edit" />
 				</a>
 				<!-- only show delete option for last element, and only if it doesn't have any sample entries -->
 				<c:if test="${i.count == fn:length(levels) && sampleEntries[i.count-1][1] == 0}">
 					&nbsp;|&nbsp;
-					<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/deleteAddressHierarchyLevel.form?levelId=${level.id}"
+					<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/deleteAddressHierarchyLevel.form?levelId=<c:out value='${level.id}'/>"
 					   onclick="return confirm('<spring:message code="addresshierarchy.admin.confirmDeleteLevel"/>');">
 					   <spring:message code="general.delete" />
 					</a>
@@ -78,7 +78,7 @@
 	</c:forEach>
 	<tr>
 		<td class="tableCell" colspan="4">
-			<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form">
+				<a href="${pageContext.request.contextPath}/module/addresshierarchy/admin/editAddressHierarchyLevel.form">
 				<spring:message code="addresshierarchy.admin.addLevel" />
 			</a>
 		</td>
@@ -103,13 +103,13 @@
 
 <tr>
 	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.delimiter" />:</nobr></td>
-	<td class="tableCell"><input type="text" name="delimiter" size="1" value="${delimiter}" /> <spring:message code="addresshierarchy.admin.delimiter.warning" /></td>
+	<td class="tableCell"><input type="text" name="delimiter" size="1" value="<c:out value='${delimiter}'/>" /> <spring:message code="addresshierarchy.admin.delimiter.warning" /></td>
 	<td class="tableCell">&nbsp;</td>
 </tr>
 
 <tr>
     <td class="tableCell" style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.userGeneratedIdDelimiter" />:</nobr></td>
-    <td class="tableCell"><input type="text" name="userGeneratedIdDelimiter" size="1" value="${userGeneratedIdDelimiter}" /> <spring:message code="addresshierarchy.admin.userGeneratedIdDelimiter.warning" /></td>
+    <td class="tableCell"><input type="text" name="userGeneratedIdDelimiter" size="1" value="<c:out value='${userGeneratedIdDelimiter}'/>" /> <spring:message code="addresshierarchy.admin.userGeneratedIdDelimiter.warning" /></td>
     <td class="tableCell">&nbsp;</td>
 </tr>
 

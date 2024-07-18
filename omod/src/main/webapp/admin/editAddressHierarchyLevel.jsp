@@ -53,14 +53,14 @@
 
 
 <form id="editAddressHierarchyLevel" action="updateAddressHierarchyLevel.form" method="post">
-<input type="hidden" name="levelId" value="${level.id}"/>
+<input type="hidden" name="levelId" value="<c:out value='${level.id}'/>"/>
 
 <table cellspacing="0" cellpadding="0" class="box">
 
 <tr>
 	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="general.name" />:</nobr></td>
 	<td class="tableCell">
-		<input type="text" name="name" value="${level.name}"/>
+		<input type="text" name="name" value="<c:out value='${level.name}'/>"/>
 	</td>
 	<td class="tableCell" width="60%">&nbsp;</td>
 </tr>
@@ -72,8 +72,8 @@
 			<option value=""></option>
 			<c:forEach var="field" items="${addressFields}">
 				<c:if test="${nameMappings[field.name] != null}">
-					<option value="${field.name}" <c:if test="${level.addressField == field}">selected</c:if> >
-						<spring:message code="${nameMappings[field.name]}"/> (${field.name})
+					<option value="<c:out value="${field.name}"/> <c:if test="${level.addressField == field}">selected</c:if> >
+						<spring:message code="${nameMappings[field.name]}"/> (<c:out value="${field.name}"/>)
 					</option>
 				</c:if>
 			</c:forEach>
@@ -86,7 +86,7 @@
 <tr>
 	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="addresshierarchy.admin.required" />:</nobr></td>
 	<td class="tableCell">
-		<input type="hidden" id="required" name="required" value="${level.required}"/>
+		<input type="hidden" id="required" name="required" value="<c:out value='${level.required}'/>"/>
 		<input type="checkbox" id="requiredCheckbox" name="requiredCheckbox" value="true" <c:if test="${level.required == true}">checked</c:if> />
 	</td>
 </tr>
