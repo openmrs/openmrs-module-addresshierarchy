@@ -11,6 +11,11 @@ public class InitializeFullAddressCacheTask extends AbstractAddressHierarchyTask
 	
 	@Override
     public void execute() {
-		Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
+        try {
+            Context.addProxyPrivilege("Get Global Properties");
+            Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
+        } finally {
+            Context.removeProxyPrivilege("Get Global Properties");
+        }
     }
 }

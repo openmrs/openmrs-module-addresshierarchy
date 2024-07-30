@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -706,15 +705,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	synchronized public void initializeFullAddressCache() {
 
 		// generally, this global property should be set to true; it just allows cache load to be disabled to speed startup
-		String globalProperty = "";
-		try {
-			Context.addProxyPrivilege("Get Global Properties");
-			globalProperty = Context.getAdministrationService().getGlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP);
-		} finally {
-			Context.removeProxyPrivilege("Get Global Properties");
-		}
-
-		if (BooleanUtils.toBoolean(globalProperty)) {
+		if (Context.getAdministrationService().getGlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP).equalsIgnoreCase("true")) {
 
 			// only initialize if necessary (and if we have entries)
 			if ((this.fullAddressCacheInitialized == false || MapUtils.isEmpty(this.fullAddressCache))
