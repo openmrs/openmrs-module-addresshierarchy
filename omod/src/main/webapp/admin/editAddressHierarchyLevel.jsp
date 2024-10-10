@@ -28,8 +28,20 @@
 			else {
 				$j('#required').attr('value', "false");
 			} 
-		});		
+		});
 	});
+
+function beforeSubmit() {
+	const nameField = document.getElementById('fieldTypeName');
+	const requiredCheckbox = document.getElementById('requiredCheckbox');
+
+	nameField.value=html_sanitize(nameField.value);
+
+	const requiredField = document.getElementById('required');
+	requiredField.value = requiredCheckbox.checked ? 'true' : 'false';
+
+	return true; 
+}
 -->
 </script>
 <!-- END JQUERY -->
@@ -52,7 +64,7 @@
 <div><b class="boxHeader"><spring:message code="addresshierarchy.admin.editLevel" /></b>
 
 
-<form id="editAddressHierarchyLevel" action="updateAddressHierarchyLevel.form" method="post">
+<form id="editAddressHierarchyLevel" action="updateAddressHierarchyLevel.form" method="post" onSubmit="return beforeSubmit()">
 <input type="hidden" name="levelId" value="<c:out value='${level.id}'/>"/>
 
 <table cellspacing="0" cellpadding="0" class="box">
@@ -60,7 +72,7 @@
 <tr>
 	<td class="tableCell" style="font-weight:bold"><nobr><spring:message code="general.name" />:</nobr></td>
 	<td class="tableCell">
-		<input type="text" name="name" value="<c:out value='${level.name}'/>"/>
+		<input type="text" id="fieldTypeName" name="name" value="<c:out value='${level.name}'/>"/>
 	</td>
 	<td class="tableCell" width="60%">&nbsp;</td>
 </tr>
