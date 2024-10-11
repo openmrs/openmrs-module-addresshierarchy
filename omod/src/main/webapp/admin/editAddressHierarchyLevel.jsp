@@ -31,15 +31,9 @@
 		});
 	});
 
-function beforeSubmit() {
+function sanitizeAndSubmit() {
 	const nameField = document.getElementById('fieldTypeName');
-	const requiredCheckbox = document.getElementById('requiredCheckbox');
-
 	nameField.value=html_sanitize(nameField.value);
-
-	const requiredField = document.getElementById('required');
-	requiredField.value = requiredCheckbox.checked ? 'true' : 'false';
-
 	return true; 
 }
 -->
@@ -64,7 +58,7 @@ function beforeSubmit() {
 <div><b class="boxHeader"><spring:message code="addresshierarchy.admin.editLevel" /></b>
 
 
-<form id="editAddressHierarchyLevel" action="updateAddressHierarchyLevel.form" method="post" onSubmit="return beforeSubmit()">
+<form id="editAddressHierarchyLevel" action="updateAddressHierarchyLevel.form" method="post" onSubmit="return sanitizeAndSubmit()">
 <input type="hidden" name="levelId" value="<c:out value='${level.id}'/>"/>
 
 <table cellspacing="0" cellpadding="0" class="box">
