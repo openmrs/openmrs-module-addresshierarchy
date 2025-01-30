@@ -266,13 +266,13 @@ public class AddressConfigurationLoader {
 		XStream xs = new XStream(new DomDriver());
 		try {
 			Method allowTypeHierarchy = XStream.class.getMethod("allowTypeHierarchy", Class.class);
-			log.warn("Allowing types for address hierarchy");
 			allowTypeHierarchy.invoke(xs, AddressConfiguration.class);
 			allowTypeHierarchy.invoke(xs, AddressComponent.class);
 			allowTypeHierarchy.invoke(xs, AddressHierarchyFile.class);
+			log.debug("Successfully configured address configuration serializer with allowed types");
 		}
 		catch (Exception e) {
-			log.error("Error invoking address hierarchy allowTypes", e);
+			log.debug("Error configuring address configuration serializer with allowed types", e);
 		}
 		xs.alias("addressConfiguration", AddressConfiguration.class);
 		xs.alias("addressComponent", AddressComponent.class);
