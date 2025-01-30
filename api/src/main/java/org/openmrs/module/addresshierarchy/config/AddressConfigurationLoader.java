@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -263,6 +264,16 @@ public class AddressConfigurationLoader {
 	 */
 	public static XStream getSerializer() {
 		XStream xs = new XStream(new DomDriver());
+		try {
+			Method allowTypeHierarchy = XStream.class.getMethod("allowTypeHierarchy", Class.class);
+			log.warn("Allowing types for address hierarchy");
+			allowTypeHierarchy.invoke(xs, AddressConfiguration.class);
+			allowTypeHierarchy.invoke(xs, AddressComponent.class);
+			allowTypeHierarchy.invoke(xs, AddressHierarchyFile.class);
+		}
+		catch (Exception e) {
+			log.error("Error invoking address hierarchy allowTypes", e);
+		}
 		xs.alias("addressConfiguration", AddressConfiguration.class);
 		xs.alias("addressComponent", AddressComponent.class);
 		xs.alias("addressHierarchyFile", AddressHierarchyFile.class);
