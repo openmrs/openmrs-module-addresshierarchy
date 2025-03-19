@@ -78,7 +78,7 @@ function sanitizeAndSubmit() {
 			<option value=""></option>
 			<c:forEach var="field" items="${addressFields}">
 				<c:if test="${nameMappings[field.name] != null}">
-					<option value="<c:out value="${field.name}"/> <c:if test="${level.addressField == field}">selected</c:if> >
+					<option value="<c:out value="${field.name}"/>" <c:if test="${level.addressField == field}">selected</c:if> >
 						<spring:message code="${nameMappings[field.name]}"/> (<c:out value="${field.name}"/>)
 					</option>
 				</c:if>
