@@ -38,7 +38,7 @@ abstract public class I18nModuleContextSensitiveTest extends AOPModuleContextSen
 	 */
 	public I18nModuleContextSensitiveTest() {
 		super();
-        ModuleFactory.getStartedModulesMap().put("exti18n", new Module("", "exti18n", "", "", "", "1.0.0") );
+        ModuleFactory.getStartedModulesMap().put("exti18n", new Module("", "exti18n", "", "", "", "1.0.0", "") );
 	}
 	
 	@Override

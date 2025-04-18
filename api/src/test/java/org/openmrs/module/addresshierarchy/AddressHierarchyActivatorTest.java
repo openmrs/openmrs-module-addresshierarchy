@@ -13,7 +13,6 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
@@ -22,7 +21,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-@DirtiesContext
+
 public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTest {
 
   private static String APP_DATA_TEST_DIRECTORY = "testAppDataDir";
@@ -43,7 +42,6 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
   private void setAppDataDirPath(String strPath) {
     String path = getClass().getClassLoader().getResource(strPath).getPath() + File.separator;
 
-    OpenmrsConstants.APPLICATION_DATA_DIRECTORY = path; // The 1.9 way
     Properties prop = new Properties();
     prop.setProperty(OpenmrsConstants.APPLICATION_DATA_DIRECTORY_RUNTIME_PROPERTY, path); // The 1.10+ way
     Context.setRuntimeProperties(prop);
@@ -71,7 +69,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 
     level = ahs.getAddressHierarchyLevelByAddressField(AddressField.NEIGHBORHOOD_CELL);
     entries = ahs.getAddressHierarchyEntriesByLevel(level);
-    Set<String> entryNames = new HashSet<String>();
+    Set<String> entryNames = new HashSet<>();
     for (AddressHierarchyEntry entry : entries) {
       entryNames.add(entry.getName());
     }

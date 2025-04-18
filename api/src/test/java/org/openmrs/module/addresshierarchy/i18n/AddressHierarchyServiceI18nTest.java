@@ -24,16 +24,15 @@ import org.openmrs.module.addresshierarchy.AddressToEntryMap;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.openmrs.test.Verifies;
-import org.springframework.test.annotation.DirtiesContext;
 
-@DirtiesContext
+
 public class AddressHierarchyServiceI18nTest extends I18nModuleContextSensitiveTest {
 
 	protected final Log log = LogFactory.getLog(getClass());
 
 	@Test
 	@Verifies(value = "should fetch child address hierarchy entry referenced by name", method = "getChildAddressHierarchyEntryByName(AddressHierarchyEntry)")
-	public void getChildAddressHierarchyEntryByName_shouldGetChildAddressHierarchyEntryByName() throws Exception {
+	public void getChildAddressHierarchyEntryByName_shouldGetChildAddressHierarchyEntryByName() {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 
 		AddressHierarchyEntry scituateMa = ahService.getAddressHierarchyEntry(7);

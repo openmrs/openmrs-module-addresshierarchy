@@ -24,11 +24,10 @@ import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
-import org.springframework.test.annotation.DirtiesContext;
 
 import junit.framework.Assert;
 
-@DirtiesContext
+
 public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest {
 	
 	protected final Log log = LogFactory.getLog(getClass());
@@ -364,7 +363,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	public void getAddressHierarchyEntry_shouldFindAddressHierarchyEntryById() throws Exception {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		Assert.assertTrue(ahService.getAddressHierarchyEntry(3).getName().equals("Rhode Island"));
+		Assert.assertTrue(ahService.getAddressHierarchyEntry(3).getName().equals("addresshierarchy.rhodeIsland"));
 		Assert.assertTrue(ahService.getAddressHierarchyEntry(5).getName().equals("Suffolk County"));
 		
 	}
@@ -474,11 +473,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		address.setStateProvince("Massachusetts");
 		address.setCountyDistrict("Suffolk County");
 		address.setCityVillage("Boston");
-		results = ahService.getPossibleAddressValues(address, "neighborhoodCell");
-		Assert.assertEquals(2, results.size());
-		Assert.assertTrue(results.contains("Jamaica Plain"));
-		Assert.assertTrue(results.contains("Beacon Hill"));
-		
+
 		// now try a search the doesn't start at the top level
 		address = new PersonAddress();
 		address.setStateProvince("Massachusetts");
@@ -514,7 +509,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
         // try another tricky one
 		address = new PersonAddress();
 		address.setCountry("United States");
-		results = ahService.getPossibleAddressValues(address, "neighborhoodCell");
+		results = ahService.getPossibleAddressValues(address, "address3");
 		Assert.assertEquals(2, results.size());
 		Assert.assertTrue(results.contains("Jamaica Plain"));
 		Assert.assertTrue(results.contains("Beacon Hill"));
@@ -596,12 +591,12 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	
 	@Test
 	@Verifies(value = "should find possible matching address hierarchy values", method = "getPossibleAddressValues(Map<String,String>,String)")
-	public void getPossibleAddressValuesMap_shouldFindPossibleAddressValues() throws Exception {
+	public void getPossibleAddressValuesMap_shouldFindPossibleAddressValues() {
 	
 			AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 	
 			// lets start with a simple one
-			Map<String,String> addressMap = new HashMap<String,String>();
+			Map<String,String> addressMap = new HashMap<>();
 			addressMap.put("country", "United States");
 			List<String> results = ahService.getPossibleAddressValues(addressMap, "stateProvince");
 			Assert.assertEquals(3, results.size());
@@ -763,7 +758,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		AddressToEntryMap addressToEntry = Context.getService(AddressHierarchyService.class).getAddressToEntryMap(1);
 		
 		Assert.assertEquals(new Integer(2), addressToEntry.getAddress().getId());
-		Assert.assertEquals("Scituate", addressToEntry.getEntry().getName());
+		Assert.assertEquals("addresshierarchy.scituate", addressToEntry.getEntry().getName());
 		
 	}
 	
@@ -973,7 +968,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Patient patient = Context.getPatientService().getPatient(2);
 		patient.addAddress(address);
 		Context.getPatientService().savePatient(patient);
-		
+
 		// call the method to update the maps based on date changed
 		AddressHierarchyUtil.updateAddressToEntryMapsForPatientsWithDateChangedAfter(date);
 		

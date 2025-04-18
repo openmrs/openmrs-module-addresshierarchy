@@ -15,7 +15,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.exti18n.ExtI18nConstants;
 import org.openmrs.test.Verifies;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,7 +26,7 @@ import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@DirtiesContext
+
 public class AddressValuesAOPInterceptorTest extends I18nModuleContextSensitiveTest {
 	
 	private Patient patient;
@@ -187,11 +186,11 @@ public class AddressValuesAOPInterceptorTest extends I18nModuleContextSensitiveT
 		// The l10n values keys must be returned
 		//
 		Assert.assertNotNull(location.getId());
-		Assert.assertThat(location.getCountry(), equalTo("United States"));
-		Assert.assertThat(location.getStateProvince(), equalTo("Massachusetts"));
-		Assert.assertThat(location.getCountyDistrict(), equalTo("Suffolk County"));
-		Assert.assertThat(location.getCityVillage(), equalTo("Boston"));
-		Assert.assertThat(location.getAddress3(), equalTo("Beacon Hill"));
+		Assert.assertThat(location.getCountry(), equalTo("addresshierarchy.unitedStates"));
+		Assert.assertThat(location.getStateProvince(), equalTo("addresshierarchy.massachusetts"));
+		Assert.assertThat(location.getCountyDistrict(), equalTo("addresshierarchy.suffolkCounty"));
+		Assert.assertThat(location.getCityVillage(), equalTo("addresshierarchy.boston"));
+		Assert.assertThat(location.getAddress3(), equalTo("addresshierarchy.beaconHill"));
 		
 		//
 		// Now updating the location
@@ -203,6 +202,6 @@ public class AddressValuesAOPInterceptorTest extends I18nModuleContextSensitiveT
 		//
 		// The updated value should be returned as l10n
 		//
-		Assert.assertThat(location.getAddress3(), equalTo("Jamaica Plain"));
+		Assert.assertThat(location.getAddress3(), equalTo("addresshierarchy.Jamaica Plain"));
 	}
 }

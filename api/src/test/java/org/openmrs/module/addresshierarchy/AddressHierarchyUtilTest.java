@@ -12,9 +12,8 @@ import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
-import org.springframework.test.annotation.DirtiesContext;
 
-@DirtiesContext
+
 public class AddressHierarchyUtilTest extends BaseModuleContextSensitiveTest {
 
 	protected final Log log = LogFactory.getLog(getClass());
