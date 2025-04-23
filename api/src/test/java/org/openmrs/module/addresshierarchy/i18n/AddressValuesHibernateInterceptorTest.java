@@ -15,20 +15,22 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.exti18n.ExtI18nConstants;
 import org.openmrs.module.exti18n.api.TestWithAOP;
+import org.openmrs.test.SkipBaseSetup;
 import org.openmrs.test.Verifies;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
 @DirtiesContext
+@SkipBaseSetup
 public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSensitiveTest {
 	
 	private Patient patient;
@@ -53,11 +55,11 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		patientIdentifier.setLocation(new Location(1));
 		patientIdentifier.setPreferred(true);
 		
-		Set<PatientIdentifier> patientIdentifiers = new LinkedHashSet<PatientIdentifier>();
+		Set<PatientIdentifier> patientIdentifiers = new TreeSet<>();
 		patientIdentifiers.add(patientIdentifier);
 		patient.setIdentifiers(patientIdentifiers);
 	}
-	
+
 	@Test
 	@Verifies(value = "should save the i18n address coming from an address in a specific locale", method = "onSave(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types)")
 	public void onSaveAndOnFlushDirty_shouldSaveI18nPersonAddress() {

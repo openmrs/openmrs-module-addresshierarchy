@@ -38,7 +38,7 @@ abstract public class I18nModuleContextSensitiveTest extends AOPModuleContextSen
 	 */
 	public I18nModuleContextSensitiveTest() {
 		super();
-        ModuleFactory.getStartedModulesMap().put("exti18n", new Module("", "exti18n", "", "", "", "1.0.0") );
+        ModuleFactory.getStartedModulesMap().put("exti18n", new Module("", "exti18n", "", "", "", "1.0.0", "") );
 	}
 	
 	@Override
@@ -51,7 +51,12 @@ abstract public class I18nModuleContextSensitiveTest extends AOPModuleContextSen
 	
 	@Before
 	public void setupI18n() throws Exception {
-		
+		initializeInMemoryDatabase();
+		authenticate();
+		executeDataSet(INITIAL_XML_DATASET_PACKAGE_PATH);
+		executeDataSet(EXAMPLE_XML_DATASET_PACKAGE_PATH);
+		executeDataSet(XML_DATASET_PACKAGE_PATH);
+
 		// Loading message properties files
 		getTestsMessageSource().addMessageProperties("org/openmrs/module/addresshierarchy/include/addresshierarchy.properties");
 		getTestsMessageSource().addMessageProperties("org/openmrs/module/addresshierarchy/include/addresshierarchy_fr.properties");
@@ -59,10 +64,6 @@ abstract public class I18nModuleContextSensitiveTest extends AOPModuleContextSen
 		
 		Context.getAdministrationService().saveGlobalProperty(
 		    new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "true"));
-		
-		initializeInMemoryDatabase();
-		authenticate();
-		executeDataSet(XML_DATASET_PACKAGE_PATH);
 
 		ahService = Context.getService(AddressHierarchyService.class);
 		ahService.initI18nCache();
@@ -71,7 +72,7 @@ abstract public class I18nModuleContextSensitiveTest extends AOPModuleContextSen
 	@After
 	public void tearDownI18n() {
 		Context.getAdministrationService().saveGlobalProperty(
-		    new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "false"));
+				new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "false"));
 		ahService.resetI18nCache();
 		ModuleFactory.getStartedModulesMap().clear();
 	}

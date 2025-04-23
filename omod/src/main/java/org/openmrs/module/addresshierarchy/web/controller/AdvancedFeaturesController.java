@@ -83,31 +83,9 @@ public class AdvancedFeaturesController {
 			lastStartTimeGlobalProp.setPropertyValue(null);
 			Context.getAdministrationService().saveGlobalProperty(lastStartTimeGlobalProp);
 		}
-		
-		// save the task
-		if (updaterTask != null) {
-			try {
-				Context.getSchedulerService().saveTask(updaterTask);
-			}
-			catch (NoSuchMethodError ex) {
-				//platform 2.0 renamed saveTask to saveTaskDefinition
-				try {
-					Method method = Context.getSchedulerService().getClass().getMethod("saveTaskDefinition", new Class[] { TaskDefinition.class });
-					method.invoke(Context.getSchedulerService(), updaterTask);
-				}
-				catch (NoSuchMethodException e) {
-					//this should not happen
-				}
-				catch (IllegalAccessException e) {
-					//this should not happen
-				}
-				catch (InvocationTargetException e) {
-					//this should not happen
-				}
-			}
-		}
-		
-		// redirect back to the same page
+
+		Context.getSchedulerService().saveTaskDefinition(updaterTask);
+        // redirect back to the same page
 		return new ModelAndView("redirect:/module/addresshierarchy/admin/advancedFeatures.form");
 	 }
 }

@@ -135,7 +135,7 @@ public class AddressHierarchyUtil {
 	    	patients = Context.getPatientService().getAllPatients();
 	    }
 	    	    
-	    if (patients != null && patients.size() > 0) {
+	    if (patients != null && !patients.isEmpty()) {
 	    	for (Patient patient : patients) {
 	    		ahService.updateAddressToEntryMapsForPerson(patient);
 	    	}

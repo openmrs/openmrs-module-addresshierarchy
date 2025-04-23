@@ -8,12 +8,14 @@ import org.junit.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.SkipBaseSetup;
 import org.openmrs.test.Verifies;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
 @DirtiesContext
+@SkipBaseSetup
 public class AddressHierarchyMigrationTest extends BaseModuleContextSensitiveTest {
 	
 	protected final Log log = LogFactory.getLog(getClass());

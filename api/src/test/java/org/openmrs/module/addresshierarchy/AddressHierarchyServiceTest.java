@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -249,13 +250,13 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	public void getAddressHierarchyEntryCountByLevel_shouldGetCountOfAddressHierarchyEntries() throws Exception {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
-		Assert.assertEquals(new Integer(3), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(1)));
-		Assert.assertEquals(new Integer(4), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(2)));
-		Assert.assertEquals(new Integer(2), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(3)));
-		Assert.assertEquals(new Integer(3), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(4)));
-		Assert.assertEquals(new Integer(8), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(5)));
-		Assert.assertEquals(new Integer(0), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(6)));
-		Assert.assertEquals(new Integer(2), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(7)));
+		Assert.assertEquals(Integer.valueOf(3), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(1)));
+		Assert.assertEquals(Integer.valueOf(4), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(2)));
+		Assert.assertEquals(Integer.valueOf(2), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(3)));
+		Assert.assertEquals(Integer.valueOf(3), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(4)));
+		Assert.assertEquals(Integer.valueOf(8), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(5)));
+		Assert.assertEquals(Integer.valueOf(0), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(6)));
+		Assert.assertEquals(Integer.valueOf(2), ahService.getAddressHierarchyEntryCountByLevel(ahService.getAddressHierarchyLevel(7)));
 	}
 	
 	@Test
@@ -474,7 +475,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		address.setStateProvince("Massachusetts");
 		address.setCountyDistrict("Suffolk County");
 		address.setCityVillage("Boston");
-		results = ahService.getPossibleAddressValues(address, "neighborhoodCell");
+		results = ahService.getPossibleAddressValues(address, "address3");
 		Assert.assertEquals(2, results.size());
 		Assert.assertTrue(results.contains("Jamaica Plain"));
 		Assert.assertTrue(results.contains("Beacon Hill"));
@@ -514,7 +515,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
         // try another tricky one
 		address = new PersonAddress();
 		address.setCountry("United States");
-		results = ahService.getPossibleAddressValues(address, "neighborhoodCell");
+		results = ahService.getPossibleAddressValues(address, "address3");
 		Assert.assertEquals(2, results.size());
 		Assert.assertTrue(results.contains("Jamaica Plain"));
 		Assert.assertTrue(results.contains("Beacon Hill"));
@@ -962,7 +963,7 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		
 		// try the same address as previously, but now try to trigger it via the updateAddressToEntryMapsForPatientsWithDateChangedAfter()
-		Date date = new Date(); // get a timestamp BEFORE we update the patient
+		Date date = Date.from(Instant.now().minusSeconds(1)); // get a timestamp BEFORE we update the patient
 		
 		PersonAddress address = new PersonAddress();
 		address.setStateProvince("massachusetts");

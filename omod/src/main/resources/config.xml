@@ -19,7 +19,7 @@
 
 	<!-- /Base Module Properties -->
 
-	<require_version>${openMRSRuntimeVersion}</require_version>
+	<require_version>${openMRSVersion}</require_version>
 
 	<aware_of_modules>
 		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>

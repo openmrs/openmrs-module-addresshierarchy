@@ -7,6 +7,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyImportUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.SkipBaseSetup;
 import org.openmrs.test.Verifies;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @DirtiesContext
+@SkipBaseSetup
 public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTest {
 	
 	protected static final String CSV_FILE_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleFile.csv";
@@ -38,7 +40,7 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		AddressHierarchyImportUtil.importAddressHierarchyFile(file, "\\|");
 
         // make sure the right number of entries have been imported (particularly to double-check that no blank entries have been created)
-        Assert.assertEquals(new Integer(39), ahService.getAddressHierarchyEntryCount());
+        Assert.assertEquals(Integer.valueOf(39), ahService.getAddressHierarchyEntryCount());
 
 		// verify that a few data points exist	
 		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
@@ -94,7 +96,7 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		AddressHierarchyImportUtil.importAddressHierarchyFile(file, ",");
 		
 		// confirm that all 17902 entries have been added
-		Assert.assertEquals(new Integer(17902), ahService.getAddressHierarchyEntryCount());
+		Assert.assertEquals(Integer.valueOf(17902), ahService.getAddressHierarchyEntryCount());
 		
 		// verify that a few data points exist	
 		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
