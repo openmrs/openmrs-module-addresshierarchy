@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>addresshierarchy</artifactId>
-	<version>2.22.0-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Address Hierarchy</name>
 	<description>Parent project for Address Hierarchy</description>
@@ -79,11 +79,11 @@
 	</dependencyManagement>
 
 	<properties>
-		<openMRSVersion>1.10.6</openMRSVersion>
-		<openMRSMinorVersion>1.9</openMRSMinorVersion>
-		<openMRSRuntimeVersion>1.9.12</openMRSRuntimeVersion>
+		<openMRSVersion>2.7.0</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<exti18nVersion>1.0.0</exti18nVersion>
+		<exti18nVersion>1.1.0-SNAPSHOT</exti18nVersion>
+		<legacyUiVersion>1.22.0</legacyUiVersion>
+		<javaxServeletVersion>4.0.1</javaxServeletVersion>
 	</properties>
 
 	<build>
@@ -142,52 +142,5 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-	
-	<!-- different profiles for building/testing against different version of openmrs -->
-	<profiles>
-		<profile>
-			<id>openmrs-1.9</id>
-			
-			<properties>
-				<openMRSVersion>1.9.1</openMRSVersion>
-				<openMRSMinorVersion>1.9</openMRSMinorVersion>
-				<logicVersion>0.5</logicVersion>
-			</properties>
-			
-			<dependencyManagement>
-				<dependencies>
-					<dependency>
-						<groupId>org.openmrs.api</groupId>
-						<artifactId>openmrs-api</artifactId>
-						<version>${openMRSVersion}</version>
-						<type>test-jar</type>
-						<scope>test</scope>
-					</dependency>
-					<dependency>
-						<groupId>org.openmrs.web</groupId>
-						<artifactId>openmrs-web</artifactId>
-						<version>${openMRSVersion}</version>
-						<type>test-jar</type>
-						<scope>test</scope>
-					</dependency>
-					<dependency>
-						<groupId>org.openmrs.test</groupId>
-						<artifactId>openmrs-test</artifactId>
-						<version>${openMRSVersion}</version>
-						<type>pom</type>
-						<scope>test</scope>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
-		</profile>
-		<profile>
-			<id>openmrs-1.10</id>
-			
-			<properties>
-				<openMRSVersion>1.10.6</openMRSVersion>
-				<openMRSMinorVersion>1.10</openMRSMinorVersion>
-			</properties>
-		</profile>
-	</profiles>
 
 </project>

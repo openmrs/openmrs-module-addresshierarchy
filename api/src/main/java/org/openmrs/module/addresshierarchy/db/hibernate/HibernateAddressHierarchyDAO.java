@@ -509,7 +509,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		}
 		catch (NoSuchMethodError ex) {
 			try {
-				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
+				Method method = sessionFactory.getClass().getMethod("getCurrentSession", (Class<?>) null);
 				return (org.hibernate.Session)method.invoke(sessionFactory, null);
 			}
 			catch (Exception e) {

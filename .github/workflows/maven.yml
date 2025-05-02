@@ -1,4 +1,3 @@
-# this build is designed to replicate the Travis CI workflow
 name: Java CI with Maven
 
 on:
@@ -8,32 +7,22 @@ on:
     branches: [ "master" ]
 
 jobs:
-  java-8:
-
+  build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java: [8, 11, 21]
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 8
+
+      - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v3
         with:
-          java-version: '8'
+          java-version: ${{ matrix.java }}
           distribution: 'adopt'
           cache: maven
-      - name: Build with Maven
-        run: mvn clean install --file pom.xml
 
-  java-11:
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'adopt'
-          cache: maven
       - name: Build with Maven
         run: mvn clean install --file pom.xml

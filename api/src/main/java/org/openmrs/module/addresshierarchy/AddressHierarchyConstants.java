@@ -18,7 +18,7 @@ public class AddressHierarchyConstants {
 	/* Name of the task that updates the address toe entry map */
 	public static final String TASK_NAME_ADDRESS_TO_ENTRY_MAP_UPDATER = "Address To Entry Map Updater";
 	public static final String TASK_CLASS_ADDRESS_TO_ENTRY_MAP_UPDATER = "org.openmrs.module.addresshierarchy.scheduler.AddressToEntryMapsUpdaterTask";
-	public static final Long TASK_PARAMETER_ADDRESS_ENTRY_MAP_DEFAULT_REPEAT_INTERVAL = new Long(86400);   // default repeat interval is once every 24 hours (24 hours = 86400 seconds)
+	public static final Long TASK_PARAMETER_ADDRESS_ENTRY_MAP_DEFAULT_REPEAT_INTERVAL = 86400L;   // default repeat interval is once every 24 hours (24 hours = 86400 seconds)
 	
 	/* Precompile some standard Patterns that we are using */
 	public static final Pattern PATTERN_NON_WORD_AND_NON_WHITESPACE = Pattern.compile("[\\/\\\\\"'`~@#$%^&*()+{}\\[\\]<>,.!?-]+");   // matches sets of 1 or more of the characters: /\"'`~@#$%^&*()+{}[]<>,.!?-

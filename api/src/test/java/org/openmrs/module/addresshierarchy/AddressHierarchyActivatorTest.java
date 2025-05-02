@@ -42,11 +42,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
   
   private void setAppDataDirPath(String strPath) {
     String path = getClass().getClassLoader().getResource(strPath).getPath() + File.separator;
-
-    OpenmrsConstants.APPLICATION_DATA_DIRECTORY = path; // The 1.9 way
-    Properties prop = new Properties();
-    prop.setProperty(OpenmrsConstants.APPLICATION_DATA_DIRECTORY_RUNTIME_PROPERTY, path); // The 1.10+ way
-    Context.setRuntimeProperties(prop);
+    System.setProperty(OpenmrsConstants.KEY_OPENMRS_APPLICATION_DATA_DIRECTORY, path);
   }
 
   @Test

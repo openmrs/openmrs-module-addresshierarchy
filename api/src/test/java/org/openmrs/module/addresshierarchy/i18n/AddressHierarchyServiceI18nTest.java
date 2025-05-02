@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,10 +24,12 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.AddressToEntryMap;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
+import org.openmrs.test.SkipBaseSetup;
 import org.openmrs.test.Verifies;
 import org.springframework.test.annotation.DirtiesContext;
 
 @DirtiesContext
+@SkipBaseSetup
 public class AddressHierarchyServiceI18nTest extends I18nModuleContextSensitiveTest {
 
 	protected final Log log = LogFactory.getLog(getClass());
@@ -641,7 +644,7 @@ public class AddressHierarchyServiceI18nTest extends I18nModuleContextSensitiveT
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 
 		// try the same address as previously, but now try to trigger it via the updateAddressToEntryMapsForPatientsWithDateChangedAfter()
-		Date date = new Date(); // get a timestamp BEFORE we update the patient
+		Date date = Date.from(Instant.now().minusSeconds(1));// get a timestamp BEFORE we update the patient
 
 		PersonAddress address = new PersonAddress();
 		address.setStateProvince("massachusetts");
@@ -660,7 +663,7 @@ public class AddressHierarchyServiceI18nTest extends I18nModuleContextSensitiveT
 		List<AddressToEntryMap> addressToEntryList = ahService.getAddressToEntryMapsByPersonAddress(address);
 		Assert.assertEquals(3, addressToEntryList.size());
 
-		Set<AddressHierarchyEntry> entries = new HashSet<AddressHierarchyEntry>();
+		Set<AddressHierarchyEntry> entries = new HashSet<>();
 
 		for (AddressToEntryMap addressToEntry : addressToEntryList) {
 			address = ahService.getI18nPersonAddress(address);

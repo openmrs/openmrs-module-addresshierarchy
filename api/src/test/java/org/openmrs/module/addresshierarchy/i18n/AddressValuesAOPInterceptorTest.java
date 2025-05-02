@@ -20,10 +20,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -47,7 +47,7 @@ public class AddressValuesAOPInterceptorTest extends I18nModuleContextSensitiveT
 		patientIdentifier.setLocation(new Location(1));
 		patientIdentifier.setPreferred(true);
 		
-		Set<PatientIdentifier> patientIdentifiers = new LinkedHashSet<PatientIdentifier>();
+		Set<PatientIdentifier> patientIdentifiers = new TreeSet<>();
 		patientIdentifiers.add(patientIdentifier);
 		patient.setIdentifiers(patientIdentifiers);
 	}

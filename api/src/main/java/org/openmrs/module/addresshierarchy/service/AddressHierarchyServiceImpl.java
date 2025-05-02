@@ -585,8 +585,8 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 
 		if (level != null) {
 			// add the top level to this list
-			if ((includeUnmapped == true || level.getAddressField() != null) 
-					&& (includeEmptyLevels == true ||  getAddressHierarchyEntryCountByLevel(level) > 0)) {
+			if ((includeUnmapped || level.getAddressField() != null)
+					&& (includeEmptyLevels ||  getAddressHierarchyEntryCountByLevel(level) > 0)) {
 				levels.add(level);
 			}
 
