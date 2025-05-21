@@ -483,9 +483,21 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
     @Override
     public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeName(AddressHierarchyLevel level, String name, int limit) {
         Session session = getCurrentSession();
-        Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
-        criteria.createCriteria("level").add(Restrictions.eq("levelId", level.getId()));
-        criteria.add(Restrictions.ilike("name", name, MatchMode.START));
+        Criteria criteria = session.createCriteria(AddressHierarchyEntry.class, "entry"); // Give the root criteria an alias
+        Criterion nameMatch = Restrictions.ilike("entry.name", name, MatchMode.ANYWHERE);
+        criteria.createCriteria("level").add(Restrictions.eq("levelId", level.getLevelId()));
+        Criteria currentCriteria = criteria;
+        String parentAlias = "parent0";
+        AddressHierarchyLevel currentLevel = level.getParent();
+        int i = 0;
+        while (currentLevel != null) {
+            currentCriteria = currentCriteria.createCriteria("parent", parentAlias);
+            nameMatch = Restrictions.or(nameMatch, Restrictions.ilike(parentAlias + ".name", name, MatchMode.ANYWHERE));
+            currentLevel = currentLevel.getParent();
+            i++;
+            parentAlias = "parent" + i;
+        }
+        criteria.add(nameMatch);
         criteria.setMaxResults(limit);
         return criteria.list();
     }
