@@ -1142,11 +1142,11 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		AddressHierarchyLevel level = ahService.getAddressHierarchyLevel(5);
 
-		List<AddressHierarchyEntry> result = ahService.getAddressHierarchyEntriesByLevelAndLikeName(level, "mouth", 10);
+		List<AddressHierarchyEntry> result = ahService.getAddressHierarchyEntriesByLevelAndLikeName(level, "oston", 10);
 
 		assertThat(result.size(), is(equalTo(1)));
 		AddressHierarchyEntry plymouth = result.get(0);
-		assertThat(plymouth.getName(), is(equalTo("Plymouth")));
+		assertThat(plymouth.getName(), is(equalTo("Boston")));
 	}
 	
 	@Test
