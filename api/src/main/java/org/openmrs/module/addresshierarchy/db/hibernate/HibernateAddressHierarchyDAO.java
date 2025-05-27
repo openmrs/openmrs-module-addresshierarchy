@@ -491,7 +491,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
         AddressHierarchyLevel currentLevel = level.getParent();
         int i = 0;
         while (currentLevel != null) {
-            currentCriteria = currentCriteria.createCriteria("parent", parentAlias);
+            currentCriteria = currentCriteria.createCriteria("parent", parentAlias, Criteria.LEFT_JOIN);
             nameMatch = Restrictions.or(nameMatch, Restrictions.ilike(parentAlias + ".name", name, MatchMode.ANYWHERE));
             currentLevel = currentLevel.getParent();
             i++;

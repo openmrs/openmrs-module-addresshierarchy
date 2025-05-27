@@ -757,11 +757,11 @@ public class AddressHierarchyServiceI18nTest extends I18nModuleContextSensitiveT
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 		AddressHierarchyLevel level = ahService.getAddressHierarchyLevel(5);
 
-		List<AddressHierarchyEntry> result = ahService.getAddressHierarchyEntriesByLevelAndLikeName(level, "mouth", 10);
+		List<AddressHierarchyEntry> result = ahService.getAddressHierarchyEntriesByLevelAndLikeName(level, "oston", 10);
 
 		assertThat(result.size(), is(equalTo(1)));
 		AddressHierarchyEntry plymouth = result.get(0);
-		assertThat(plymouth.getLocalizedName(), is(equalTo("Plymouth")));
+		assertThat(plymouth.getLocalizedName(), is(equalTo("Boston")));
 	}
 
 	@Test
