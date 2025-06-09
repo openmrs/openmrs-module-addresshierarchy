@@ -9,9 +9,11 @@ stages:
     manual: false
     final: false
     jobs:
+    - Build and Test JDK 17
     - Build and Test JDK 21
     - Build and Test JDK 24
     - Build and Test JDK 11
+    - Build and Test JDK 8
 - Deploy:
     manual: false
     final: false
@@ -22,6 +24,41 @@ stages:
     final: false
     jobs:
     - Release to maven
+Build and Test JDK 17:
+  key: BTJ17
+  tasks:
+  - script:
+      interpreter: SHELL
+      scripts:
+      - |-
+        #!/bin/bash -eu
+
+        set -x
+
+        export IMAGE=${bamboo.build.docker.image.id}
+
+        docker pull ${IMAGE}
+
+        docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" ${IMAGE} bash -c 'chmod -R 777 .'
+      description: Resolve file permissions
+  - checkout:
+      force-clean-build: 'true'
+      description: Checkout default repository
+  - script:
+      interpreter: SHELL
+      scripts:
+      - |-
+        #!/bin/bash -eu
+
+        set -x
+
+        export IMAGE="maven:3.9.9-amazoncorretto-17"
+
+        docker pull ${IMAGE}
+
+        docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" ${IMAGE} bash -c 'mvn clean package && chmod -R 777 .'
+      description: Build and test
+  artifact-subscriptions: []
 Build and Test JDK 21:
   key: JOB1
   tasks:
@@ -121,6 +158,41 @@ Build and Test JDK 11:
         set -x
 
         export IMAGE="maven:3.9.9-eclipse-temurin-11"
+
+        docker pull ${IMAGE}
+
+        docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" ${IMAGE} bash -c 'mvn clean package && chmod -R 777 .'
+      description: Build and test
+  artifact-subscriptions: []
+Build and Test JDK 8:
+  key: BTJ8
+  tasks:
+  - script:
+      interpreter: SHELL
+      scripts:
+      - |-
+        #!/bin/bash -eu
+
+        set -x
+
+        export IMAGE=${bamboo.build.docker.image.id}
+
+        docker pull ${IMAGE}
+
+        docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" ${IMAGE} bash -c 'chmod -R 777 .'
+      description: Resolve file permissions
+  - checkout:
+      force-clean-build: 'true'
+      description: Checkout default repository
+  - script:
+      interpreter: SHELL
+      scripts:
+      - |-
+        #!/bin/bash -eu
+
+        set -x
+
+        export IMAGE="maven:3.9.9-amazoncorretto-8"
 
         docker pull ${IMAGE}
 
