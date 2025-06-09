@@ -49,7 +49,7 @@ Build and Test JDK 21:
 
         set -x
 
-        export IMAGE="maven:3.9.9-amazoncorretto-21"
+        export IMAGE="maven:3.9.9-eclipse-temurin-21"
 
         docker pull ${IMAGE}
 
@@ -84,7 +84,7 @@ Build and Test JDK 11:
 
         set -x
 
-        export IMAGE="maven:3.9.9-amazoncorretto-11"
+        export IMAGE="maven:3.9.9-eclipse-temurin-11"
 
         docker pull ${IMAGE}
 

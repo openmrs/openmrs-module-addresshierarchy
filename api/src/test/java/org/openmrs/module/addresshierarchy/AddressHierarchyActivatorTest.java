@@ -11,7 +11,6 @@ import org.openmrs.module.addresshierarchy.config.ConfigDirUtil;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
-import org.openmrs.test.SkipBaseSetup;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -23,7 +22,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-@SkipBaseSetup
 @DirtiesContext
 public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTest {
 
@@ -33,12 +31,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
   private AddressHierarchyActivator activator;
 
   @Before
-  public void setup()  throws Exception {
-
-    initializeInMemoryDatabase();
-    executeDataSet(INITIAL_XML_DATASET_PACKAGE_PATH);
-    executeDataSet(EXAMPLE_XML_DATASET_PACKAGE_PATH);
-    authenticate();
+  public void setup() {
 
     Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP, "true"));
 
