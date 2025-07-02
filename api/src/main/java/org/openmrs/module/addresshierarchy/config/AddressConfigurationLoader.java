@@ -1,7 +1,5 @@
 package org.openmrs.module.addresshierarchy.config;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -13,6 +11,7 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyImportUtil;
+import org.openmrs.serialization.JacksonSerializer;
 import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.util.OpenmrsUtil;
 
@@ -20,7 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -151,8 +149,8 @@ public class AddressConfigurationLoader {
 	public static void installAddressTemplate(Object addressTemplate) {
 		try {
 			log.info("Installing address template");
-			String xml = Context.getSerializationService().getDefaultSerializer().serialize(addressTemplate);
-			setGlobalProperty(OpenmrsConstants.GLOBAL_PROPERTY_ADDRESS_TEMPLATE, xml);
+			String json = getSerializer().serialize(addressTemplate);
+			setGlobalProperty(OpenmrsConstants.GLOBAL_PROPERTY_ADDRESS_TEMPLATE, json);
 		}
 		catch (Exception e) {
 			throw new IllegalArgumentException("Unable to serialize and save address template", e);
@@ -245,7 +243,7 @@ public class AddressConfigurationLoader {
 	 */
 	public static AddressConfiguration readFromString(String configuration) {
 		try {
-			return (AddressConfiguration) getSerializer().fromXML(configuration);
+			return (AddressConfiguration) getSerializer().deserialize(configuration, AddressConfiguration.class);
 		}
 		catch (Exception e) {
 			throw new IllegalArgumentException("Unable to load address configuration from configuration file.  Please check the format of this file", e);
@@ -256,28 +254,15 @@ public class AddressConfigurationLoader {
 	 * Writes a serialized String representing the address configuration from an AddressConfiguration object
 	 */
 	public static String writeToString(AddressConfiguration configuration) {
-		return getSerializer().toXML(configuration);
+		return getSerializer().serialize(configuration);
 	}
 
 	/**
 	 * @return the serializer instance used to load configuration from file
 	 */
-	public static XStream getSerializer() {
-		XStream xs = new XStream(new DomDriver());
-		try {
-			Method allowTypeHierarchy = XStream.class.getMethod("allowTypeHierarchy", Class.class);
-			allowTypeHierarchy.invoke(xs, AddressConfiguration.class);
-			allowTypeHierarchy.invoke(xs, AddressComponent.class);
-			allowTypeHierarchy.invoke(xs, AddressHierarchyFile.class);
-			log.debug("Successfully configured address configuration serializer with allowed types");
-		}
-		catch (Exception e) {
-			log.debug("Error configuring address configuration serializer with allowed types", e);
-		}
-		xs.alias("addressConfiguration", AddressConfiguration.class);
-		xs.alias("addressComponent", AddressComponent.class);
-		xs.alias("addressHierarchyFile", AddressHierarchyFile.class);
-		return xs;
+	public static JacksonSerializer getSerializer() {
+		JacksonSerializer serializer = Context.getRegisteredComponent("jacksonSerializer", JacksonSerializer.class);
+		return serializer;
 	}
 
 	/**

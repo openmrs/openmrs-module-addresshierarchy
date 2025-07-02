@@ -79,7 +79,7 @@
 	</dependencyManagement>
 
 	<properties>
-		<openMRSVersion>2.7.0</openMRSVersion>
+		<openMRSVersion>2.8.0-SNAPSHOT</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<exti18nVersion>1.1.0-SNAPSHOT</exti18nVersion>
 		<legacyUiVersion>1.22.0</legacyUiVersion>
