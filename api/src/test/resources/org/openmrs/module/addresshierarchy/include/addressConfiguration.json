@@ -12,35 +12,31 @@
          "field":"STATE_PROVINCE",
          "nameMapping":"Province/Area",
          "sizeMapping":40,
-         "elementDefault":null,
          "requiredInHierarchy":true
       },
       {
          "field":"COUNTY_DISTRICT",
          "nameMapping":"District",
          "sizeMapping":40,
-         "elementDefault":null,
          "requiredInHierarchy":false
       },
       {
          "field":"CITY_VILLAGE",
          "nameMapping":"Chiefdom",
          "sizeMapping":40,
-         "elementDefault":null,
          "requiredInHierarchy":false
       },
       {
          "field":"ADDRESS_1",
          "nameMapping":"Address",
          "sizeMapping":80,
-         "elementDefault":null,
          "requiredInHierarchy":false
       }
    ],
    "lineByLineFormat":[
       "address1",
       "cityVillage",
-      "countyDistrict, stateProvince",
+      "countyDistrict,stateProvince",
       "country"
    ],
    "addressHierarchyFile":{
