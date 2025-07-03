@@ -1,10 +1,9 @@
 package org.openmrs.module.addresshierarchy.config;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.nio.file.Files;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -28,14 +27,11 @@ public class AddressConfigurationLoaderTest extends BaseContextSensitiveTest {
     private AdministrationService adminService;
 
 	@BeforeEach
-	public void setup() throws IOException {
+	public void setup() throws IOException, Exception {
 		System.setProperty("user.home", Files.createTempDirectory(null).toString()); // see OpenmrsUtil.getApplicationDataDirectory()
 		adminService.saveGlobalProperty(
             new GlobalProperty("addressHierarchy.configuration.serializer.whitelist.types",
                 "org.openmrs.module.addresshierarchy.**"));
-		adminService.saveGlobalProperty(
-            new GlobalProperty("layout.address.format",
-                "<org.openmrs.layout.address.AddressTemplate>     <nameMappings class=\"properties\">       <property name=\"postalCode\" value=\"Location.postalCode\"/>       <property name=\"address2\" value=\"Location.address2\"/>       <property name=\"address1\" value=\"Location.address1\"/>       <property name=\"country\" value=\"Location.country\"/>       <property name=\"stateProvince\" value=\"Location.stateProvince\"/>       <property name=\"cityVillage\" value=\"Location.cityVillage\"/>     </nameMappings>     <sizeMappings class=\"properties\">       <property name=\"postalCode\" value=\"10\"/>       <property name=\"address2\" value=\"40\"/>       <property name=\"address1\" value=\"40\"/>       <property name=\"country\" value=\"10\"/>       <property name=\"stateProvince\" value=\"10\"/>       <property name=\"cityVillage\" value=\"10\"/>     </sizeMappings>     <lineByLineFormat>       <string>address1</string>       <string>address2</string>       <string>cityVillage stateProvince country postalCode</string>     </lineByLineFormat>    <requiredElements> </requiredElements> </org.openmrs.layout.address.AddressTemplate>"));
 	}
 
 	@Test

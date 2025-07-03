@@ -1,0 +1,46 @@
+{
+  "addressComponents": [
+    {
+      "field": "COUNTRY",
+      "nameMapping": "Country",
+      "sizeMapping": "40",
+      "elementDefault": "United States",
+      "requiredInHierarchy": true
+    },
+    {
+      "field": "STATE_PROVINCE",
+      "nameMapping": "State",
+      "sizeMapping": "40",
+      "requiredInHierarchy": true
+    },
+    {
+      "field": "COUNTY_DISTRICT",
+      "nameMapping": "County",
+      "sizeMapping": "40",
+      "requiredInHierarchy": true
+    },
+    {
+      "field": "CITY_VILLAGE",
+      "nameMapping": "Citi",
+      "sizeMapping": "40",
+      "requiredInHierarchy": true
+    },
+    {
+      "field": "NEIGHBORHOOD_CELL",
+      "nameMapping": "Neighborhood",
+      "sizeMapping": "80",
+      "requiredInHierarchy": false
+    }
+  ],
+  "lineByLineFormat": [
+    "neighborhoodCell",
+    "cityVillage",
+    "countyDistrict, stateProvince",
+    "country"
+  ],
+  "addressHierarchyFile": {
+    "filename": "address-hierarchy-entries.csv",
+    "entryDelimiter": ",",
+    "identifierDelimiter": "^"
+  }
+}

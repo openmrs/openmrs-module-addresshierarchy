@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class AddressConfigurationLoader {
 
-	protected static final String ADDR_CONFIG_FILE_NAME = "addressConfiguration.xml";
+	protected static final String ADDR_CONFIG_FILE_NAME = "addressConfiguration.json";
 
 	public static final String NOT_COMPUTABLE_CHECKSUM = "not_computable_checksum";
 	public static final String NOT_READABLE_CHECKSUM = "not_readadble_checksum";
