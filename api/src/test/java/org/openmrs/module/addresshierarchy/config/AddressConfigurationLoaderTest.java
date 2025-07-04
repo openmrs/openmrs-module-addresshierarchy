@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.addresshierarchy.AddressField;
-import org.openmrs.test.jupiter.BaseContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.util.OpenmrsClassLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class AddressConfigurationLoaderTest extends BaseContextSensitiveTest {
+public class AddressConfigurationLoaderTest extends BaseModuleContextSensitiveTest {
 
 	protected final Log log = LogFactory.getLog(getClass());
 

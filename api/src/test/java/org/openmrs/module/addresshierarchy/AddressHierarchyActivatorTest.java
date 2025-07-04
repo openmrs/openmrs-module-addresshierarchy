@@ -11,7 +11,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
 import org.openmrs.module.addresshierarchy.config.ConfigDirUtil;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
-import org.openmrs.test.jupiter.BaseContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AddressHierarchyActivatorTest extends BaseContextSensitiveTest {
+public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTest {
 
   private static String APP_DATA_TEST_DIRECTORY = "testAppDataDir";
 
