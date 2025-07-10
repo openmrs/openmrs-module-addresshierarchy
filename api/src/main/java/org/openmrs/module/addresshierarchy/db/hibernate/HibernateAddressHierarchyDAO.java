@@ -485,7 +485,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
         Session session = getCurrentSession();
         Criteria criteria = session.createCriteria(AddressHierarchyEntry.class);
         criteria.createCriteria("level").add(Restrictions.eq("levelId", level.getId()));
-        criteria.add(Restrictions.ilike("name", name, MatchMode.START));
+        criteria.add(Restrictions.ilike("name", name, MatchMode.ANYWHERE));
         criteria.setMaxResults(limit);
         return criteria.list();
     }
