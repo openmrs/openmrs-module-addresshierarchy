@@ -3,9 +3,9 @@ package org.openmrs.module.addresshierarchy.web.controller.ajax;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 
@@ -24,7 +24,7 @@ public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensiti
     @Autowired
     private AddressHierarchyAjaxController controller;
 
-    @Before
+    @BeforeEach
     public void setupDatabase() throws Exception {
         initializeInMemoryDatabase();
         authenticate();

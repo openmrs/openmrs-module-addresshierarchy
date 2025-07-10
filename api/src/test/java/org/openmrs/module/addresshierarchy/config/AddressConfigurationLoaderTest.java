@@ -1,35 +1,45 @@
 package org.openmrs.module.addresshierarchy.config;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.nio.file.Files;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.openmrs.GlobalProperty;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.module.addresshierarchy.AddressField;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.util.OpenmrsClassLoader;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class AddressConfigurationLoaderTest {
+public class AddressConfigurationLoaderTest extends BaseModuleContextSensitiveTest {
 
 	protected final Log log = LogFactory.getLog(getClass());
 
-	public static final String CONFIG_RESOURCE = "org/openmrs/module/addresshierarchy/include/addressConfiguration.xml";
+	public static final String CONFIG_RESOURCE = "org/openmrs/module/addresshierarchy/include/addressConfiguration.json";
 
-	@Before
-	public void setup() throws IOException {
+	@Autowired
+    private AdministrationService adminService;
+
+	@BeforeEach
+	public void setup() throws IOException, Exception {
 		System.setProperty("user.home", Files.createTempDirectory(null).toString()); // see OpenmrsUtil.getApplicationDataDirectory()
+		adminService.saveGlobalProperty(
+            new GlobalProperty("addressHierarchy.configuration.serializer.whitelist.types",
+                "org.openmrs.module.addresshierarchy.**"));
 	}
 
 	@Test
 	public void should_writeToString() throws Exception {
 		AddressConfiguration config = getAddressConfiguration();
-		String actualXml = IOUtils.toString(OpenmrsClassLoader.getInstance().getResourceAsStream(CONFIG_RESOURCE), "UTF-8");
-		String expectedXml = AddressConfigurationLoader.writeToString(config);
-		Assert.assertEquals(StringUtils.deleteWhitespace(expectedXml), StringUtils.deleteWhitespace(actualXml));
+		String expectedJson = IOUtils.toString(OpenmrsClassLoader.getInstance().getResourceAsStream(CONFIG_RESOURCE), "UTF-8");
+		String actualJson = AddressConfigurationLoader.writeToString(config);
+		assertEquals(StringUtils.deleteWhitespace(expectedJson), StringUtils.deleteWhitespace(actualJson));
 	}
 
 	@Test
@@ -38,7 +48,7 @@ public class AddressConfigurationLoaderTest {
 		
 		String serialized = IOUtils.toString(OpenmrsClassLoader.getInstance().getResourceAsStream(CONFIG_RESOURCE), "UTF-8");
 		AddressConfiguration actualConfig = AddressConfigurationLoader.readFromString(serialized);
-		Assert.assertEquals(expectedConfig, actualConfig);
+		assertTrue(expectedConfig.equals(actualConfig));
 	}
 
 	protected AddressConfiguration getAddressConfiguration() {
