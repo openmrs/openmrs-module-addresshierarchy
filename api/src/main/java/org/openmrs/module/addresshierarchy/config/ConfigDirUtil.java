@@ -53,6 +53,10 @@ public class ConfigDirUtil {
 		this.checksumDirPath = Paths.get(checksumDirPath, domain).toString();
 	}
 
+	public ConfigDirUtil(String configDirPath, String domain) {
+		this.domainDirPath = Paths.get(configDirPath, domain).toString();
+	}
+
 	public String getDomainDirPath() {
 		return domainDirPath;
 	}
