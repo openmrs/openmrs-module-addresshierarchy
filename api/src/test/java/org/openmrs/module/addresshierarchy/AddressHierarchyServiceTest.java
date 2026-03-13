@@ -24,12 +24,14 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.SkipBaseSetup;
 import org.openmrs.test.Verifies;
 import org.springframework.test.annotation.DirtiesContext;
 
 import junit.framework.Assert;
 
 @DirtiesContext
+@SkipBaseSetup
 public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest {
 	
 	protected final Log log = LogFactory.getLog(getClass());
@@ -40,6 +42,8 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	public void setupDatabase() throws Exception {
 		initializeInMemoryDatabase();
 		authenticate();
+		executeDataSet(INITIAL_XML_DATASET_PACKAGE_PATH);
+		executeDataSet(EXAMPLE_XML_DATASET_PACKAGE_PATH);
 		executeDataSet(XML_DATASET_PACKAGE_PATH);
 	}
 	
