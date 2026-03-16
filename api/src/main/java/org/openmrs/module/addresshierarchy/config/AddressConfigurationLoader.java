@@ -23,9 +23,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Responsible for loading the address configuration appropriately
@@ -52,86 +50,6 @@ public class AddressConfigurationLoader {
 	public static String getChecksumsPath() {
 		return Paths.get(OpenmrsUtil.getApplicationDataDirectory(),
 				"configuration_checksums").toString();
-	}
-
-	public static Map<String, String> loadAddressConfiguration(Path configPath, Map<String, String> previousChecksums) {
-		final ConfigDirUtil configUtil = new ConfigDirUtil(configPath.toString(), AddressHierarchyConstants.ADDRESS_HIERARCHY_DOMAIN);
-		final Map<String, String> updatedChecksums = new HashMap<>();
-
-		String xmlConfigFileName = ADDR_CONFIG_FILE_NAME;
-
-		File domainDir = new File(configUtil.domainDirPath);
-		if (!domainDir.exists()) {
-			log.info("Address hierarchy domain folder appears not present, skipping the loading process: " + domainDir.getPath());
-			return updatedChecksums;
-		}
-		File configFile = configUtil.getConfigFile(xmlConfigFileName);
-		if (!configFile.exists()) {
-			log.error("Address hierarchy configuration file appears invalid, skipping the loading process: " + configFile.getPath());
-			return updatedChecksums;
-		}
-
-		String lastChecksum = "";
-		String checksum = "";
-
-		//
-		// Processing the XML configuraton file
-		//
-		AddressConfiguration addressConfiguration = readFromFile(configFile);
-		final String xmlConfigChecksumPath = AddressHierarchyConstants.ADDRESS_HIERARCHY_DOMAIN + "/" + xmlConfigFileName;
-		boolean forceReloadEntries = false;
-
-		lastChecksum = previousChecksums.get(xmlConfigChecksumPath);
-		checksum = configUtil.computeChecksum(xmlConfigFileName);
-
-		if (checksum.equals(lastChecksum)) {
-			log.info("Address hierarchy configuration file is unchanged, skipping it: " + xmlConfigFileName);
-		}
-		else {
-
-			log.info("Address hierarchy configuration file has changed, reloading it: " + xmlConfigFileName);
-
-			if (!isMatchableLevelConfig(addressConfiguration.getAddressComponents()) && !addressConfiguration.mustWipe()) {
-				log.warn("The address hierarchy configuration was not loaded because of a mismatch between the exisiting and provided address hierarchy levels.");
-				return updatedChecksums;
-			}
-
-			if (addressConfiguration.mustWipe()) {
-				log.warn("The exisiting address and address hierarchy configuration is being wiped.");
-				wipeAddressHierarchy();
-			}
-
-			// Address template
-			installAddressTemplate(addressConfiguration.getAddressTemplate());
-
-			// Levels
-			installAddressHierarchyLevels(addressConfiguration.getAddressComponents());
-
-			updatedChecksums.put(xmlConfigChecksumPath, checksum);
-			forceReloadEntries = true;  // if anything upstream is changed, we force reload the address entries from CSV
-		}
-
-		//
-		// Processing the CSV entries file
-		//
-		String csvEntriesFileName = addressConfiguration.getAddressHierarchyFile().getFilename();
-		final String csvEntriesChecksumPath = AddressHierarchyConstants.ADDRESS_HIERARCHY_DOMAIN + "/" + csvEntriesFileName;
-		lastChecksum = previousChecksums.get(csvEntriesChecksumPath);
-		checksum = configUtil.computeChecksum(csvEntriesFileName);
-
-		if (checksum.equals(lastChecksum) && !forceReloadEntries) {
-			log.info("Address hierarchy entries CSV file is unchanged, skipping it: " + csvEntriesFileName);
-		}
-		else {
-			log.info("Address hierarchy entries CSV file has changed, reloading it: " + csvEntriesFileName);
-			installAddressHierarchyEntries(configUtil, addressConfiguration.getAddressHierarchyFile(), forceReloadEntries || addressConfiguration.mustWipe());
-			updatedChecksums.put(csvEntriesChecksumPath, checksum);
-
-			log.info("Entries loaded, re-initializing address cache");
-			getService().initializeFullAddressCache();
-		}
-		getService().initI18nCache();
-		return updatedChecksums;
 	}
 	
 	public static void loadAddressConfiguration(Path configPath, Path checksumsPath) {
