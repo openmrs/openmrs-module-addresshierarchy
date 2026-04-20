@@ -1,0 +1,47 @@
+{
+   "wipe":false,
+   "addressComponents":[
+      {
+         "field":"COUNTRY",
+         "nameMapping":"Country",
+         "sizeMapping":40,
+         "elementDefault":"Sierra Leone",
+         "requiredInHierarchy":true
+      },
+      {
+         "field":"STATE_PROVINCE",
+         "nameMapping":"Province/Area",
+         "sizeMapping":40,
+         "requiredInHierarchy":true
+      },
+      {
+         "field":"COUNTY_DISTRICT",
+         "nameMapping":"District",
+         "sizeMapping":40,
+         "requiredInHierarchy":false
+      },
+      {
+         "field":"CITY_VILLAGE",
+         "nameMapping":"Chiefdom",
+         "sizeMapping":40,
+         "requiredInHierarchy":false
+      },
+      {
+         "field":"ADDRESS_1",
+         "nameMapping":"Address",
+         "sizeMapping":80,
+         "requiredInHierarchy":false
+      }
+   ],
+   "lineByLineFormat":[
+      "address1",
+      "cityVillage",
+      "countyDistrict,stateProvince",
+      "country"
+   ],
+   "addressHierarchyFile":{
+      "filename":"address-hierarchy-entries.csv",
+      "entryDelimiter":"|",
+      "identifierDelimiter":"^"
+   }
+}

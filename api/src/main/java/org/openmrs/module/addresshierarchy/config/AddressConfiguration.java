@@ -5,6 +5,8 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.util.OpenmrsUtil;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -76,6 +78,7 @@ public class AddressConfiguration {
     /**
      * @return a new AddressTemplate instance for the given configuration
      */
+    @JsonIgnore
     public Object getAddressTemplate() {
         Object addressTemplate = null;
         try {
@@ -136,19 +139,19 @@ public class AddressConfiguration {
         if (this.getAddressComponents().size() != that.getAddressComponents().size()) {
             return false;
         }
-        for (int i=0; i<this.getAddressComponents().size(); i++) {
-            if (!this.getAddressComponents().get(i).equals(that.getAddressComponents().get(i))) {
-                return false;
-            }
+        
+        if (this.getAddressComponents().size() == that.getAddressComponents().size()) {
+            return this.getAddressComponents().stream().allMatch(item -> that.getAddressComponents().contains(item));
         }
+
         if (this.getLineByLineFormat().size() != that.getLineByLineFormat().size()) {
             return false;
         }
-        for (int i=0; i<this.getLineByLineFormat().size(); i++) {
-            if (!this.getLineByLineFormat().get(i).equals(that.getLineByLineFormat().get(i))) {
-                return false;
-            }
+
+        if (this.getLineByLineFormat().size() == that.getLineByLineFormat().size()) {
+            return this.getLineByLineFormat().stream().allMatch(item -> that.getLineByLineFormat().contains(item));
         }
+
         if (!OpenmrsUtil.nullSafeEquals(this.getAddressHierarchyFile(), that.getAddressHierarchyFile())) {
             return false;
         }

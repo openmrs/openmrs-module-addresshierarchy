@@ -1,28 +1,26 @@
 package org.openmrs.module.addresshierarchy;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
 import org.openmrs.module.addresshierarchy.config.ConfigDirUtil;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.test.Verifies;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
-@DirtiesContext
 public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTest {
 
   private static String APP_DATA_TEST_DIRECTORY = "testAppDataDir";
@@ -30,12 +28,16 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
   @Autowired
   private AddressHierarchyActivator activator;
 
-  @Before
+  @BeforeEach
   public void setup() {
 
     Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP, "true"));
 
     setAppDataDirPath(APP_DATA_TEST_DIRECTORY);
+
+    Context.getAdministrationService().saveGlobalProperty(
+            new GlobalProperty("addressHierarchy.configuration.serializer.whitelist.types",
+                "org.openmrs.module.addresshierarchy.**"));
 
     Assert.assertTrue(CollectionUtils.isEmpty(Context.getService(AddressHierarchyService.class).getAddressHierarchyLevels()));
   }
@@ -46,7 +48,6 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
   }
 
   @Test
-  @Verifies(value = "should load new address hierarchy configuration from configuration/addresshierarchy", method = "started()")
   public void started_shouldLoadAddressHierachyConfig() {
 
     // Setup
@@ -91,7 +92,6 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
   }
 
   @Test
-  @Verifies(value = "should not load again an address hierarchy configuration from configuration/addresshierarchy", method = "started()")
   public void started_shouldNotReLoadAddressHierachyConfig() {
 
     // Setup
@@ -119,7 +119,6 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
   }
 
   @Test
-  @Verifies(value = "should keep existing entries when wipe is set to false", method = "started()")
   public void started_shouldNotWipeExistingEntries() {
 
     // Setup
@@ -162,9 +161,8 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
     Assert.assertEquals("Point Shirley", pointShirley.getName());
   }
   
-  @Ignore
+  @Disabled
   @Test
-  @Verifies(value = "should wipe existing entries when wipe is set to true", method = "started()")
   public void started_shouldWipeExistingEntries() {
 
     // Setup
@@ -202,9 +200,9 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
     for (AddressHierarchyEntry entry : entries) {
       entryNames.add(entry.getName());
     }
-    Assert.assertFalse(entryNames.contains("Beacon Hill"));
-    Assert.assertFalse(entryNames.contains("Jamaica Plain"));
-    Assert.assertTrue(entryNames.contains("Auburndale"));
-    Assert.assertTrue(entryNames.contains("Chestnut Hill"));
+    assertFalse(entryNames.contains("Beacon Hill"));
+    assertFalse(entryNames.contains("Jamaica Plain"));
+    assertTrue(entryNames.contains("Auburndale"));
+    assertTrue(entryNames.contains("Chestnut Hill"));
   }
 }
