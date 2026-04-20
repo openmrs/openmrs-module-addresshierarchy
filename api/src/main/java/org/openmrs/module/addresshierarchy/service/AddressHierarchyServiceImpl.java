@@ -44,7 +44,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 
 	protected static final Log log = LogFactory.getLog(AddressHierarchyServiceImpl.class);
-
+	
+	private static final String GET_GLOBAL_PROPERTIES = "Get Global Properties";
 	private AddressHierarchyDAO dao;
 
 	private Map<Locale, Map<String,List<String>> > fullAddressCache;
@@ -705,17 +706,25 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	synchronized public void initializeFullAddressCache() {
 
 		// generally, this global property should be set to true; it just allows cache load to be disabled to speed startup
-		if (Context.getAdministrationService().getGlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP).equalsIgnoreCase("true")) {
-
-			// only initialize if necessary (and if we have entries)
-			if ((this.fullAddressCacheInitialized == false || MapUtils.isEmpty(this.fullAddressCache))
-					&& this.getAddressHierarchyEntryCount() > 0) {
-
-				this.fullAddressCache = new HashMap<Locale, Map<String,List<String>> >();
-				Locale locale = i18nCache.getLocaleForFullAddressCache();
-				getAddressesForLocale(locale);
-				this.fullAddressCacheInitialized = true;
+		try {
+			Context.addProxyPrivilege(GET_GLOBAL_PROPERTIES);
+			if (Context.getAdministrationService()
+			        .getGlobalProperty(AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP)
+			        .equalsIgnoreCase("true")) {
+				
+				// only initialize if necessary (and if we have entries)
+				if ((this.fullAddressCacheInitialized == false || MapUtils.isEmpty(this.fullAddressCache))
+				        && this.getAddressHierarchyEntryCount() > 0) {
+					
+					this.fullAddressCache = new HashMap<Locale, Map<String, List<String>>>();
+					Locale locale = i18nCache.getLocaleForFullAddressCache();
+					getAddressesForLocale(locale);
+					this.fullAddressCacheInitialized = true;
+				}
 			}
+		}
+		finally {
+			Context.removeProxyPrivilege(GET_GLOBAL_PROPERTIES);
 		}
 
 	}
