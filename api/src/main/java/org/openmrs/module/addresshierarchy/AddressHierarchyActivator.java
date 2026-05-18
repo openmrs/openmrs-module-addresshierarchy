@@ -18,6 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.ModuleFactory;
+import org.openmrs.module.ModuleUtil;
 import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
@@ -32,7 +34,9 @@ public class AddressHierarchyActivator extends BaseModuleActivator implements Mo
 	@Override
 	public void started() {
 		log.info("AddressHierarchy Module Started");
-		AddressConfigurationLoader.loadAddressConfiguration();
+		if (ModuleFactory.getLoadedModules().stream().noneMatch(m -> "initializer".equals(m.getModuleId()))) {
+			AddressConfigurationLoader.loadAddressConfiguration();
+		}
 	}
 
 	@Override
