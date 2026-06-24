@@ -36,18 +36,18 @@ public class AddressHierarchyLevel extends BaseOpenmrsObject {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Getters and Setters
 	 */
 	
 	public void setName(String name) {
-	    this.name = name;
-    }
-
+		this.name = name;
+	}
+	
 	public String getName() {
-	    return name;
-    }
+		return name;
+	}
 	
 	public AddressHierarchyLevel getParent() {
 		return parent;
@@ -56,7 +56,7 @@ public class AddressHierarchyLevel extends BaseOpenmrsObject {
 	public void setParent(AddressHierarchyLevel parent) {
 		this.parent = parent;
 	}
-
+	
 	public void setLevelId(Integer levelId) {
 		this.levelId = levelId;
 	}
@@ -64,29 +64,29 @@ public class AddressHierarchyLevel extends BaseOpenmrsObject {
 	public Integer getLevelId() {
 		return this.levelId;
 	}
-
+	
 	public void setAddressField(AddressField addressField) {
-	    this.addressField = addressField;
-    }
-
+		this.addressField = addressField;
+	}
+	
 	public AddressField getAddressField() {
-	    return addressField;
-    }
-
-    public Integer getId() {
-	    return this.levelId;
-    }
-
-    public void setId(Integer id) {
-	   this.levelId = id;
-    }
-
+		return addressField;
+	}
+	
+	public Integer getId() {
+		return this.levelId;
+	}
+	
+	public void setId(Integer id) {
+		this.levelId = id;
+	}
+	
 	public void setRequired(Boolean required) {
-	    this.required = required;
-    }
-
+		this.required = required;
+	}
+	
 	public Boolean getRequired() {
-	    return required;
-    }
-
+		return required;
+	}
+	
 }

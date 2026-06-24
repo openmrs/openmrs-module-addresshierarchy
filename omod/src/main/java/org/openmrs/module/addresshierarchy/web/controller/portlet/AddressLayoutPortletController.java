@@ -23,10 +23,10 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
 	
 	/** Overrides the handle request to use the custom address hierarchy jsp if in edit mode */
 	
-    @Override
-	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	                                                                                           IOException {
-	
+	@Override
+	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
+		
 		ModelAndView mav = super.handleRequest(request, response);
 		
 		String originalPortletPath = mav.getViewName();
@@ -37,33 +37,38 @@ public class AddressLayoutPortletController extends org.openmrs.web.controller.l
 		// 3) we aren't in view mode, and 4) we have defined address hierarchy levels
 		try {
 			@SuppressWarnings("unchecked")
-            Map<Object,Object> map = (Map<Object,Object>) mav.getModelMap().get("model");	
-			if (AddressHierarchyUtil.getGlobalPropertyAsBoolean("addresshierarchy.enableOverrideOfAddressPortlet") == true &&
-					map.containsKey("size") && ((String) map.get("size")).equals("full") &&
-					(!map.containsKey("layoutMode") || ((String) map.get("layoutMode")).equals("edit")) &&
-					ahService.getAddressHierarchyLevelsCount() > 0) {
+			Map<Object, Object> map = (Map<Object, Object>) mav.getModelMap().get("model");
+			if (AddressHierarchyUtil.getGlobalPropertyAsBoolean("addresshierarchy.enableOverrideOfAddressPortlet") == true
+			        && map.containsKey("size") && ((String) map.get("size")).equals("full")
+			        && (!map.containsKey("layoutMode") || ((String) map.get("layoutMode")).equals("edit"))
+			        && ahService.getAddressHierarchyLevelsCount() > 0) {
 				
 				// get the ordered address hierarchy levels and add them to the map
 				List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels(false);
 				mav.getModelMap().addAttribute("hierarchyLevels", levels);
-
+				
 				// Do not enforce required field validation when editing an address on the location admin page
-				boolean validateRequiredFields = !(request.getServletPath().equals("/WEB-INF/view/admin/locations/locationForm.jsp") || request.getServletPath().equals("/WEB-INF/view/module/legacyui/admin/locations/locationForm.jsp"));
+				boolean validateRequiredFields = !(request.getServletPath()
+				        .equals("/WEB-INF/view/admin/locations/locationForm.jsp")
+				        || request.getServletPath()
+				                .equals("/WEB-INF/view/module/legacyui/admin/locations/locationForm.jsp"));
 				mav.getModelMap().addAttribute("validateRequiredFields", validateRequiredFields);
-
+				
 				// figure out at what point we need to switch to free text entry by iterating backwards
 				// through the levels until we find a level with entries
 				Integer i;
-				for (i = levels.size()-1; i > 0; i--) {
-					List<AddressHierarchyEntry> entries = Context.getService(AddressHierarchyService.class).getAddressHierarchyEntriesByLevel(levels.get(i));
+				for (i = levels.size() - 1; i > 0; i--) {
+					List<AddressHierarchyEntry> entries = Context.getService(AddressHierarchyService.class)
+					        .getAddressHierarchyEntriesByLevel(levels.get(i));
 					if (entries != null && entries.size() > 0) {
 						break;
 					}
 				}
-				mav.getModelMap().addAttribute("switchToFreetext", i+1);
+				mav.getModelMap().addAttribute("switchToFreetext", i + 1);
 				
 				// add the global property that specifies whether we should allow freetext entries for levels which have entries
-				mav.getModelMap().addAttribute("allowFreetext", AddressHierarchyUtil.getGlobalPropertyAsBoolean("addresshierarchy.allowFreetext"));
+				mav.getModelMap().addAttribute("allowFreetext",
+				    AddressHierarchyUtil.getGlobalPropertyAsBoolean("addresshierarchy.allowFreetext"));
 				
 				// set the path to the custom page
 				String portletPath = "/module/addresshierarchy/portlets/addressLayout";

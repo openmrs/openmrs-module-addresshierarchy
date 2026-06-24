@@ -9,9 +9,8 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyLevel;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.springframework.util.StringUtils;
 
-
 public class AddressHierarchyLevelEditor extends PropertyEditorSupport {
-
+	
 	private Log log = LogFactory.getLog(this.getClass());
 	
 	public AddressHierarchyLevelEditor() {

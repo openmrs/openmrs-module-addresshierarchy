@@ -22,28 +22,27 @@ import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 /**
- * This class contains the logic that is run every time this module
- * is either started or shutdown
+ * This class contains the logic that is run every time this module is either started or shutdown
  */
 public class AddressHierarchyActivator extends BaseModuleActivator implements ModuleActivator {
-
+	
 	private Log log = LogFactory.getLog(this.getClass());
-
+	
 	@Override
 	public void started() {
 		log.info("AddressHierarchy Module Started");
 		AddressConfigurationLoader.loadAddressConfiguration();
 	}
-
+	
 	@Override
 	public void stopped() {
 		log.info("AddressHierarchy Module Stopped");
 	}
-
+	
 	@Override
-    public void contextRefreshed() {
-        // initialize the caches on module startup
-        Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
-        Context.getService(AddressHierarchyService.class).initI18nCache();
-    }
+	public void contextRefreshed() {
+		// initialize the caches on module startup
+		Context.getService(AddressHierarchyService.class).initializeFullAddressCache();
+		Context.getService(AddressHierarchyService.class).initI18nCache();
+	}
 }

@@ -21,14 +21,12 @@ import org.openmrs.module.addresshierarchy.AddressHierarchyConstants;
 import org.openmrs.module.web.extension.AdministrationSectionExt;
 
 /**
- * This class defines the links that will appear on the administration page
- * under the "addresshierarchy.title" heading.
- * 
- * This extension is enabled by defining (uncommenting) it in the 
- * /metadata/config.xml file. 
+ * This class defines the links that will appear on the administration page under the
+ * "addresshierarchy.title" heading. This extension is enabled by defining (uncommenting) it in the
+ * /metadata/config.xml file.
  */
 public class AdminList extends AdministrationSectionExt {
-
+	
 	/**
 	 * @see org.openmrs.module.web.extension.AdministrationSectionExt#getMediaType()
 	 */

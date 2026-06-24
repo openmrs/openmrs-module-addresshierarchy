@@ -32,13 +32,13 @@ public class AddressHierarchyMigrationTest extends BaseModuleContextSensitiveTes
 	@Test
 	@Verifies(value = "should assign properly parent to address hierarchy levels", method = "setAddressHierarchyLevelParents()")
 	public void setAddressHierarchyLevelParents_shouldSetAddressHierarchyLevelParents() throws Exception {
-
+		
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
-
+		
 		ahService.setAddressHierarchyLevelParents();
 		
 		List<AddressHierarchyLevel> levels = ahService.getAddressHierarchyLevels();
-	
+		
 		// (note that street should have been removed because it has no entries, so there only should be 6 levels) 
 		Assert.assertEquals(6, levels.size());
 		
@@ -49,6 +49,6 @@ public class AddressHierarchyMigrationTest extends BaseModuleContextSensitiveTes
 		Assert.assertEquals(7, Integer.valueOf(ahService.getAddressHierarchyLevel(4).getParent().getId()).intValue());
 		Assert.assertEquals(2, Integer.valueOf(ahService.getAddressHierarchyLevel(5).getParent().getId()).intValue());
 		Assert.assertEquals(1, Integer.valueOf(ahService.getAddressHierarchyLevel(7).getParent().getId()).intValue());
-	
+		
 	}
 }

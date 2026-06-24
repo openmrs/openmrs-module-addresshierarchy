@@ -17,9 +17,9 @@ import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.PersonAddress;
 
 /**
- * A simple class to provide link between an Address and an Address Hierarchy Entry 
- * for reporting purposes.  This class is not automatically created when an address is
- * saved, but can be set to update changed PersonAddresses on a regular schedule
+ * A simple class to provide link between an Address and an Address Hierarchy Entry for reporting
+ * purposes. This class is not automatically created when an address is saved, but can be set to
+ * update changed PersonAddresses on a regular schedule
  */
 public class AddressToEntryMap extends BaseOpenmrsObject {
 	
@@ -32,47 +32,47 @@ public class AddressToEntryMap extends BaseOpenmrsObject {
 	/**
 	 * Constructors
 	 */
-	public AddressToEntryMap(){
+	public AddressToEntryMap() {
 	}
-
+	
 	public AddressToEntryMap(PersonAddress address, AddressHierarchyEntry entry) {
-	    this.address = address;
-	    this.entry = entry;
-    }
+		this.address = address;
+		this.entry = entry;
+	}
 	
 	/**
 	 * Getters and Setters
 	 */
-    public PersonAddress getAddress() {
-    	return address;
-    }
+	public PersonAddress getAddress() {
+		return address;
+	}
 	
-    public void setAddress(PersonAddress address) {
-    	this.address = address;
-    }
-
-    public AddressHierarchyEntry getEntry() {
-    	return entry;
-    }
+	public void setAddress(PersonAddress address) {
+		this.address = address;
+	}
 	
-    public void setEntry(AddressHierarchyEntry entry) {
-    	this.entry = entry;
-    }
-
+	public AddressHierarchyEntry getEntry() {
+		return entry;
+	}
+	
+	public void setEntry(AddressHierarchyEntry entry) {
+		this.entry = entry;
+	}
+	
 	public Integer getAddressToEntryMapId() {
-	    return personAddressToAddressHierarchyEntryMapId;
-    }
-
-	public void setAddressToEntryMapId(Integer id) {	
+		return personAddressToAddressHierarchyEntryMapId;
+	}
+	
+	public void setAddressToEntryMapId(Integer id) {
 		this.personAddressToAddressHierarchyEntryMapId = id;
-    }
-    
+	}
+	
 	public Integer getId() {
-	    return personAddressToAddressHierarchyEntryMapId;
-    }
-
-	public void setId(Integer id) {	
+		return personAddressToAddressHierarchyEntryMapId;
+	}
+	
+	public void setId(Integer id) {
 		this.personAddressToAddressHierarchyEntryMapId = id;
-    }
+	}
 	
 }

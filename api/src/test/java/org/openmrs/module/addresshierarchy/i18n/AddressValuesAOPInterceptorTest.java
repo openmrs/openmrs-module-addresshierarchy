@@ -31,7 +31,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public class AddressValuesAOPInterceptorTest extends I18nModuleContextSensitiveTest {
 	
 	private Patient patient;
-
+	
 	@Before
 	public void setup() throws Exception {
 		
@@ -131,7 +131,8 @@ public class AddressValuesAOPInterceptorTest extends I18nModuleContextSensitiveT
 		
 		// Setup
 		String enabled = Context.getAdministrationService().getGlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT);
-		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "false"));
+		Context.getAdministrationService()
+		        .saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "false"));
 		
 		//
 		// Setting translatable address, at least partially
@@ -158,7 +159,8 @@ public class AddressValuesAOPInterceptorTest extends I18nModuleContextSensitiveT
 		Assert.assertThat(actualAddress.getStateProvince(), equalTo("addresshierarchy.massachusetts"));
 		
 		// Tear down
-		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, enabled));
+		Context.getAdministrationService()
+		        .saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, enabled));
 	}
 	
 	@Test

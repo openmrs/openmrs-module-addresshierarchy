@@ -11,11 +11,11 @@ import org.openmrs.module.addresshierarchy.AddressToEntryMap;
 
 /**
  * The Interface AddressHierarchyDAO which is implemented in HibernateAddressHierarchyDAO which
- * links to the tables address_hierarchy_entry, address_hierarchy_level and person_address. This class does
- * the functions of storing and retrieving addresses.
+ * links to the tables address_hierarchy_entry, address_hierarchy_level and person_address. This
+ * class does the functions of storing and retrieving addresses.
  */
 public interface AddressHierarchyDAO {
-
+	
 	/**
 	 * Returns the number of address hierarchy entries
 	 */
@@ -42,17 +42,21 @@ public interface AddressHierarchyDAO {
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level);
 	
 	/**
-	 * Gets all address hierarchy entries associated with the a certain level that have the specified name
+	 * Gets all address hierarchy entries associated with the a certain level that have the specified
+	 * name
 	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel level, String name);
 	
 	/**
-	 * Gets all address hierarchy entries associated with the a certain level that have the specified name and the specified parent
+	 * Gets all address hierarchy entries associated with the a certain level that have the specified
+	 * name and the specified parent
 	 */
-	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
-
-	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel level, String name, AddressHierarchyEntry parent);
-
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndNameAndParent(AddressHierarchyLevel level,
+	        String name, AddressHierarchyEntry parent);
+	
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeNameAndParent(AddressHierarchyLevel level,
+	        String name, AddressHierarchyEntry parent);
+	
 	/**
 	 * Gets all the address hierarchy entries that are children of the specified entry
 	 */
@@ -60,7 +64,8 @@ public interface AddressHierarchyDAO {
 	
 	/**
 	 * Gets the address hierarchy entry which the specified name that is a child of the given entry
-	 * (Will throw exception if there are multiple matches, as there should never be two entries with the same name AND parent)
+	 * (Will throw exception if there are multiple matches, as there should never be two entries with
+	 * the same name AND parent)
 	 */
 	public AddressHierarchyEntry getChildAddressHierarchyEntryByName(AddressHierarchyEntry entry, String childName);
 	
@@ -80,8 +85,8 @@ public interface AddressHierarchyDAO {
 	public List<AddressHierarchyLevel> getAddressHierarchyLevels();
 	
 	/**
-	 * Returns the top level in the hierarchy (i.e., the highest level, with no parent)
-	 * (Will throw an exception if the multiple levels with no parents)
+	 * Returns the top level in the hierarchy (i.e., the highest level, with no parent) (Will throw an
+	 * exception if the multiple levels with no parents)
 	 */
 	public AddressHierarchyLevel getTopAddressHierarchyLevel();
 	
@@ -91,8 +96,8 @@ public interface AddressHierarchyDAO {
 	public AddressHierarchyLevel getAddressHierarchyLevel(int levelId);
 	
 	/**
-	 * Gets the address hierarchy level that is the child of the specified level
-	 * (Will throw an exception if there are multiple children--a level should only have one child)
+	 * Gets the address hierarchy level that is the child of the specified level (Will throw an
+	 * exception if there are multiple children--a level should only have one child)
 	 */
 	public AddressHierarchyLevel getAddressHierarchyLevelByParent(AddressHierarchyLevel parent);
 	
@@ -132,8 +137,8 @@ public interface AddressHierarchyDAO {
 	public List<Patient> findAllPatientsWithDateChangedAfter(Date date);
 	
 	/**
-	 * The following methods are deprecated and just exist to provide backwards compatibility to
-	 * Rwanda Address Hierarchy module--most are Rwanda-specific
+	 * The following methods are deprecated and just exist to provide backwards compatibility to Rwanda
+	 * Address Hierarchy module--most are Rwanda-specific
 	 */
 	@Deprecated
 	public void associateCoordinates(AddressHierarchyEntry ah, double latitude, double longitude);
@@ -155,8 +160,9 @@ public interface AddressHierarchyDAO {
 	
 	@Deprecated
 	public List<Object[]> getAllAddresses(int page);
-
-    public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeName(AddressHierarchyLevel level, String name, int limit);
-
+	
+	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevelAndLikeName(AddressHierarchyLevel level, String name,
+	        int limit);
+	
 	public AddressHierarchyEntry getAddressHierarchyEntryByUuid(String uuid);
 }
