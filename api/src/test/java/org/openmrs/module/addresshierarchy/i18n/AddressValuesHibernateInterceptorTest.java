@@ -59,7 +59,7 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		patientIdentifiers.add(patientIdentifier);
 		patient.setIdentifiers(patientIdentifiers);
 	}
-
+	
 	@Test
 	@Verifies(value = "should save the i18n address coming from an address in a specific locale", method = "onSave(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types)")
 	public void onSaveAndOnFlushDirty_shouldSaveI18nPersonAddress() {
@@ -139,7 +139,8 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		
 		// Setup
 		String enabled = Context.getAdministrationService().getGlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT);
-		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "false"));
+		Context.getAdministrationService()
+		        .saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "false"));
 		
 		//
 		// Setting an i18n address,, at least partially
@@ -166,7 +167,8 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		Assert.assertThat(actualAddress.getStateProvince(), equalTo("Connecticut"));
 		
 		// Tear down
-		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, enabled));
+		Context.getAdministrationService()
+		        .saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, enabled));
 	}
 	
 	@Test

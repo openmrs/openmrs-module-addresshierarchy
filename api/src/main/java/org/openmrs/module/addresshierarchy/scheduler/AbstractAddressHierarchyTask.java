@@ -12,12 +12,12 @@ import org.openmrs.api.context.ContextAuthenticationException;
  * Used as a base class for tasks we configure via build-in Spring scheduling
  */
 public abstract class AbstractAddressHierarchyTask extends TimerTask {
-
+	
 	private static Log log = LogFactory.getLog(AbstractAddressHierarchyTask.class);
 	
 	/**
-	 * Sub-classes should override this method instead of the run method to implement their logic
-	 * The run method takes care of exception handling and authentication to the Context for you
+	 * Sub-classes should override this method instead of the run method to implement their logic The
+	 * run method takes care of exception handling and authentication to the Context for you
 	 */
 	public abstract void execute();
 	
@@ -51,7 +51,9 @@ public abstract class AbstractAddressHierarchyTask extends TimerTask {
 			Context.authenticate(userName, password);
 		}
 		catch (ContextAuthenticationException e) {
-			log.error("Error authenticating user. Please ensure you scheduler username and password are configured correctly in your global properties", e);
+			log.error(
+			    "Error authenticating user. Please ensure you scheduler username and password are configured correctly in your global properties",
+			    e);
 		}
 	}
 }

@@ -7,8 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.addresshierarchy.AddressField;
 import org.springframework.util.StringUtils;
 
-
-public class AddressFieldEditor extends PropertyEditorSupport  {
+public class AddressFieldEditor extends PropertyEditorSupport {
 	
 	private Log log = LogFactory.getLog(this.getClass());
 	

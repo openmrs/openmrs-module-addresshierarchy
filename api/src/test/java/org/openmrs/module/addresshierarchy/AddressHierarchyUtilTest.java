@@ -18,7 +18,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @DirtiesContext
 @SkipBaseSetup
 public class AddressHierarchyUtilTest extends BaseModuleContextSensitiveTest {
-
+	
 	protected final Log log = LogFactory.getLog(getClass());
 	
 	protected static final String XML_DATASET_PACKAGE_PATH = "org/openmrs/module/addresshierarchy/include/addressHierarchy-dataset.xml";

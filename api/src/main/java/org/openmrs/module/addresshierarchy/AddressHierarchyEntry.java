@@ -5,9 +5,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 /**
- * Represents a single entry in the Address Hierarchy (ie., like "United States", or "Massachusetts", or "Boston")
- * 
- * Must be unique on combined name and parent
+ * Represents a single entry in the Address Hierarchy (ie., like "United States", or
+ * "Massachusetts", or "Boston") Must be unique on combined name and parent
  */
 public class AddressHierarchyEntry extends BaseOpenmrsObject implements Comparable<AddressHierarchyEntry> {
 	
@@ -15,7 +14,7 @@ public class AddressHierarchyEntry extends BaseOpenmrsObject implements Comparab
 	
 	// the name of the entry ("Boston")
 	private String name;
-
+	
 	// the associated level in the hierarchy 
 	private AddressHierarchyLevel level;
 	
@@ -39,12 +38,12 @@ public class AddressHierarchyEntry extends BaseOpenmrsObject implements Comparab
 	}
 	
 	/**
-	 * Comparator  -- standard comparison is by name
+	 * Comparator -- standard comparison is by name
 	 */
-
-    public int compareTo(AddressHierarchyEntry other) {
-	    return this.name.compareTo(other.getName());
-    }
+	
+	public int compareTo(AddressHierarchyEntry other) {
+		return this.name.compareTo(other.getName());
+	}
 	
 	/**
 	 * Equals
@@ -66,19 +65,19 @@ public class AddressHierarchyEntry extends BaseOpenmrsObject implements Comparab
 	 */
 	public String getLocalizedName() {
 		return Context.getService(AddressHierarchyService.class).getL10nMessage(getName());
-    }
+	}
 	
 	/**
 	 * Getters and Setters
 	 */
 	
 	public void setName(String name) {
-	    this.name = name;
-    }
-
+		this.name = name;
+	}
+	
 	public String getName() {
 		return name;
-    }
+	}
 	
 	public Double getLatitude() {
 		return latitude;
@@ -135,27 +134,27 @@ public class AddressHierarchyEntry extends BaseOpenmrsObject implements Comparab
 	public void setParent(AddressHierarchyEntry parent) {
 		this.parent = parent;
 	}
-
+	
 	/**
 	 * Getters and Setters to map fields to alternative names
 	 */
 	
-    public Integer getId() {
-    	return this.addressHierarchyEntryId;
-    }
-    
-    public void setId(Integer id) {
-	    this.addressHierarchyEntryId = id;	    
-    }
+	public Integer getId() {
+		return this.addressHierarchyEntryId;
+	}
 	
-    public String getLocationName() {
+	public void setId(Integer id) {
+		this.addressHierarchyEntryId = id;
+	}
+	
+	public String getLocationName() {
 		return name;
 	}
 	
 	public void setLocationName(String locationName) {
 		this.name = locationName;
 	}
-    
+	
 	public AddressHierarchyLevel getAddressHierarchyLevel() {
 		return level;
 	}

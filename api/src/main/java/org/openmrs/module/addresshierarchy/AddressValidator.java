@@ -10,35 +10,38 @@ import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 
 /**
  * This Rwanda-specific validator is deprecated and remains only to provide Rwanda compatibility
- * 
- * Could replace this with a generic validator?  though isAddressStructured may be more appropriate as a service method?
+ * Could replace this with a generic validator? though isAddressStructured may be more appropriate
+ * as a service method?
  */
 
 @Deprecated
 public class AddressValidator {
-
+	
 	protected final Log log = LogFactory.getLog(getClass());
 	
 	// TODO: need make this generic--confirm that is it being used?
 	// TODO: this also can be derived from the AddressHiearchyType "mapping" ?
 	// TODO: will have to use the reflection utility function I plan to create to fetch address component by reflection
-
-    public boolean isAddressStructured(PersonAddress pa){
+	
+	public boolean isAddressStructured(PersonAddress pa) {
 		
-		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
+		AddressHierarchyService ahs = ((AddressHierarchyService) Context.getService(AddressHierarchyService.class));
 		List<AddressHierarchyEntry> hierarchyList = ahs.getTopOfHierarchyList();
 		boolean structured = false;
 		String country = pa.getCountry();
 		
-		
-		
 		int matchingLocationId = -1;
-		if((matchingLocationId = getMatchingLocation(country,hierarchyList)) != -1){
-			if((matchingLocationId = getMatchingLocation(pa.getStateProvince(),ahs.getNextComponent(matchingLocationId))) != -1){
-				if((matchingLocationId = getMatchingLocation(pa.getCountyDistrict(),ahs.getNextComponent(matchingLocationId))) != -1){
-					if((matchingLocationId = getMatchingLocation(pa.getCityVillage(),ahs.getNextComponent(matchingLocationId))) != -1){
-						if((matchingLocationId = getMatchingLocation(pa.getAddress3(),ahs.getNextComponent(matchingLocationId))) != -1){
-							if((matchingLocationId = getMatchingLocation(pa.getAddress1(),ahs.getNextComponent(matchingLocationId))) != -1){
+		if ((matchingLocationId = getMatchingLocation(country, hierarchyList)) != -1) {
+			if ((matchingLocationId = getMatchingLocation(pa.getStateProvince(),
+			    ahs.getNextComponent(matchingLocationId))) != -1) {
+				if ((matchingLocationId = getMatchingLocation(pa.getCountyDistrict(),
+				    ahs.getNextComponent(matchingLocationId))) != -1) {
+					if ((matchingLocationId = getMatchingLocation(pa.getCityVillage(),
+					    ahs.getNextComponent(matchingLocationId))) != -1) {
+						if ((matchingLocationId = getMatchingLocation(pa.getAddress3(),
+						    ahs.getNextComponent(matchingLocationId))) != -1) {
+							if ((matchingLocationId = getMatchingLocation(pa.getAddress1(),
+							    ahs.getNextComponent(matchingLocationId))) != -1) {
 								structured = true;
 							}
 						}
@@ -51,33 +54,36 @@ public class AddressValidator {
 		return structured;
 	}
 	
-    public String getInvalidReason(PersonAddress pa){
+	public String getInvalidReason(PersonAddress pa) {
 		
-		AddressHierarchyService ahs = ((AddressHierarchyService)Context.getService(AddressHierarchyService.class));
+		AddressHierarchyService ahs = ((AddressHierarchyService) Context.getService(AddressHierarchyService.class));
 		List<AddressHierarchyEntry> hierarchyList = ahs.getTopOfHierarchyList();
 		boolean structured = false;
 		boolean badCountry = true;
 		boolean badProvince = true;
 		boolean badDistrict = true;
 		boolean badSector = true;
-		boolean badCell  = true;
+		boolean badCell = true;
 		boolean badUmudugudu = true;
 		String country = pa.getCountry();
 		
-		
-		
 		int matchingLocationId = -1;
-		if((matchingLocationId = getMatchingLocation(country,hierarchyList)) != -1){
+		if ((matchingLocationId = getMatchingLocation(country, hierarchyList)) != -1) {
 			badCountry = false;
-			if((matchingLocationId = getMatchingLocation(pa.getStateProvince(),ahs.getNextComponent(matchingLocationId))) != -1){
+			if ((matchingLocationId = getMatchingLocation(pa.getStateProvince(),
+			    ahs.getNextComponent(matchingLocationId))) != -1) {
 				badProvince = false;
-				if((matchingLocationId = getMatchingLocation(pa.getCountyDistrict(),ahs.getNextComponent(matchingLocationId))) != -1){
+				if ((matchingLocationId = getMatchingLocation(pa.getCountyDistrict(),
+				    ahs.getNextComponent(matchingLocationId))) != -1) {
 					badDistrict = false;
-					if((matchingLocationId = getMatchingLocation(pa.getCityVillage(),ahs.getNextComponent(matchingLocationId))) != -1){
+					if ((matchingLocationId = getMatchingLocation(pa.getCityVillage(),
+					    ahs.getNextComponent(matchingLocationId))) != -1) {
 						badSector = false;
-						if((matchingLocationId = getMatchingLocation(pa.getAddress3(),ahs.getNextComponent(matchingLocationId))) != -1){
+						if ((matchingLocationId = getMatchingLocation(pa.getAddress3(),
+						    ahs.getNextComponent(matchingLocationId))) != -1) {
 							badCell = false;
-							if((matchingLocationId = getMatchingLocation(pa.getAddress1(),ahs.getNextComponent(matchingLocationId))) != -1){
+							if ((matchingLocationId = getMatchingLocation(pa.getAddress1(),
+							    ahs.getNextComponent(matchingLocationId))) != -1) {
 								badUmudugudu = false;
 								structured = true;
 							}
@@ -88,22 +94,22 @@ public class AddressValidator {
 		}
 		
 		log.debug("structured val " + structured + " for " + pa);
-		if(badCountry){
+		if (badCountry) {
 			return "country";
-		}else if (badProvince){
+		} else if (badProvince) {
 			return "province";
-		}else if (badDistrict){
+		} else if (badDistrict) {
 			return "district";
-		}else if (badSector){
+		} else if (badSector) {
 			return "sector";
-		}else if (badCell){
+		} else if (badCell) {
 			return "cell";
-		}else if (badUmudugudu){
+		} else if (badUmudugudu) {
 			return "umudugudu";
-		}else{
+		} else {
 			return null;
 		}
-
+		
 	}
 	
 	/**
@@ -112,10 +118,10 @@ public class AddressValidator {
 	 * @param partToCompare
 	 * @param locations
 	 */
-	private int getMatchingLocation(String partToCompare, List<AddressHierarchyEntry> locations){
+	private int getMatchingLocation(String partToCompare, List<AddressHierarchyEntry> locations) {
 		int matchingLocationId = -1;
-		for(AddressHierarchyEntry ah : locations){
-			if(ah.getLocationName().equalsIgnoreCase(partToCompare)){
+		for (AddressHierarchyEntry ah : locations) {
+			if (ah.getLocationName().equalsIgnoreCase(partToCompare)) {
 				matchingLocationId = ah.getAddressHierarchyEntryId();
 				return matchingLocationId;
 			}

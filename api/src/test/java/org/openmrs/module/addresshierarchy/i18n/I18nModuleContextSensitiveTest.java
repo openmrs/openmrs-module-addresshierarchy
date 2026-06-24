@@ -32,13 +32,13 @@ abstract public class I18nModuleContextSensitiveTest extends AOPModuleContextSen
 	protected TestsMessageSource getTestsMessageSource() {
 		return (TestsMessageSource) Context.getMessageSourceService().getActiveMessageSource();
 	}
-
+	
 	/*
 	 * pre-Spring loading setup
 	 */
 	public I18nModuleContextSensitiveTest() {
 		super();
-        ModuleFactory.getStartedModulesMap().put("exti18n", new Module("", "exti18n", "", "", "", "1.0.0", "") );
+		ModuleFactory.getStartedModulesMap().put("exti18n", new Module("", "exti18n", "", "", "", "1.0.0", ""));
 	}
 	
 	@Override
@@ -56,23 +56,25 @@ abstract public class I18nModuleContextSensitiveTest extends AOPModuleContextSen
 		executeDataSet(INITIAL_XML_DATASET_PACKAGE_PATH);
 		executeDataSet(EXAMPLE_XML_DATASET_PACKAGE_PATH);
 		executeDataSet(XML_DATASET_PACKAGE_PATH);
-
+		
 		// Loading message properties files
-		getTestsMessageSource().addMessageProperties("org/openmrs/module/addresshierarchy/include/addresshierarchy.properties");
-		getTestsMessageSource().addMessageProperties("org/openmrs/module/addresshierarchy/include/addresshierarchy_fr.properties");
+		getTestsMessageSource()
+		        .addMessageProperties("org/openmrs/module/addresshierarchy/include/addresshierarchy.properties");
+		getTestsMessageSource()
+		        .addMessageProperties("org/openmrs/module/addresshierarchy/include/addresshierarchy_fr.properties");
 		getTestsMessageSource().refreshCache();
 		
-		Context.getAdministrationService().saveGlobalProperty(
-		    new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "true"));
-
+		Context.getAdministrationService()
+		        .saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "true"));
+		
 		ahService = Context.getService(AddressHierarchyService.class);
 		ahService.initI18nCache();
 	}
 	
 	@After
 	public void tearDownI18n() {
-		Context.getAdministrationService().saveGlobalProperty(
-				new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "false"));
+		Context.getAdministrationService()
+		        .saveGlobalProperty(new GlobalProperty(ExtI18nConstants.GLOBAL_PROP_REV_I18N_SUPPORT, "false"));
 		ahService.resetI18nCache();
 		ModuleFactory.getStartedModulesMap().clear();
 	}
