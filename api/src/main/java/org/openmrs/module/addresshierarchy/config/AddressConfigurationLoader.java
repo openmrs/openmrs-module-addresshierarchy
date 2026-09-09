@@ -71,7 +71,7 @@ public class AddressConfigurationLoader {
 		
 		File domainDir = new File(configUtil.domainDirPath);
 		if (!domainDir.exists()) {
-			log.warn(
+			log.info(
 			    "Address hierarchy domain folder appears not present, skipping the loading process: " + domainDir.getPath());
 			return updatedChecksums;
 		}
@@ -96,7 +96,7 @@ public class AddressConfigurationLoader {
 		checksum = configUtil.computeChecksum(xmlConfigFileName);
 		
 		if (checksum.equals(lastChecksum)) {
-			log.warn("Address hierarchy configuration file is unchanged, skipping it: " + xmlConfigFileName);
+			log.info("Address hierarchy configuration file is unchanged, skipping it: " + xmlConfigFileName);
 		} else {
 
 			log.warn("Address hierarchy configuration file has changed, reloading it: " + xmlConfigFileName);
@@ -131,7 +131,7 @@ public class AddressConfigurationLoader {
 		checksum = configUtil.computeChecksum(csvEntriesFileName);
 		
 		if (checksum.equals(lastChecksum) && !forceReloadEntries) {
-			log.warn("Address hierarchy entries CSV file is unchanged, skipping it: " + csvEntriesFileName);
+			log.info("Address hierarchy entries CSV file is unchanged, skipping it: " + csvEntriesFileName);
 		} else {
 			log.warn("Address hierarchy entries CSV file has changed, reloading it: " + csvEntriesFileName);
 			installAddressHierarchyEntries(configUtil, addressConfiguration.getAddressHierarchyFile(),
@@ -153,7 +153,7 @@ public class AddressConfigurationLoader {
 		
 		File domainDir = new File(configUtil.domainDirPath);
 		if (!domainDir.exists()) {
-			log.warn(
+			log.info(
 			    "Address hierarchy domain folder appears not present, skipping the loading process: " + domainDir.getPath());
 			return;
 		}
@@ -177,7 +177,7 @@ public class AddressConfigurationLoader {
 		checksum = configUtil.computeChecksum(xmlConfigFileName);
 		
 		if (checksum.equals(lastChecksum)) {
-			log.warn("Address hierarchy configuration file is unchanged, skipping it: " + xmlConfigFileName);
+			log.info("Address hierarchy configuration file is unchanged, skipping it: " + xmlConfigFileName);
 		} else {
 
 			log.warn("Address hierarchy configuration file has changed, reloading it: " + xmlConfigFileName);
@@ -211,7 +211,7 @@ public class AddressConfigurationLoader {
 		checksum = configUtil.computeChecksum(csvEntriesFileName);
 		
 		if (checksum.equals(lastChecksum) && !forceReloadEntries) {
-			log.warn("Address hierarchy entries CSV file is unchanged, skipping it: " + csvEntriesFileName);
+			log.info("Address hierarchy entries CSV file is unchanged, skipping it: " + csvEntriesFileName);
 		} else {
 			log.warn("Address hierarchy entries CSV file has changed, reloading it: " + csvEntriesFileName);
 			installAddressHierarchyEntries(configUtil, addressConfiguration.getAddressHierarchyFile(),
