@@ -98,9 +98,9 @@ public class AddressConfigurationLoader {
 		if (checksum.equals(lastChecksum)) {
 			log.info("Address hierarchy configuration file is unchanged, skipping it: " + xmlConfigFileName);
 		} else {
-			
-			log.info("Address hierarchy configuration file has changed, reloading it: " + xmlConfigFileName);
-			
+
+			log.warn("Address hierarchy configuration file has changed, reloading it: " + xmlConfigFileName);
+
 			if (!isMatchableLevelConfig(addressConfiguration.getAddressComponents()) && !addressConfiguration.mustWipe()) {
 				log.warn(
 				    "The address hierarchy configuration was not loaded because of a mismatch between the exisiting and provided address hierarchy levels.");
@@ -133,12 +133,12 @@ public class AddressConfigurationLoader {
 		if (checksum.equals(lastChecksum) && !forceReloadEntries) {
 			log.info("Address hierarchy entries CSV file is unchanged, skipping it: " + csvEntriesFileName);
 		} else {
-			log.info("Address hierarchy entries CSV file has changed, reloading it: " + csvEntriesFileName);
+			log.warn("Address hierarchy entries CSV file has changed, reloading it: " + csvEntriesFileName);
 			installAddressHierarchyEntries(configUtil, addressConfiguration.getAddressHierarchyFile(),
 			    forceReloadEntries || addressConfiguration.mustWipe());
 			updatedChecksums.put(csvEntriesChecksumPath, checksum);
-			
-			log.info("Entries loaded, re-initializing address cache");
+
+			log.warn("Entries loaded, re-initializing address cache");
 			getService().initializeFullAddressCache();
 		}
 		getService().initI18nCache();
@@ -179,9 +179,9 @@ public class AddressConfigurationLoader {
 		if (checksum.equals(lastChecksum)) {
 			log.info("Address hierarchy configuration file is unchanged, skipping it: " + xmlConfigFileName);
 		} else {
-			
-			log.info("Address hierarchy configuration file has changed, reloading it: " + xmlConfigFileName);
-			
+
+			log.warn("Address hierarchy configuration file has changed, reloading it: " + xmlConfigFileName);
+
 			if (!isMatchableLevelConfig(addressConfiguration.getAddressComponents()) && !addressConfiguration.mustWipe()) {
 				log.warn(
 				    "The address hierarchy configuration was not loaded because of a mismatch between the exisiting and provided address hierarchy levels.");
@@ -213,12 +213,12 @@ public class AddressConfigurationLoader {
 		if (checksum.equals(lastChecksum) && !forceReloadEntries) {
 			log.info("Address hierarchy entries CSV file is unchanged, skipping it: " + csvEntriesFileName);
 		} else {
-			log.info("Address hierarchy entries CSV file has changed, reloading it: " + csvEntriesFileName);
+			log.warn("Address hierarchy entries CSV file has changed, reloading it: " + csvEntriesFileName);
 			installAddressHierarchyEntries(configUtil, addressConfiguration.getAddressHierarchyFile(),
 			    forceReloadEntries || addressConfiguration.mustWipe());
 			configUtil.writeChecksum(csvEntriesFileName, checksum);
-			
-			log.info("Entries loaded, re-initializing address cache");
+
+			log.warn("Entries loaded, re-initializing address cache");
 			getService().initializeFullAddressCache();
 		}
 		getService().initI18nCache();
@@ -247,7 +247,7 @@ public class AddressConfigurationLoader {
 	 */
 	public static void installAddressTemplate(Object addressTemplate) {
 		try {
-			log.info("Installing address template");
+			log.warn("Installing address template");
 			String xml = Context.getSerializationService().getDefaultSerializer().serialize(addressTemplate);
 			setGlobalProperty(OpenmrsConstants.GLOBAL_PROPERTY_ADDRESS_TEMPLATE, xml);
 		}
@@ -277,8 +277,8 @@ public class AddressConfigurationLoader {
 	public static void installAddressHierarchyLevels(List<AddressComponent> addressComponents) {
 		
 		if (getService().getAddressHierarchyLevelsCount() == 0) {
-			
-			log.info("Installing address hierarchy levels");
+
+			log.warn("Installing address hierarchy levels");
 			AddressHierarchyLevel lastLevel = null;
 			for (AddressComponent component : addressComponents) {
 				AddressHierarchyLevel level = new AddressHierarchyLevel();
@@ -290,8 +290,8 @@ public class AddressConfigurationLoader {
 				lastLevel = level;
 			}
 		} else {
-			
-			log.info("Updating address hierarchy levels");
+
+			log.warn("Updating address hierarchy levels");
 			
 			for (AddressComponent component : addressComponents) {
 				AddressHierarchyLevel level = getService().getAddressHierarchyLevelByAddressField(component.getField());
@@ -306,12 +306,13 @@ public class AddressConfigurationLoader {
 	 */
 	public static void installAddressHierarchyEntries(ConfigDirUtil configDirUtil, AddressHierarchyFile file,
 	        boolean deleteEntries) {
-		log.info("Installing address hierarchy entries");
+		log.warn("Installing address hierarchy entries");
+		long startTime = System.currentTimeMillis();
 		if (deleteEntries) {
 			log.warn("Deleting existing address hierarchy entries");
 			getService().deleteAllAddressHierarchyEntries();
 		}
-		
+
 		InputStream is = null;
 		try {
 			is = new FileInputStream(configDirUtil.getConfigFile(file.getFilename()));
@@ -324,6 +325,7 @@ public class AddressConfigurationLoader {
 		finally {
 			IOUtils.closeQuietly(is);
 		}
+		log.warn("Address hierarchy entries installed in " + ((System.currentTimeMillis() - startTime) / 1000) + " seconds");
 	}
 	
 	/**

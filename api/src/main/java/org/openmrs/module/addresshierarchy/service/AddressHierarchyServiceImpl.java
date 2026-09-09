@@ -755,50 +755,72 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 			Method encodeStringMethod = fetchEncodeStringMethod();
 			
 			for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
-				initializeFullAddressCacheHelper(locale, entry, phoneticProcessor, encodeStringMethod);
+				if (!initializeFullAddressCacheHelper(locale, entry, phoneticProcessor, encodeStringMethod)) {
+					break;
+				}
 			}
 		}
 		return ret;
 	}
-	
-	private void initializeFullAddressCacheHelper(Locale locale, AddressHierarchyEntry entry, String phoneticProcessor,
+
+	// Returns false if the cache was reset out from under this build (see resetFullAddressCache()), in which case
+	// the caller should stop recursing rather than keep walking the tree against a cache that no longer exists.
+	// This narrows the race between a build and a concurrent reset, it does not close it: resetFullAddressCache()
+	// is intentionally left unsynchronized, so fullAddressCache can still be nulled between the check below and
+	// this method's own use of it. A subsequent entry save flips fullAddressCacheInitialized back to false
+	// regardless, so a later initializeFullAddressCache() call rebuilds correctly once entries have stopped
+	// changing - no data is lost either way.
+	private boolean initializeFullAddressCacheHelper(Locale locale, AddressHierarchyEntry entry, String phoneticProcessor,
 	        Method encodeStringMethod) {
-		
+
+		Map<String, List<String>> cacheForLocale = this.fullAddressCache == null ? null : this.fullAddressCache.get(locale);
+		if (cacheForLocale == null) {
+			log.debug("Full address cache was reset while being initialized, abandoning this build");
+			return false;
+		}
+
 		List<AddressHierarchyEntry> entries = getChildAddressHierarchyEntries(entry);
-		
+
 		// if this is leaf node, then create the full address and add it to the list of addresses to return
 		if (entries == null || entries.isEmpty()) {
-			
+
 			StringBuilder key = new StringBuilder();
 			StringBuilder value = new StringBuilder();
-			
+
 			// set the key to the encoded name of the entry, and the value to the actual name
 			key.append(encodeString(encodeStringMethod, entry.getLocalizedName(), phoneticProcessor));
 			value.append(entry.getLocalizedName());
-			
+
 			AddressHierarchyEntry tempEntry = entry;
-			
+
 			// follow back up the tree to the top level and concatenate the names to create the full address string
 			while (tempEntry.getParent() != null) {
 				tempEntry = tempEntry.getParent();
 				key.insert(0, encodeString(encodeStringMethod, tempEntry.getLocalizedName(), phoneticProcessor) + "|");
 				value.insert(0, tempEntry.getLocalizedName() + "|");
 			}
-			
+
 			// add it to the cache
-			if (!this.fullAddressCache.get(locale).containsKey(key.toString())) {
-				this.fullAddressCache.get(locale).put(key.toString(), new ArrayList<String>());
+			if (!cacheForLocale.containsKey(key.toString())) {
+				cacheForLocale.put(key.toString(), new ArrayList<String>());
 			}
-			this.fullAddressCache.get(locale).get(key.toString()).add(value.toString());
+			cacheForLocale.get(key.toString()).add(value.toString());
 		}
 		// if not a leaf node, process it's children recursively
 		else {
 			for (AddressHierarchyEntry currentEntry : entries) {
-				initializeFullAddressCacheHelper(locale, currentEntry, phoneticProcessor, encodeStringMethod);
+				if (!initializeFullAddressCacheHelper(locale, currentEntry, phoneticProcessor, encodeStringMethod)) {
+					return false;
+				}
 			}
 		}
+		return true;
 	}
 	
+	// Deliberately not synchronized with initializeFullAddressCache()/getAddressesForLocale(): this is called after
+	// every entry save, including each CSV import batch, so it must never block on a concurrent full cache build
+	// (which can take a while over a large hierarchy). See initializeFullAddressCacheHelper() for how a build
+	// tolerates this running concurrently.
 	@Transactional(readOnly = true)
 	public void resetFullAddressCache() {
 		this.fullAddressCache = null;

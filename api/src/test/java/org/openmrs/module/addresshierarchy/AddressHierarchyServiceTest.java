@@ -14,11 +14,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +33,7 @@ import org.openmrs.Patient;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
+import org.openmrs.module.addresshierarchy.service.AddressHierarchyServiceImpl;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.SkipBaseSetup;
@@ -1182,5 +1185,63 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		AddressHierarchyEntry plymouth = result.get(0);
 		assertThat(plymouth.getName(), is(equalTo("Plymouth")));
 	}
-	
+
+	@Test
+	@Verifies(value = "should not throw if the full address cache is reset concurrently mid-build (ADDR-144)", method = "initializeFullAddressCache()")
+	public void initializeFullAddressCache_shouldNotThrowIfCacheIsResetDuringBuild() throws Exception {
+
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+		List<AddressHierarchyEntry> topLevelEntries = ahService.getAddressHierarchyEntriesAtTopLevel();
+		AddressHierarchyEntry leafEntry = findLeafEntry(ahService, topLevelEntries);
+		Assert.assertNotNull("Test fixture should contain at least one leaf address hierarchy entry", leafEntry);
+		AddressHierarchyEntry nonLeafEntry = topLevelEntries.get(0);
+		Assert.assertFalse("Test fixture should contain at least one non-leaf address hierarchy entry",
+		    ahService.getChildAddressHierarchyEntries(nonLeafEntry).isEmpty());
+
+		// Context.getService() returns a (possibly multiply-nested, e.g. transaction + OpenMRS logging advice)
+		// Spring AOP proxy, not the raw impl, so unwrap it to reflectively invoke a private method/field on the
+		// actual AddressHierarchyServiceImpl instance.
+		Object target = ahService;
+		while (target instanceof org.springframework.aop.framework.Advised) {
+			target = ((org.springframework.aop.framework.Advised) target).getTargetSource().getTarget();
+		}
+
+		Method helper = AddressHierarchyServiceImpl.class.getDeclaredMethod("initializeFullAddressCacheHelper",
+		    Locale.class, AddressHierarchyEntry.class, String.class, Method.class);
+		helper.setAccessible(true);
+
+		// Simulates another thread's resetFullAddressCache() call racing in mid-build (see ADDR-144): reset the
+		// cache via the real public method, then directly invoke the private recursive helper as if a build had
+		// already been under way when that reset happened. Before the fix, this threw a NullPointerException on
+		// a leaf entry - and, on a non-leaf entry, silently kept walking every remaining descendant instead of
+		// aborting, so also assert the abort is reported (false) and not just swallowed.
+		ahService.resetFullAddressCache();
+		Object leafResult = helper.invoke(target, Context.getLocale(), leafEntry, null, null);
+		Assert.assertEquals(Boolean.FALSE, leafResult);
+
+		ahService.resetFullAddressCache();
+		Object nonLeafResult = helper.invoke(target, Context.getLocale(), nonLeafEntry, null, null);
+		Assert.assertEquals(Boolean.FALSE, nonLeafResult);
+
+		// a subsequent, uninterrupted call should still build the cache correctly
+		ahService.initializeFullAddressCache();
+		Set<String> results = ahService.searchAddresses("boston", null);
+		Assert.assertFalse(results.isEmpty());
+	}
+
+	private AddressHierarchyEntry findLeafEntry(AddressHierarchyService ahService, List<AddressHierarchyEntry> entries) {
+		for (AddressHierarchyEntry entry : entries) {
+			List<AddressHierarchyEntry> children = ahService.getChildAddressHierarchyEntries(entry);
+			if (children == null || children.isEmpty()) {
+				return entry;
+			}
+			AddressHierarchyEntry leaf = findLeafEntry(ahService, children);
+			if (leaf != null) {
+				return leaf;
+			}
+		}
+		return null;
+	}
+
 }

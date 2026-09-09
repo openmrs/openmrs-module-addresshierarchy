@@ -35,9 +35,11 @@ public class AddressHierarchyImportUtil {
 	
 	protected static final Log log = LogFactory.getLog(AddressHierarchyImportUtil.class);
 	
-	// number of entries to save at one time
-	// we want to save in batches to improve performance, but if try to save ALL at once we can run into memory issues
-	protected static final int ENTRY_BATCH_SIZE = 10;
+	// number of entries to save (and commit, since each batch is its own @Transactional call) at one time.
+	// Each commit has real overhead, so this needs to be large enough that a big hierarchy (tens of thousands
+	// of entries) doesn't take an excessive number of transactions to import, while staying small enough that
+	// a single batch's entries don't cause memory pressure.
+	protected static final int ENTRY_BATCH_SIZE = 500;
 	
 	/**
 	 * Takes a file of delimited addresses and creates and address hierarchy out of it Starting level
