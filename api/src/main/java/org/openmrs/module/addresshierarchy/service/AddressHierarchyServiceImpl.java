@@ -769,17 +769,9 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		// if this is leaf node, then create the full address and add it to the list of addresses to return
 		if (entries == null || entries.isEmpty()) {
 
-			// resetFullAddressCache() is called (unsynchronized) after every entry save, and can null out
-			// this.fullAddressCache while a build triggered on another thread is still recursing here - most
-			// commonly when a large hierarchy is still being imported when the cache build is first triggered.
-			// If that's happened, abort this build rather than NPE; a subsequent save already flips
-			// fullAddressCacheInitialized back to false, so a later call to initializeFullAddressCache() will
-			// rebuild it correctly once entries have stopped changing.
-			Map<String, List<String>> cacheForLocale = this.fullAddressCache == null ? null
-			        : this.fullAddressCache.get(locale);
+			Map<String, List<String>> cacheForLocale = this.fullAddressCache == null ? null : this.fullAddressCache.get(locale);
 			if (cacheForLocale == null) {
-				log.warn(
-				    "Full address cache was reset while being initialized (likely because address hierarchy entries are still being saved) - aborting this build; it will be retried once entries have stopped changing.");
+				log.debug("Full address cache was reset while being initialized");
 				return;
 			}
 
