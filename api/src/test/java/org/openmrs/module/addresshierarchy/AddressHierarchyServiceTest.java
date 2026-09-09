@@ -1192,8 +1192,12 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 
-		AddressHierarchyEntry leafEntry = findLeafEntry(ahService, ahService.getAddressHierarchyEntriesAtTopLevel());
+		List<AddressHierarchyEntry> topLevelEntries = ahService.getAddressHierarchyEntriesAtTopLevel();
+		AddressHierarchyEntry leafEntry = findLeafEntry(ahService, topLevelEntries);
 		Assert.assertNotNull("Test fixture should contain at least one leaf address hierarchy entry", leafEntry);
+		AddressHierarchyEntry nonLeafEntry = topLevelEntries.get(0);
+		Assert.assertFalse("Test fixture should contain at least one non-leaf address hierarchy entry",
+		    ahService.getChildAddressHierarchyEntries(nonLeafEntry).isEmpty());
 
 		// Context.getService() returns a (possibly multiply-nested, e.g. transaction + OpenMRS logging advice)
 		// Spring AOP proxy, not the raw impl, so unwrap it to reflectively invoke a private method/field on the
@@ -1203,14 +1207,22 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 			target = ((org.springframework.aop.framework.Advised) target).getTargetSource().getTarget();
 		}
 
-		// Simulates another thread's resetFullAddressCache() call racing in mid-build (see ADDR-144): reset the
-		// cache via the real public method, then directly invoke the private recursive helper as if a build had
-		// already been under way when that reset happened. Before the fix, this threw a NullPointerException.
-		ahService.resetFullAddressCache();
 		Method helper = AddressHierarchyServiceImpl.class.getDeclaredMethod("initializeFullAddressCacheHelper",
 		    Locale.class, AddressHierarchyEntry.class, String.class, Method.class);
 		helper.setAccessible(true);
-		helper.invoke(target, Context.getLocale(), leafEntry, null, null);
+
+		// Simulates another thread's resetFullAddressCache() call racing in mid-build (see ADDR-144): reset the
+		// cache via the real public method, then directly invoke the private recursive helper as if a build had
+		// already been under way when that reset happened. Before the fix, this threw a NullPointerException on
+		// a leaf entry - and, on a non-leaf entry, silently kept walking every remaining descendant instead of
+		// aborting, so also assert the abort is reported (false) and not just swallowed.
+		ahService.resetFullAddressCache();
+		Object leafResult = helper.invoke(target, Context.getLocale(), leafEntry, null, null);
+		Assert.assertEquals(Boolean.FALSE, leafResult);
+
+		ahService.resetFullAddressCache();
+		Object nonLeafResult = helper.invoke(target, Context.getLocale(), nonLeafEntry, null, null);
+		Assert.assertEquals(Boolean.FALSE, nonLeafResult);
 
 		// a subsequent, uninterrupted call should still build the cache correctly
 		ahService.initializeFullAddressCache();
