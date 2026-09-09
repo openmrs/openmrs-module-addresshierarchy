@@ -768,28 +768,42 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		
 		// if this is leaf node, then create the full address and add it to the list of addresses to return
 		if (entries == null || entries.isEmpty()) {
-			
+
+			// resetFullAddressCache() is called (unsynchronized) after every entry save, and can null out
+			// this.fullAddressCache while a build triggered on another thread is still recursing here - most
+			// commonly when a large hierarchy is still being imported when the cache build is first triggered.
+			// If that's happened, abort this build rather than NPE; a subsequent save already flips
+			// fullAddressCacheInitialized back to false, so a later call to initializeFullAddressCache() will
+			// rebuild it correctly once entries have stopped changing.
+			Map<String, List<String>> cacheForLocale = this.fullAddressCache == null ? null
+			        : this.fullAddressCache.get(locale);
+			if (cacheForLocale == null) {
+				log.warn(
+				    "Full address cache was reset while being initialized (likely because address hierarchy entries are still being saved) - aborting this build; it will be retried once entries have stopped changing.");
+				return;
+			}
+
 			StringBuilder key = new StringBuilder();
 			StringBuilder value = new StringBuilder();
-			
+
 			// set the key to the encoded name of the entry, and the value to the actual name
 			key.append(encodeString(encodeStringMethod, entry.getLocalizedName(), phoneticProcessor));
 			value.append(entry.getLocalizedName());
-			
+
 			AddressHierarchyEntry tempEntry = entry;
-			
+
 			// follow back up the tree to the top level and concatenate the names to create the full address string
 			while (tempEntry.getParent() != null) {
 				tempEntry = tempEntry.getParent();
 				key.insert(0, encodeString(encodeStringMethod, tempEntry.getLocalizedName(), phoneticProcessor) + "|");
 				value.insert(0, tempEntry.getLocalizedName() + "|");
 			}
-			
+
 			// add it to the cache
-			if (!this.fullAddressCache.get(locale).containsKey(key.toString())) {
-				this.fullAddressCache.get(locale).put(key.toString(), new ArrayList<String>());
+			if (!cacheForLocale.containsKey(key.toString())) {
+				cacheForLocale.put(key.toString(), new ArrayList<String>());
 			}
-			this.fullAddressCache.get(locale).get(key.toString()).add(value.toString());
+			cacheForLocale.get(key.toString()).add(value.toString());
 		}
 		// if not a leaf node, process it's children recursively
 		else {
