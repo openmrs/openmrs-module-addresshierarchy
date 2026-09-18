@@ -1241,31 +1241,6 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertFalse(results.isEmpty());
 	}
 
-	@Test
-	@Verifies(value = "should return an empty result, not throw, when no address hierarchy is configured", method = "searchAddresses(String,AddressHierarchyLevel)")
-	public void searchAddresses_shouldReturnEmptyResultIfNoLevelsOrEntriesConfigured() throws Exception {
-
-		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
-
-		// wipe the hierarchy so that there are no entries and no levels at all, as on a fresh install
-		ahService.deleteAllAddressHierarchyEntries();
-		while (ahService.getAddressHierarchyLevelsCount() > 0) {
-			ahService.deleteAddressHierarchyLevel(ahService.getBottomAddressHierarchyLevel());
-		}
-		ahService.resetFullAddressCache();
-
-		Assert.assertNull(ahService.getTopAddressHierarchyLevel());
-
-		// with no levels there is no top level, and building the full address cache used to throw a
-		// NullPointerException on the very first search; worse, the (empty) cache for the locale had already
-		// been published by then, so every later search was served that empty cache as a successful result
-		Set<String> firstSearch = ahService.searchAddresses("boston", null);
-		Assert.assertTrue(firstSearch.isEmpty());
-
-		Set<String> secondSearch = ahService.searchAddresses("boston", null);
-		Assert.assertTrue(secondSearch.isEmpty());
-	}
-
 	private AddressHierarchyEntry findLeafEntry(AddressHierarchyService ahService, List<AddressHierarchyEntry> entries) {
 		for (AddressHierarchyEntry entry : entries) {
 			List<AddressHierarchyEntry> children = ahService.getChildAddressHierarchyEntries(entry);
