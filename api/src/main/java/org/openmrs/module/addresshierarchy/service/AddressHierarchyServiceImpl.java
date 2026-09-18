@@ -794,7 +794,10 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	private boolean initializeFullAddressCacheHelper(Locale locale, AddressHierarchyEntry entry, String phoneticProcessor,
 	        Method encodeStringMethod) {
 
-		Map<String, List<String>> cacheForLocale = this.fullAddressCache == null ? null : this.fullAddressCache.get(locale);
+		// capture the map before reading from it: resetFullAddressCache() is deliberately unsynchronized, so a
+		// ternary that tests the field and then dereferences it can be nulled between its own two reads
+		Map<Locale, Map<String, List<String>>> cache = this.fullAddressCache;
+		Map<String, List<String>> cacheForLocale = cache == null ? null : cache.get(locale);
 		if (cacheForLocale == null) {
 			log.debug("Full address cache was reset while being initialized, abandoning this build");
 			return false;
