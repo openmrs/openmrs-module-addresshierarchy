@@ -770,8 +770,14 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 				built = !abandoned;
 			}
 			finally {
-				if (!built && this.fullAddressCache != null) {
-					this.fullAddressCache.remove(locale);
+				if (!built) {
+					// capture the map before testing it: resetFullAddressCache() is deliberately unsynchronized,
+					// so the field can be nulled between the check and the remove(), which would throw out of this
+					// finally block and mask whatever made the build fail in the first place
+					Map<Locale, Map<String, List<String>>> cache = this.fullAddressCache;
+					if (cache != null) {
+						cache.remove(locale);
+					}
 				}
 			}
 		}
