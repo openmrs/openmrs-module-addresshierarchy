@@ -14,8 +14,11 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.ui.ModelMap;
 
 import java.util.ArrayList;
@@ -95,6 +98,38 @@ public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensiti
 		    "incorrect-parent-uuid", null, 10);
 		assertThat(result.size(), is(equalTo(2)));
 		assertThat(result, hasItem(modelMapWithValue("name", "Unions Of Kaliganj Upazila")));
+	}
+	
+	/**
+	 * The test hierarchy has five mapped levels (country, state, county, city, neighborhood), so this
+	 * search string supplies a value for every one of them; there is no level below the last one, so
+	 * there are no child entries to return. See ADDR-147.
+	 */
+	@Test
+	public void getChildAddressHierarchyEntries_shouldReturnEmptyResultWhenAValueIsSuppliedForEveryMappedLevel()
+	        throws Exception {
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		controller.getChildAddressHierarchyEntries(new ModelMap(), new MockHttpServletRequest(), response,
+		    "United States|Massachusetts|Suffolk County|Boston|Jamaica Plain");
+		assertThat(response.getContentAsString(), is(equalTo("[]")));
+	}
+	
+	@Test
+	public void getChildAddressHierarchyEntries_shouldReturnTheEntriesAtTheLevelBelowTheLastValueSupplied()
+	        throws Exception {
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		controller.getChildAddressHierarchyEntries(new ModelMap(), new MockHttpServletRequest(), response,
+		    "United States|Massachusetts|Suffolk County|Boston");
+		assertThat(response.getContentAsString(),
+		    is(equalTo("[{ \"name\": \"Beacon Hill\" },{ \"name\": \"Jamaica Plain\" }]")));
+	}
+	
+	@Test(expected = AddressHierarchyModuleException.class)
+	public void getChildAddressHierarchyEntries_shouldFailWhenMoreValuesAreSuppliedThanThereAreMappedLevels()
+	        throws Exception {
+		controller.getChildAddressHierarchyEntries(new ModelMap(), new MockHttpServletRequest(),
+		    new MockHttpServletResponse(),
+		    "United States|Massachusetts|Suffolk County|Boston|Jamaica Plain|Some Street");
 	}
 	
 	public Matcher<ModelMap> modelMapWithValue(final String field, final String name) {
