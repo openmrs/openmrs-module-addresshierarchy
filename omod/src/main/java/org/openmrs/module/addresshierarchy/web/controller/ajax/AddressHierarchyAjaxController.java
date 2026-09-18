@@ -84,9 +84,7 @@ public class AddressHierarchyAjaxController {
 				i++;
 			}
 			
-			// now do the actual search, but only if there is still a level below the ones the caller
-			// has supplied values for; if a value has been provided for every mapped level there are
-			// no child entries to return, so we fall through with an empty list
+			// only search for possible values if there is a level below this one to report
 			if (i < levels.size()) {
 				childEntryNames = ahService.getPossibleAddressValues(address, levels.get(i).getAddressField());
 			}
