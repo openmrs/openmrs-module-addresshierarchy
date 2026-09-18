@@ -365,6 +365,17 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
+	@Verifies(value = "should return an empty list if the level is null", method = "getAddressHierarchyEntriesByLevel(AddressHierarchyLevel)")
+	public void getAddressHierarchyEntriesByLevel_shouldReturnEmptyListIfLevelIsNull() throws Exception {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		List<AddressHierarchyEntry> entries = ahService.getAddressHierarchyEntriesByLevel(null);
+		
+		Assert.assertNotNull(entries);
+		Assert.assertTrue(entries.isEmpty());
+	}
+	
+	@Test
 	@Verifies(value = "should find all address hierarchy entries at top level", method = "getAddressHierarchyEntriesAtTopLevel()")
 	public void getAddressHierarchyEntriesAtTopLevel_shouldGetAddressHierarchyEntriesAtTopLevel() throws Exception {
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);

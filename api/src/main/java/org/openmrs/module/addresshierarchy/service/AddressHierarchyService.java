@@ -162,7 +162,8 @@ public interface AddressHierarchyService {
 	 * Returns all address hierarchy entries at with the given level
 	 * 
 	 * @param level
-	 * @return a list of all address hierarchy entries at the given level
+	 * @return a list of all address hierarchy entries at the given level, or an empty list if the
+	 *         level is null
 	 */
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level);
 	

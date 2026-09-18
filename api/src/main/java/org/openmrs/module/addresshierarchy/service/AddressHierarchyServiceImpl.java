@@ -461,7 +461,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level) {
 		if (level == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		
 		return dao.getAddressHierarchyEntriesByLevel(level);
@@ -749,14 +749,35 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		Map<String, List<String>> ret = this.fullAddressCache.get(locale);
 		if (ret == null) {
 			ret = new HashMap<String, List<String>>();
+			// the map has to be published before the build starts, because initializeFullAddressCacheHelper()
+			// writes the addresses it generates into the cached map (and uses its absence to detect a concurrent
+			// reset); if the build does not run to completion we take it back out again below, so that a partial
+			// or abandoned build is never served to a later caller as a successfully built cache
 			this.fullAddressCache.put(locale, ret);
-			// first determine if we are going to do phonetic processing
-			String phoneticProcessor = fetchPhoneticProcessor();
-			Method encodeStringMethod = fetchEncodeStringMethod();
-			
-			for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
-				if (!initializeFullAddressCacheHelper(locale, entry, phoneticProcessor, encodeStringMethod)) {
-					break;
+			boolean built = false;
+			try {
+				// first determine if we are going to do phonetic processing
+				String phoneticProcessor = fetchPhoneticProcessor();
+				Method encodeStringMethod = fetchEncodeStringMethod();
+				
+				boolean abandoned = false;
+				for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
+					if (!initializeFullAddressCacheHelper(locale, entry, phoneticProcessor, encodeStringMethod)) {
+						abandoned = true;
+						break;
+					}
+				}
+				built = !abandoned;
+			}
+			finally {
+				if (!built) {
+					// capture the map before testing it: resetFullAddressCache() is deliberately unsynchronized,
+					// so the field can be nulled between the check and the remove(), which would throw out of this
+					// finally block and mask whatever made the build fail in the first place
+					Map<Locale, Map<String, List<String>>> cache = this.fullAddressCache;
+					if (cache != null) {
+						cache.remove(locale);
+					}
 				}
 			}
 		}
@@ -773,7 +794,10 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	private boolean initializeFullAddressCacheHelper(Locale locale, AddressHierarchyEntry entry, String phoneticProcessor,
 	        Method encodeStringMethod) {
 
-		Map<String, List<String>> cacheForLocale = this.fullAddressCache == null ? null : this.fullAddressCache.get(locale);
+		// capture the map before reading from it: resetFullAddressCache() is deliberately unsynchronized, so a
+		// ternary that tests the field and then dereferences it can be nulled between its own two reads
+		Map<Locale, Map<String, List<String>>> cache = this.fullAddressCache;
+		Map<String, List<String>> cacheForLocale = cache == null ? null : cache.get(locale);
 		if (cacheForLocale == null) {
 			log.debug("Full address cache was reset while being initialized, abandoning this build");
 			return false;
