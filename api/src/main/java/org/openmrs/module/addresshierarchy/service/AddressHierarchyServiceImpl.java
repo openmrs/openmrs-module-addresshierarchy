@@ -461,7 +461,7 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	@Transactional(readOnly = true)
 	public List<AddressHierarchyEntry> getAddressHierarchyEntriesByLevel(AddressHierarchyLevel level) {
 		if (level == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		
 		return dao.getAddressHierarchyEntriesByLevel(level);
@@ -749,14 +749,29 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		Map<String, List<String>> ret = this.fullAddressCache.get(locale);
 		if (ret == null) {
 			ret = new HashMap<String, List<String>>();
+			// the map has to be published before the build starts, because initializeFullAddressCacheHelper()
+			// writes the addresses it generates into the cached map (and uses its absence to detect a concurrent
+			// reset); if the build does not run to completion we take it back out again below, so that a partial
+			// or abandoned build is never served to a later caller as a successfully built cache
 			this.fullAddressCache.put(locale, ret);
-			// first determine if we are going to do phonetic processing
-			String phoneticProcessor = fetchPhoneticProcessor();
-			Method encodeStringMethod = fetchEncodeStringMethod();
-			
-			for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
-				if (!initializeFullAddressCacheHelper(locale, entry, phoneticProcessor, encodeStringMethod)) {
-					break;
+			boolean built = false;
+			try {
+				// first determine if we are going to do phonetic processing
+				String phoneticProcessor = fetchPhoneticProcessor();
+				Method encodeStringMethod = fetchEncodeStringMethod();
+				
+				boolean abandoned = false;
+				for (AddressHierarchyEntry entry : getAddressHierarchyEntriesByLevel(getTopAddressHierarchyLevel())) {
+					if (!initializeFullAddressCacheHelper(locale, entry, phoneticProcessor, encodeStringMethod)) {
+						abandoned = true;
+						break;
+					}
+				}
+				built = !abandoned;
+			}
+			finally {
+				if (!built && this.fullAddressCache != null) {
+					this.fullAddressCache.remove(locale);
 				}
 			}
 		}
