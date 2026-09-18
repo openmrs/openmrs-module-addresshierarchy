@@ -74,7 +74,7 @@ public class AddressHierarchyAjaxController {
 			// iterate through all the names in the search string to form the PersonAddress object
 			for (String name : searchString.split("\\|")) {
 				if (StringUtils.isNotBlank(name)) {
-					if (levels.size() <= i - 1) { // make sure we haven't reached the bottom level, because this would make no sense
+					if (levels.size() <= i) { // make sure there is a level to assign this value to
 						throw new AddressHierarchyModuleException(
 						        "Address hierarchy levels have not been properly defined.");
 					} else {
@@ -84,8 +84,12 @@ public class AddressHierarchyAjaxController {
 				i++;
 			}
 			
-			// now do the actual search
-			childEntryNames = ahService.getPossibleAddressValues(address, levels.get(i).getAddressField());
+			// now do the actual search, but only if there is still a level below the ones the caller
+			// has supplied values for; if a value has been provided for every mapped level there are
+			// no child entries to return, so we fall through with an empty list
+			if (i < levels.size()) {
+				childEntryNames = ahService.getPossibleAddressValues(address, levels.get(i).getAddressField());
+			}
 			
 		}
 		
