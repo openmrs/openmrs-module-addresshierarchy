@@ -32,6 +32,10 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 	protected static final String CSV_FILE__WITH_USER_GENERATED_IDS_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleFileWithUserGeneratedIds.csv";
 	
 	protected static final String CSV_LARGE_FILE_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleLargeFile.csv";
+
+	protected static final String CSV_FILE_ADDITIONS_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleFileAdditions.csv";
+
+	protected static final String CSV_FILE_WITH_UPDATED_USER_GENERATED_IDS_TO_IMPORT = "org/openmrs/module/addresshierarchy/include/addressHierarchyUtilTest-sampleFileWithUpdatedUserGeneratedIds.csv";
 	
 	@Before
 	public void setupDatabase() throws Exception {
@@ -111,6 +115,88 @@ public class AddressHierarchyImportUtilTest extends BaseModuleContextSensitiveTe
 		        .get(0).getUserGeneratedId());
 	}
 	
+	@Test
+	@Verifies(value = "should not duplicate entries when the same file is imported twice", method = "importAddressHierarchyFile()")
+	public void importCsvFile_shouldNotDuplicateEntriesWhenImportedTwice() throws Exception {
+
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+		AddressHierarchyImportUtil.importAddressHierarchyFile(
+		    getClass().getClassLoader().getResourceAsStream(CSV_FILE_TO_IMPORT), "\\|");
+		Assert.assertEquals(Integer.valueOf(39), ahService.getAddressHierarchyEntryCount());
+
+		AddressHierarchyImportUtil.importAddressHierarchyFile(
+		    getClass().getClassLoader().getResourceAsStream(CSV_FILE_TO_IMPORT), "\\|");
+
+		// every entry in the file already exists, so the second import should add nothing
+		Assert.assertEquals(Integer.valueOf(39), ahService.getAddressHierarchyEntryCount());
+
+		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
+		Assert.assertEquals(1, ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "BOTHA-BOTHE").size());
+		Assert.assertEquals(1,
+		    ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(2), "Makhunoane Council").size());
+	}
+
+	@Test
+	@Verifies(value = "should attach new entries to existing parents when importing over an existing hierarchy", method = "importAddressHierarchyFile()")
+	public void importCsvFile_shouldAttachNewEntriesToExistingParents() throws Exception {
+
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+		AddressHierarchyImportUtil.importAddressHierarchyFile(
+		    getClass().getClassLoader().getResourceAsStream(CSV_FILE_TO_IMPORT), "\\|");
+
+		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
+		AddressHierarchyEntry existingParent = ahService
+		        .getAddressHierarchyEntriesByLevelAndName(levels.get(2), "Makhunoane Council").get(0);
+
+		AddressHierarchyImportUtil.importAddressHierarchyFile(
+		    getClass().getClassLoader().getResourceAsStream(CSV_FILE_ADDITIONS_TO_IMPORT), "\\|");
+
+		// the first line of the additions file already exists in its entirety, the second adds a single leaf
+		// under an existing parent, and the third adds a whole new branch below an existing top-level entry
+		Assert.assertEquals(Integer.valueOf(43), ahService.getAddressHierarchyEntryCount());
+
+		// the new leaf must hang off the entry that was already there rather than off a duplicate, even though
+		// the additions file spells its top-level ancestor in a different case
+		List<AddressHierarchyEntry> newVillage = ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(3),
+		    "Brand New Village");
+		Assert.assertEquals(1, newVillage.size());
+		Assert.assertEquals(existingParent.getId(), newVillage.get(0).getParent().getId());
+		Assert.assertEquals(1,
+		    ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(2), "Makhunoane Council").size());
+		Assert.assertEquals(1, ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "BOTHA-BOTHE").size());
+
+		// the wholly new branch should have been created and rooted under the existing top-level entry
+		AddressHierarchyEntry newDistrict = ahService
+		        .getAddressHierarchyEntriesByLevelAndName(levels.get(1), "BRAND NEW DISTRICT").get(0);
+		Assert.assertEquals("BOTHA-BOTHE", newDistrict.getParent().getName());
+	}
+
+	@Test
+	@Verifies(value = "should update the user generated id of an existing entry", method = "importAddressHierarchyFile()")
+	public void importCsvFile_shouldUpdateUserGeneratedIdOfExistingEntry() throws Exception {
+
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+		AddressHierarchyImportUtil.importAddressHierarchyFile(
+		    getClass().getClassLoader().getResourceAsStream(CSV_FILE__WITH_USER_GENERATED_IDS_TO_IMPORT), "\\|", "%");
+
+		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
+		Assert.assertEquals("12",
+		    ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "BOTHA-BOTHE").get(0).getUserGeneratedId());
+
+		int countBefore = ahService.getAddressHierarchyEntryCount();
+		AddressHierarchyImportUtil.importAddressHierarchyFile(
+		    getClass().getClassLoader().getResourceAsStream(CSV_FILE_WITH_UPDATED_USER_GENERATED_IDS_TO_IMPORT), "\\|",
+		    "%");
+
+		// re-importing an entry that already exists must update its user generated id in place, not add a row
+		Assert.assertEquals(Integer.valueOf(countBefore), ahService.getAddressHierarchyEntryCount());
+		Assert.assertEquals("99",
+		    ahService.getAddressHierarchyEntriesByLevelAndName(levels.get(0), "BOTHA-BOTHE").get(0).getUserGeneratedId());
+	}
+
 	@Test
 	@Verifies(value = "should import large csv file", method = "importAddressHierarchyFile()")
 	public void importCsvFile_shouldImportLargeCsvFile() throws Exception {

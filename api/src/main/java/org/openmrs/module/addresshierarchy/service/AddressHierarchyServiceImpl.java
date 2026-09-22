@@ -579,6 +579,19 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 		}
 		resetFullAddressCache();
 	}
+
+	@Transactional(readOnly = true)
+	public List<AddressHierarchyEntry> getDetachedAddressHierarchyEntries() {
+		return dao.getDetachedAddressHierarchyEntries();
+	}
+
+	@Transactional
+	public void bulkSaveAddressHierarchyEntries(List<AddressHierarchyEntry> entriesToInsert,
+	        Map<Integer, String> userGeneratedIdsByEntryId) {
+		dao.insertAddressHierarchyEntries(entriesToInsert);
+		dao.updateAddressHierarchyEntryUserGeneratedIds(userGeneratedIdsByEntryId);
+		resetFullAddressCache();
+	}
 	
 	@Transactional
 	public void deleteAllAddressHierarchyEntries() {

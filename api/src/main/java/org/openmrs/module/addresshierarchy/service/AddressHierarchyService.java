@@ -257,6 +257,34 @@ public interface AddressHierarchyService {
 	 */
 	@Authorized({ AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
 	public void saveAddressHierarchyEntries(List<AddressHierarchyEntry> entries);
+
+	/**
+	 * Returns the whole hierarchy as detached objects, with each entry's parent linked to the object
+	 * representing that parent. The returned entries are not attached to the session, so changing one has no
+	 * effect on the database. This is intended for callers that need to inspect the entire hierarchy at once,
+	 * such as the importer, and want to avoid the cost of holding every entry as a managed entity.
+	 *
+	 * @return every address hierarchy entry, detached and linked to its parent
+	 */
+	public List<AddressHierarchyEntry> getDetachedAddressHierarchyEntries();
+
+	/**
+	 * Writes a whole hierarchy in one transaction, inserting new entries and applying user generated id changes
+	 * to existing ones. Either everything is written or nothing is, so a failure part way through cannot leave
+	 * a half-loaded hierarchy behind.
+	 * <p>
+	 * Entries are inserted in batches rather than one at a time and are never added to the persistence context,
+	 * which is what makes loading a large hierarchy practical. Because the rows are written without going
+	 * through Hibernate, applying user generated id changes flushes and then clears the session, so any entity
+	 * held across this call should be treated as detached afterwards.
+	 *
+	 * @param entriesToInsert entries that do not yet exist, ordered so that a parent appears before its
+	 *            children; each is given the id the database assigns to it
+	 * @param userGeneratedIdsByEntryId the new user generated id for each already-persisted entry that needs one
+	 */
+	@Authorized({ AddressHierarchyConstants.PRIV_MANAGE_ADDRESS_HIERARCHY })
+	public void bulkSaveAddressHierarchyEntries(List<AddressHierarchyEntry> entriesToInsert,
+	        Map<Integer, String> userGeneratedIdsByEntryId);
 	
 	/**
 	 * Removes all address hierarchy entries--use with care

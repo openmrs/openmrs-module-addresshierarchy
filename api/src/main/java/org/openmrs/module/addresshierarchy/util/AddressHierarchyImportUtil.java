@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -34,12 +34,6 @@ import java.util.Stack;
 public class AddressHierarchyImportUtil {
 	
 	protected static final Log log = LogFactory.getLog(AddressHierarchyImportUtil.class);
-	
-	// number of entries to save (and commit, since each batch is its own @Transactional call) at one time.
-	// Each commit has real overhead, so this needs to be large enough that a big hierarchy (tens of thousands
-	// of entries) doesn't take an excessive number of transactions to import, while staying small enough that
-	// a single batch's entries don't cause memory pressure.
-	protected static final int ENTRY_BATCH_SIZE = 500;
 	
 	/**
 	 * Takes a file of delimited addresses and creates and address hierarchy out of it Starting level
@@ -52,18 +46,25 @@ public class AddressHierarchyImportUtil {
 		
 		String line;
 		
-		// to let us know if we even need to query the database (to speed up performance)
-		Boolean hasExistingEntries = ahService.getAddressHierarchyEntryCount() > 0 ? true : false;
-		
 		// a cache we use to speed up performance
 		Map<AddressHierarchyEntry, Map<String, AddressHierarchyEntry>> entryCache = new HashMap<AddressHierarchyEntry, Map<String, AddressHierarchyEntry>>();
-		
-		// the list of all address hierarchy entries
-		List<AddressHierarchyEntry> entries = new LinkedList<AddressHierarchyEntry>();
-		
+
+		// the entries the file describes that do not exist yet, parents always ahead of their children
+		List<AddressHierarchyEntry> entries = new ArrayList<AddressHierarchyEntry>();
+
+		// user generated ids the file assigns to entries that already exist. Those entries are detached, so the
+		// change has to be collected here and written as an update rather than riding along on an insert.
+		Map<Integer, String> userGeneratedIdUpdates = new HashMap<Integer, String>();
+
 		// get an ordered list of the address hierarchy levels
 		List<AddressHierarchyLevel> levels = ahService.getOrderedAddressHierarchyLevels();
-		
+
+		// resolving each entry against the database as the file was read made importing over an existing
+		// hierarchy quadratic, so the hierarchy is pulled into memory once up front instead
+		for (AddressHierarchyEntry entry : ahService.getDetachedAddressHierarchyEntries()) {
+			addToCache(entryCache, entry.getParent(), entry);
+		}
+
 		// if we aren't starting at the top level of the hierarchy, remove all the levels before the one we wish to start at
 		if (startingLevel != null) {
 			Iterator<AddressHierarchyLevel> i = levels.iterator();
@@ -103,18 +104,11 @@ public class AddressHierarchyImportUtil {
 							AddressHierarchyEntry entry = null;
 							AddressHierarchyEntry parent = entryStack.isEmpty() ? null : entryStack.peek();
 							
-							// first see if this entry already exists in the cache
-							if (entryCache.containsKey(parent)
-							        && entryCache.get(parent).containsKey(entryNameAndIdPair[0].toLowerCase())) {
-								entry = entryCache.get(parent).get(entryNameAndIdPair[0].toLowerCase());
-							}
-							// if it is not in the cache, see if it is in the database if there are existing entries
-							else if (hasExistingEntries) {
-								entry = ahService.getChildAddressHierarchyEntryByName(parent, entryNameAndIdPair[0]);
-								// if we have found an entry, add it to the cache
-								if (entry != null) {
-									addToCache(entryCache, parent, entry);
-								}
+							// the cache holds the pre-existing hierarchy as well as everything created by this
+							// import, so a miss here means the entry does not exist yet and must be created
+							Map<String, AddressHierarchyEntry> siblings = entryCache.get(parent);
+							if (siblings != null) {
+								entry = siblings.get(entryNameAndIdPair[0].toLowerCase());
 							}
 							
 							// if we still haven't found the entry, we need to create it
@@ -130,8 +124,14 @@ public class AddressHierarchyImportUtil {
 								addToCache(entryCache, parent, entry);
 							}
 							
-							// update/set the user defined id if one has been specified
+							// update/set the user defined id if one has been specified. A file is allowed to name
+							// the same entry more than once with different ids, and the last one read wins, so
+							// an entry that already exists records the change for the update pass each time.
 							if (entryNameAndIdPair.length > 1) {
+								if (entry.getId() != null
+								        && !entryNameAndIdPair[1].equals(entry.getUserGeneratedId())) {
+									userGeneratedIdUpdates.put(entry.getId(), entryNameAndIdPair[1]);
+								}
 								entry.setUserGeneratedId(entryNameAndIdPair[1]);
 							}
 							
@@ -147,20 +147,10 @@ public class AddressHierarchyImportUtil {
 		}
 		
 		log.info(entries.size() + " address hierarchy entries to save");
-		
-		// now do the actual save, broken up into batches
-		int batchStart = 0;
-		int batchEnd = ENTRY_BATCH_SIZE;
-		
-		while (batchEnd <= entries.size()) {
-			ahService.saveAddressHierarchyEntries(entries.subList(batchStart, batchEnd));
-			batchStart = batchEnd;
-			batchEnd = batchEnd + ENTRY_BATCH_SIZE;
-		}
-		
-		if (batchStart < entries.size()) {
-			ahService.saveAddressHierarchyEntries(entries.subList(batchStart, entries.size()));
-		}
+
+		// one call, so the whole hierarchy lands in a single transaction and a failure part way through cannot
+		// leave the hierarchy half loaded
+		ahService.bulkSaveAddressHierarchyEntries(entries, userGeneratedIdUpdates);
 	}
 	
 	public static final void importAddressHierarchyFile(InputStream stream, String delimiter,
@@ -173,34 +163,32 @@ public class AddressHierarchyImportUtil {
 	}
 	
 	/**
-	 * Utility methods
+	 * Splits one cell of the file into the entry name and, where the file carries them, the user generated id.
+	 *
+	 * @return an array holding just the name, or the name followed by the user generated id. A length greater
+	 *         than one therefore means the file really did specify an id for this entry.
 	 */
 	private static final String[] splitIntoNameAndUserGeneratedId(String location, String userGeneratedIdDelimiter) {
-		
-		// hacky, poor man's pair
-		String[] entryNameAndIdPair = new String[2];
-		
+
 		// only need to split out into name and id if we have a user generated id delimiter
 		if (StringUtils.isNotBlank(userGeneratedIdDelimiter)) {
-			entryNameAndIdPair = location.split(userGeneratedIdDelimiter);
+			String[] entryNameAndIdPair = location.split(userGeneratedIdDelimiter);
 			entryNameAndIdPair[0] = StringUtils.strip(entryNameAndIdPair[0]);
-			
+
 			if (entryNameAndIdPair.length > 1) {
 				entryNameAndIdPair[1] = StringUtils.strip(entryNameAndIdPair[1]);
 			}
-		} else {
-			entryNameAndIdPair[0] = StringUtils.strip(location);
+
+			return entryNameAndIdPair;
 		}
-		
-		return entryNameAndIdPair;
+
+		return new String[] { StringUtils.strip(location) };
 	}
 	
 	private static final void addToCache(Map<AddressHierarchyEntry, Map<String, AddressHierarchyEntry>> entryCache,
 	        AddressHierarchyEntry parent, AddressHierarchyEntry entry) {
-		if (!entryCache.containsKey(parent)) {
-			entryCache.put(parent, new HashMap<String, AddressHierarchyEntry>());
-		}
-		entryCache.get(parent).put(entry.getName().toLowerCase(), entry);
+		entryCache.computeIfAbsent(parent, k -> new HashMap<String, AddressHierarchyEntry>())
+		        .put(entry.getName().toLowerCase(), entry);
 	}
 	
 }

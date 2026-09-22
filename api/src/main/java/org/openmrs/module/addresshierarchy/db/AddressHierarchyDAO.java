@@ -11,6 +11,7 @@ package org.openmrs.module.addresshierarchy.db;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.openmrs.Patient;
 import org.openmrs.PersonAddress;
@@ -82,6 +83,32 @@ public interface AddressHierarchyDAO {
 	 * Saves the specified address hierarchy entry
 	 */
 	public void saveAddressHierarchyEntry(AddressHierarchyEntry ah);
+
+	/**
+	 * Returns the whole hierarchy as detached objects, with each entry's parent linked to the object
+	 * representing that parent. Nothing is added to the persistence context, so callers that only need to look
+	 * the hierarchy up (such as the importer) do not pay the flush cost of holding it all as managed entities.
+	 *
+	 * @return every address hierarchy entry, detached and linked to its parent
+	 */
+	public List<AddressHierarchyEntry> getDetachedAddressHierarchyEntries();
+
+	/**
+	 * Inserts entries that do not yet exist in a single batched pass, filling in the id the database assigns to
+	 * each one. Entries may refer to each other as parents provided a parent appears before its children in the
+	 * list; any other parent must already be persisted.
+	 *
+	 * @param entries the entries to insert, parents before children
+	 */
+	public void insertAddressHierarchyEntries(List<AddressHierarchyEntry> entries);
+
+	/**
+	 * Applies user generated id changes to entries that already exist, without touching any of their other
+	 * columns.
+	 *
+	 * @param userGeneratedIdsByEntryId the new user generated id for each entry id to update
+	 */
+	public void updateAddressHierarchyEntryUserGeneratedIds(Map<Integer, String> userGeneratedIdsByEntryId);
 	
 	/**
 	 * Deletes all the address hierarchy entries (use with care!)

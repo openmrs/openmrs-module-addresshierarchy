@@ -10,9 +10,18 @@
 package org.openmrs.module.addresshierarchy.db.hibernate;
 
 import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +52,10 @@ import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleExcep
 public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	
 	protected final Log log = LogFactory.getLog(getClass());
-	
+
+	// how many rows are sent to the database per round trip when bulk loading a hierarchy
+	protected static final int ENTRY_BATCH_SIZE = 500;
+
 	/**
 	 * Hibernate session factory
 	 */
@@ -178,6 +190,198 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		}
 		catch (Throwable t) {
 			throw new DAOException(t);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<AddressHierarchyEntry> getDetachedAddressHierarchyEntries() {
+		Session session = getCurrentSession();
+
+		// selecting the columns rather than the entity keeps the persistence context empty. Loading these as
+		// entities instead would leave every row managed, and Hibernate walks the whole persistence context on
+		// each flush, which is what made importing a large hierarchy scale quadratically.
+		List<Object[]> rows = session.createQuery(
+		    "select e.addressHierarchyEntryId, e.name, e.userGeneratedId, e.latitude, e.longitude, e.elevation, e.uuid, e.level.levelId, e.parent.addressHierarchyEntryId from AddressHierarchyEntry e")
+		        .list();
+
+		Map<Integer, AddressHierarchyLevel> levelsById = new HashMap<Integer, AddressHierarchyLevel>();
+		for (AddressHierarchyLevel level : getAddressHierarchyLevels()) {
+			levelsById.put(level.getId(), level);
+		}
+
+		// build every entry first, then link the parents, so that the graph does not depend on the order the
+		// rows come back in
+		Map<Integer, AddressHierarchyEntry> entriesById = new HashMap<Integer, AddressHierarchyEntry>(rows.size() * 2);
+		List<AddressHierarchyEntry> entries = new ArrayList<AddressHierarchyEntry>(rows.size());
+		for (Object[] row : rows) {
+			AddressHierarchyEntry entry = new AddressHierarchyEntry();
+			entry.setAddressHierarchyEntryId((Integer) row[0]);
+			entry.setName((String) row[1]);
+			entry.setUserGeneratedId((String) row[2]);
+			entry.setLatitude((Double) row[3]);
+			entry.setLongitude((Double) row[4]);
+			entry.setElevation((Double) row[5]);
+			entry.setUuid((String) row[6]);
+			entry.setLevel(levelsById.get(row[7]));
+			entriesById.put(entry.getId(), entry);
+			entries.add(entry);
+		}
+
+		int i = 0;
+		for (Object[] row : rows) {
+			Integer parentId = (Integer) row[8];
+			if (parentId != null) {
+				entries.get(i).setParent(entriesById.get(parentId));
+			}
+			i++;
+		}
+
+		return entries;
+	}
+
+	public void insertAddressHierarchyEntries(final List<AddressHierarchyEntry> entries) {
+		if (entries == null || entries.isEmpty()) {
+			return;
+		}
+
+		// An entry whose parent is also being inserted cannot be written until that parent has been given an
+		// id, so entries are grouped by how far they sit below the nearest already-persisted ancestor and each
+		// group is written in turn. An IdentityHashMap is used deliberately: AddressHierarchyEntry.equals()
+		// reports false for anything without an id, so entries that have not been written yet cannot be told
+		// apart by a normal map.
+		final List<List<AddressHierarchyEntry>> generations = new ArrayList<List<AddressHierarchyEntry>>();
+		Map<AddressHierarchyEntry, Integer> depths = new IdentityHashMap<AddressHierarchyEntry, Integer>(entries.size());
+		for (AddressHierarchyEntry entry : entries) {
+			AddressHierarchyEntry parent = entry.getParent();
+			Integer parentDepth = parent == null ? null : depths.get(parent);
+			int depth = parentDepth == null ? 0 : parentDepth + 1;
+			depths.put(entry, depth);
+			while (generations.size() <= depth) {
+				generations.add(new ArrayList<AddressHierarchyEntry>());
+			}
+			generations.get(depth).add(entry);
+		}
+
+		try {
+			// doWork borrows the session's own connection, so these statements join whatever transaction the
+			// caller is running in and commit or roll back along with it
+			getCurrentSession().doWork(connection -> {
+				for (List<AddressHierarchyEntry> generation : generations) {
+					insertGeneration(connection, generation);
+				}
+			});
+		}
+		catch (Throwable t) {
+			throw new DAOException(t);
+		}
+	}
+
+	/**
+	 * Writes one generation of entries, every one of which is guaranteed to have a parent that already carries
+	 * an id, and copies the ids the database assigns back onto the entries so the next generation can refer to
+	 * them.
+	 */
+	private void insertGeneration(Connection connection, List<AddressHierarchyEntry> generation) throws SQLException {
+		String sql = "insert into address_hierarchy_entry (name, level_id, parent_id, user_generated_id, latitude, longitude, elevation, uuid) values (?, ?, ?, ?, ?, ?, ?, ?)";
+
+		// naming the key column rather than asking for RETURN_GENERATED_KEYS keeps this portable: PostgreSQL
+		// turns the generic form into "returning *" and hands back every column, so reading the first one would
+		// only find the id for as long as it stays the first column in the table
+		try (PreparedStatement statement = connection.prepareStatement(sql,
+		    new String[] { "address_hierarchy_entry_id" })) {
+			int batchStart = 0;
+			for (int i = 0; i < generation.size(); i++) {
+				AddressHierarchyEntry entry = generation.get(i);
+				statement.setString(1, entry.getName());
+				setIntOrNull(statement, 2, entry.getLevel() == null ? null : entry.getLevel().getId());
+				setIntOrNull(statement, 3, entry.getParent() == null ? null : entry.getParent().getId());
+				statement.setString(4, entry.getUserGeneratedId());
+				setDoubleOrNull(statement, 5, entry.getLatitude());
+				setDoubleOrNull(statement, 6, entry.getLongitude());
+				setDoubleOrNull(statement, 7, entry.getElevation());
+				statement.setString(8, entry.getUuid());
+				statement.addBatch();
+
+				if ((i + 1) % ENTRY_BATCH_SIZE == 0 || i == generation.size() - 1) {
+					statement.executeBatch();
+					assignGeneratedIds(statement, generation.subList(batchStart, i + 1));
+					batchStart = i + 1;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Copies the keys the database generated onto the entries they were generated for. The driver returns them
+	 * in the order the rows were added to the batch, so they are matched up positionally; a short or missing
+	 * result means the entries would silently keep null ids and their children would be written with a null
+	 * parent, so it is treated as a failure instead.
+	 */
+	private void assignGeneratedIds(Statement statement, List<AddressHierarchyEntry> batch) throws SQLException {
+		int assigned = 0;
+		try (ResultSet keys = statement.getGeneratedKeys()) {
+			while (keys.next() && assigned < batch.size()) {
+				batch.get(assigned).setAddressHierarchyEntryId(keys.getInt(1));
+				assigned++;
+			}
+		}
+
+		if (assigned != batch.size()) {
+			throw new SQLException("Expected " + batch.size() + " generated address hierarchy entry ids but received "
+			        + assigned);
+		}
+	}
+
+	public void updateAddressHierarchyEntryUserGeneratedIds(final Map<Integer, String> userGeneratedIdsByEntryId) {
+		if (userGeneratedIdsByEntryId == null || userGeneratedIdsByEntryId.isEmpty()) {
+			return;
+		}
+
+		try {
+			Session session = getCurrentSession();
+
+			// these rows are rewritten behind Hibernate's back, so anything the session already holds for them
+			// would otherwise keep serving the old value. Flushing first means pending work is written rather
+			// than thrown away by the clear that follows.
+			session.flush();
+
+			session.doWork(connection -> {
+				try (PreparedStatement statement = connection
+				        .prepareStatement("update address_hierarchy_entry set user_generated_id = ? where address_hierarchy_entry_id = ?")) {
+					int i = 0;
+					for (Map.Entry<Integer, String> update : userGeneratedIdsByEntryId.entrySet()) {
+						statement.setString(1, update.getValue());
+						statement.setInt(2, update.getKey());
+						statement.addBatch();
+
+						if (++i % ENTRY_BATCH_SIZE == 0) {
+							statement.executeBatch();
+						}
+					}
+					statement.executeBatch();
+				}
+			});
+
+			session.clear();
+		}
+		catch (Throwable t) {
+			throw new DAOException(t);
+		}
+	}
+
+	private static void setIntOrNull(PreparedStatement statement, int index, Integer value) throws SQLException {
+		if (value == null) {
+			statement.setNull(index, Types.INTEGER);
+		} else {
+			statement.setInt(index, value);
+		}
+	}
+
+	private static void setDoubleOrNull(PreparedStatement statement, int index, Double value) throws SQLException {
+		if (value == null) {
+			statement.setNull(index, Types.DOUBLE);
+		} else {
+			statement.setDouble(index, value);
 		}
 	}
 	
