@@ -14,7 +14,10 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
+import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -121,7 +124,56 @@ public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensiti
 		controller.getChildAddressHierarchyEntries(new ModelMap(), new MockHttpServletRequest(), response,
 		    "United States|Massachusetts|Suffolk County|Boston");
 		assertThat(response.getContentAsString(),
-		    is(equalTo("[{ \"name\": \"Beacon Hill\" },{ \"name\": \"Jamaica Plain\" }]")));
+		    is(equalTo("[{\"name\":\"Beacon Hill\"},{\"name\":\"Jamaica Plain\"}]")));
+	}
+
+	@Test
+	public void getChildAddressHierarchyEntries_shouldEscapeSpecialCharactersInEntryNames() throws Exception {
+		saveNeighborhoodInBoston(SPECIAL_CHARACTER_NAME);
+
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		controller.getChildAddressHierarchyEntries(new ModelMap(), new MockHttpServletRequest(), response,
+		    "United States|Massachusetts|Suffolk County|Boston");
+		assertThat(response.getContentAsString(), is(equalTo(
+		    "[{\"name\":\"Back \\\"Bay\\\" \\\\ North\"},{\"name\":\"Beacon Hill\"},{\"name\":\"Jamaica Plain\"}]")));
+	}
+
+	@Test
+	public void getPossibleFullAddressesForAddressHierarchyEntry_shouldEscapeSpecialCharactersInAddresses()
+	        throws Exception {
+		AddressHierarchyEntry entry = saveNeighborhoodInBoston(SPECIAL_CHARACTER_NAME);
+
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		controller.getPossibleFullAddressesForAddressHierarchyEntry(new ModelMap(), new MockHttpServletRequest(),
+		    response, SPECIAL_CHARACTER_NAME, entry.getLevel().getAddressField().getName(), null);
+		assertThat(response.getContentAsString(), is(equalTo(
+		    "[{\"address\":\"United States|New England|Massachusetts|Suffolk County|Boston|Back \\\"Bay\\\" \\\\ North\"}]")));
+	}
+
+	@Test
+	public void getPossibleFullAddressesForAddressHierarchyEntry_shouldReplacePipesWithTheGivenSeparator()
+	        throws Exception {
+		AddressHierarchyEntry entry = saveNeighborhoodInBoston(SPECIAL_CHARACTER_NAME);
+
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		controller.getPossibleFullAddressesForAddressHierarchyEntry(new ModelMap(), new MockHttpServletRequest(),
+		    response, SPECIAL_CHARACTER_NAME, entry.getLevel().getAddressField().getName(), ", ");
+		assertThat(response.getContentAsString(), is(equalTo(
+		    "[{\"address\":\"United States, New England, Massachusetts, Suffolk County, Boston, Back \\\"Bay\\\" \\\\ North\"}]")));
+	}
+
+	/** Contains the characters that must be escaped in a JSON string. */
+	private static final String SPECIAL_CHARACTER_NAME = "Back \"Bay\" \\ North";
+
+	/** Saves an entry at the same level as, and alongside, Boston's existing neighborhoods. */
+	private AddressHierarchyEntry saveNeighborhoodInBoston(String name) {
+		AddressHierarchyService service = Context.getService(AddressHierarchyService.class);
+		AddressHierarchyEntry entry = new AddressHierarchyEntry();
+		entry.setName(name);
+		entry.setParent(service.getAddressHierarchyEntry(10));
+		entry.setLevel(service.getAddressHierarchyEntry(12).getLevel());
+		service.saveAddressHierarchyEntry(entry);
+		return entry;
 	}
 	
 	@Test(expected = AddressHierarchyModuleException.class)
