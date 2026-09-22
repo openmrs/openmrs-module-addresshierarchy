@@ -9,6 +9,8 @@
  */
 package org.openmrs.module.addresshierarchy.web.controller.ajax;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -44,7 +45,10 @@ import javax.servlet.http.HttpServletResponse;
 public class AddressHierarchyAjaxController {
 	
 	protected final Log log = LogFactory.getLog(getClass());
-	
+
+	/** Leaves the servlet response writer open for the container to manage. */
+	private static final JsonFactory JSON_FACTORY = new JsonFactory().disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
+
 	/**
 	 * Returns a list of child address hierarchy entries in JSON format The parent entry is specified by
 	 * a string in the format "UNITED STATES|MASSACHUSETTS|PLYMOUTH COUNTY"
@@ -300,11 +304,10 @@ public class AddressHierarchyAjaxController {
 	        String exactMatch) throws IOException {
 		response.setContentType("text/json");
 		response.setCharacterEncoding("UTF-8");
-		PrintWriter out = response.getWriter();
-		
-		// start the JSON
-		out.print("[");
-		
+
+		JsonGenerator json = JSON_FACTORY.createGenerator(response.getWriter());
+		json.writeStartArray();
+
 		if (names != null) {
 			// sort names
 			Collections.sort(names);
@@ -320,20 +323,16 @@ public class AddressHierarchyAjaxController {
 				}
 			}
 			
-			// add the elements: ie, { "name": "Boston" }
-			i = names.iterator();
-			while (i.hasNext()) {
-				out.print("{ \"name\": \"" + i.next() + "\" }");
-				
-				// print comma as a delimiter for all but the last option in the list
-				if (i.hasNext()) {
-					out.print(",");
-				}
+			// add the elements: ie, {"name":"Boston"}
+			for (String name : names) {
+				json.writeStartObject();
+				json.writeStringField("name", name);
+				json.writeEndObject();
 			}
 		}
-		
-		// close the JSON
-		out.print("]");
+
+		json.writeEndArray();
+		json.flush();
 	}
 	
 	private void generateAddressHierarchyEntryNamesResponse(HttpServletResponse response, List<String> names)
@@ -354,31 +353,20 @@ public class AddressHierarchyAjaxController {
 		
 		response.setContentType("text/json");
 		response.setCharacterEncoding("UTF-8");
-		PrintWriter out = response.getWriter();
-		
-		out.print("[");
-		
-		if (addresses != null && addresses.size() > 0) {
-			Iterator<String> i = addresses.iterator();
-			if (StringUtils.isNotBlank(delimiter)) {
-				while (i.hasNext()) {
-					out.print("{ \"address\": \"" + StringUtils.replace(i.next(), "|", delimiter) + "\" }");
-					// print comma between entries for all but the last option in the list
-					if (i.hasNext()) {
-						out.print(",");
-					}
-				}
-			} else {
-				while (i.hasNext()) {
-					out.print("{ \"address\": \"" + i.next() + "\" }");
-					// print comma between entries for all but the last option in the list
-					if (i.hasNext()) {
-						out.print(",");
-					}
-				}
+
+		JsonGenerator json = JSON_FACTORY.createGenerator(response.getWriter());
+		json.writeStartArray();
+
+		if (addresses != null) {
+			boolean replaceDelimiter = StringUtils.isNotBlank(delimiter);
+			for (String address : addresses) {
+				json.writeStartObject();
+				json.writeStringField("address", replaceDelimiter ? StringUtils.replace(address, "|", delimiter) : address);
+				json.writeEndObject();
 			}
 		}
-		
-		out.print("]");
+
+		json.writeEndArray();
+		json.flush();
 	}
 }
