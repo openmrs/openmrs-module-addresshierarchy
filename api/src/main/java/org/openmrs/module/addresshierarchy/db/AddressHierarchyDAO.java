@@ -130,7 +130,13 @@ public interface AddressHierarchyDAO {
 	 * Gets an address hierarchy level by Id
 	 */
 	public AddressHierarchyLevel getAddressHierarchyLevel(int levelId);
-	
+	/**
+ * Gets an AddressHierarchyLevel by its UUID.
+ *
+ * @param uuid the UUID of the address hierarchy level
+ * @return the address hierarchy level with the given UUID
+ */
+public AddressHierarchyLevel getAddressHierarchyLevelByUuid(String uuid);
 	/**
 	 * Gets the address hierarchy level that is the child of the specified level (Will throw an
 	 * exception if there are multiple children--a level should only have one child)

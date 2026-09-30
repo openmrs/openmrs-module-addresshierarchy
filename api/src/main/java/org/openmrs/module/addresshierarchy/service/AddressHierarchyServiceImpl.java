@@ -671,6 +671,11 @@ public class AddressHierarchyServiceImpl implements AddressHierarchyService {
 	public AddressHierarchyLevel getAddressHierarchyLevel(Integer levelId) {
 		return dao.getAddressHierarchyLevel(levelId);
 	}
+
+	@Transactional(readOnly = true)
+public AddressHierarchyLevel getAddressHierarchyLevelByUuid(String uuid) {
+    return dao.getAddressHierarchyLevelByUuid(uuid);
+}
 	
 	@Transactional(readOnly = true)
 	public AddressHierarchyLevel getAddressHierarchyLevelByAddressField(AddressField addressField) {

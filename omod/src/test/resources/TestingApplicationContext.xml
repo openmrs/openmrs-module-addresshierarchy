@@ -37,4 +37,42 @@
 		<!--  default properties must be set in the hibernate.default.properties -->
 	</bean>
 	
+
+        <bean id="xStreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller" />
+
+        <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter" />
+
+        <bean id="xmlMarshallingHttpMessageConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+                <property name="marshaller" ref="xStreamMarshaller" />
+                <property name="unmarshaller" ref="xStreamMarshaller" />
+        </bean>
+
+        <bean id="openmrsClassScanner" class="org.openmrs.module.webservices.rest.web.OpenmrsClassScanner" factory-method="getInstance" />
+
+        <bean id="restHelperService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+                <property name="transactionManager" ref="transactionManager" />
+                <property name="target">
+                        <bean class="org.openmrs.module.webservices.rest.web.api.impl.RestHelperServiceImpl">
+                                <property name="sessionFactory" ref="dbSessionFactory" />
+                        </bean>
+                </property>
+                <property name="preInterceptors" ref="serviceInterceptors" />
+                <property name="transactionAttributeSource">
+                        <bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource" />
+                </property>
+        </bean>
+
+        <bean id="restService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+                <property name="transactionManager" ref="transactionManager" />
+                <property name="target">
+                        <bean class="org.openmrs.module.webservices.rest.web.api.impl.RestServiceImpl">
+                                <property name="restHelperService" ref="restHelperService" />
+                                <property name="openmrsClassScanner" ref="openmrsClassScanner" />
+                        </bean>
+                </property>
+                <property name="preInterceptors" ref="serviceInterceptors" />
+                <property name="transactionAttributeSource">
+                        <bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource" />
+                </property>
+        </bean>
 </beans>
