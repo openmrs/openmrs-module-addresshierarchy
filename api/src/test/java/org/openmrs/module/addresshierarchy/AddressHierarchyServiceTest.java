@@ -68,6 +68,20 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertEquals("country", level.getAddressField().getName());
 		
 	}
+
+	@Test
+public void getAddressHierarchyLevelByUuid_shouldReturnLevel() throws Exception {
+    AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+
+    AddressHierarchyLevel level = ahService.getAddressHierarchyLevel(1);
+    AddressHierarchyLevel levelByUuid = ahService.getAddressHierarchyLevelByUuid(level.getUuid());
+
+    Assert.assertNotNull(levelByUuid);
+    Assert.assertEquals(level.getUuid(), levelByUuid.getUuid());
+    Assert.assertEquals("Country", levelByUuid.getName());
+    Assert.assertEquals("country", levelByUuid.getAddressField().getName());
+}
+
 	
 	@Test
 	@Verifies(value = "should get top level hierarchy", method = "getTopAddressHierarchyLevel(int id)")

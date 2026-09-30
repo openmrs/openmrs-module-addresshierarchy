@@ -354,6 +354,13 @@ public interface AddressHierarchyService {
 	 * @return the address hierarchy level with the given id
 	 */
 	public AddressHierarchyLevel getAddressHierarchyLevel(Integer levelId);
+	/**
+ * Gets an AddressHierarchyLevel by its UUID.
+ *
+ * @param uuid the UUID of the address hierarchy level
+ * @return the address hierarchy level with the given UUID
+ */
+public AddressHierarchyLevel getAddressHierarchyLevelByUuid(String uuid);
 	
 	/**
 	 * Gets the AddressHierarchyLevel associated with the specified AddressField

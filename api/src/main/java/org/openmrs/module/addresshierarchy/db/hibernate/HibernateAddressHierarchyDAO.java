@@ -430,6 +430,14 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 		AddressHierarchyLevel type = (AddressHierarchyLevel) session.load(AddressHierarchyLevel.class, levelId);
 		return type;
 	}
+
+	@Override
+public AddressHierarchyLevel getAddressHierarchyLevelByUuid(String uuid) {
+    return (AddressHierarchyLevel) getCurrentSession()
+            .createQuery("from AddressHierarchyLevel where uuid = :uuid")
+            .setParameter("uuid", uuid)
+            .uniqueResult();
+}
 	
 	public AddressHierarchyLevel getAddressHierarchyLevelByParent(AddressHierarchyLevel parent) {
 		Session session = getCurrentSession();
