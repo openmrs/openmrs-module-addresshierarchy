@@ -13,16 +13,17 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.test.SkipBaseSetup;
 import org.openmrs.test.Verifies;
 import org.springframework.test.annotation.DirtiesContext;
 
-import junit.framework.Assert;
+import org.junit.jupiter.api.Assertions;
 
 /**
  * Exercises the address hierarchy service against a database where no address hierarchy has been
@@ -47,9 +48,12 @@ public class AddressHierarchyServiceUnconfiguredTest extends BaseModuleContextSe
 
 	protected final Log log = LogFactory.getLog(getClass());
 
-	@Before
+	@BeforeEach
 	public void setupDatabase() throws Exception {
 		initializeInMemoryDatabase();
+		// core's role privilege cache loads roles on a background thread with its own session, which cannot see
+		// this test's uncommitted rows, so commit them (tearDown deletes them again)
+		getConnection().commit();
 		authenticate();
 		executeDataSet(INITIAL_XML_DATASET_PACKAGE_PATH);
 		executeDataSet(EXAMPLE_XML_DATASET_PACKAGE_PATH);
@@ -60,6 +64,11 @@ public class AddressHierarchyServiceUnconfiguredTest extends BaseModuleContextSe
 		    AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP, "true");
 	}
 
+	@AfterEach
+	public void tearDown() {
+		deleteAllData();
+	}
+
 	@Test
 	@Verifies(value = "should return an empty result, not throw, when no address hierarchy is configured", method = "searchAddresses(String,AddressHierarchyLevel)")
 	public void searchAddresses_shouldReturnEmptyResultIfNoLevelsOrEntriesConfigured() throws Exception {
@@ -67,9 +76,9 @@ public class AddressHierarchyServiceUnconfiguredTest extends BaseModuleContextSe
 		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
 
 		// preconditions: nothing is configured, so there is no top level to start a cache build from
-		Assert.assertEquals(Integer.valueOf(0), ahService.getAddressHierarchyLevelsCount());
-		Assert.assertEquals(Integer.valueOf(0), ahService.getAddressHierarchyEntryCount());
-		Assert.assertNull(ahService.getTopAddressHierarchyLevel());
+		Assertions.assertEquals(Integer.valueOf(0), ahService.getAddressHierarchyLevelsCount());
+		Assertions.assertEquals(Integer.valueOf(0), ahService.getAddressHierarchyEntryCount());
+		Assertions.assertNull(ahService.getTopAddressHierarchyLevel());
 
 		ahService.resetFullAddressCache();
 
@@ -78,11 +87,11 @@ public class AddressHierarchyServiceUnconfiguredTest extends BaseModuleContextSe
 		// locale had already been published by then, so every later search was served that empty cache as a
 		// successful result for the life of the JVM
 		Set<String> firstSearch = ahService.searchAddresses("boston", null);
-		Assert.assertNotNull(firstSearch);
-		Assert.assertTrue(firstSearch.isEmpty());
+		Assertions.assertNotNull(firstSearch);
+		Assertions.assertTrue(firstSearch.isEmpty());
 
 		Set<String> secondSearch = ahService.searchAddresses("boston", null);
-		Assert.assertNotNull(secondSearch);
-		Assert.assertTrue(secondSearch.isEmpty());
+		Assertions.assertNotNull(secondSearch);
+		Assertions.assertTrue(secondSearch.isEmpty());
 	}
 }

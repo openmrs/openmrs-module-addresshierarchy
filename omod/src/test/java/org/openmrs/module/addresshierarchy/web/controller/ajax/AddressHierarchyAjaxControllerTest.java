@@ -12,13 +12,13 @@ package org.openmrs.module.addresshierarchy.web.controller.ajax;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.AddressHierarchyEntry;
 import org.openmrs.module.addresshierarchy.exception.AddressHierarchyModuleException;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -30,15 +30,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensitiveTest {
+public class AddressHierarchyAjaxControllerTest extends BaseModuleWebContextSensitiveTest {
 	
 	protected static final String XML_DATASET_PACKAGE_PATH = "org/openmrs/module/addresshierarchy/include/addressHierarchy-dataset.xml";
 	
 	@Autowired
 	private AddressHierarchyAjaxController controller;
 	
-	@Before
+	@BeforeEach
 	public void setupDatabase() throws Exception {
 		initializeInMemoryDatabase();
 		authenticate();
@@ -176,12 +177,12 @@ public class AddressHierarchyAjaxControllerTest extends BaseModuleContextSensiti
 		return entry;
 	}
 	
-	@Test(expected = AddressHierarchyModuleException.class)
+	@Test
 	public void getChildAddressHierarchyEntries_shouldFailWhenMoreValuesAreSuppliedThanThereAreMappedLevels()
 	        throws Exception {
-		controller.getChildAddressHierarchyEntries(new ModelMap(), new MockHttpServletRequest(),
-		    new MockHttpServletResponse(),
-		    "United States|Massachusetts|Suffolk County|Boston|Jamaica Plain|Some Street");
+		assertThrows(AddressHierarchyModuleException.class, () -> controller.getChildAddressHierarchyEntries(new ModelMap(),
+		    new MockHttpServletRequest(), new MockHttpServletResponse(),
+		    "United States|Massachusetts|Suffolk County|Boston|Jamaica Plain|Some Street"));
 	}
 	
 	public Matcher<ModelMap> modelMapWithValue(final String field, final String name) {

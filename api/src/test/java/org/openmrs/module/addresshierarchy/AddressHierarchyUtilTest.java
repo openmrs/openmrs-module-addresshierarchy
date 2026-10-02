@@ -9,17 +9,17 @@
  */
 package org.openmrs.module.addresshierarchy;
 
-import junit.framework.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.PersonAddress;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
 import org.openmrs.module.addresshierarchy.util.AddressHierarchyUtil;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.test.SkipBaseSetup;
 import org.openmrs.test.Verifies;
 import org.springframework.test.annotation.DirtiesContext;
@@ -32,7 +32,7 @@ public class AddressHierarchyUtilTest extends BaseModuleContextSensitiveTest {
 	
 	protected static final String XML_DATASET_PACKAGE_PATH = "org/openmrs/module/addresshierarchy/include/addressHierarchy-dataset.xml";
 	
-	@Before
+	@BeforeEach
 	public void setupDatabase() throws Exception {
 		initializeInMemoryDatabase();
 		authenticate();
@@ -46,7 +46,7 @@ public class AddressHierarchyUtilTest extends BaseModuleContextSensitiveTest {
 	public void getAddressFieldValue_shouldFetchAddressFieldValue() throws Exception {
 		PersonAddress address = new PersonAddress();
 		address.setCountry("United States");
-		Assert.assertEquals("United States", AddressHierarchyUtil.getAddressFieldValue(address, AddressField.COUNTRY));
+		Assertions.assertEquals("United States", AddressHierarchyUtil.getAddressFieldValue(address, AddressField.COUNTRY));
 	}
 	
 	@Test
@@ -54,7 +54,7 @@ public class AddressHierarchyUtilTest extends BaseModuleContextSensitiveTest {
 	public void setAddressFieldValue_shouldSetAddressFieldValue() throws Exception {
 		PersonAddress address = new PersonAddress();
 		AddressHierarchyUtil.setAddressFieldValue(address, AddressField.COUNTRY, "United States");
-		Assert.assertEquals("United States", address.getCountry());
+		Assertions.assertEquals("United States", address.getCountry());
 	}
 	
 	@Test
@@ -62,7 +62,7 @@ public class AddressHierarchyUtilTest extends BaseModuleContextSensitiveTest {
 	public void isDescendantOf_shouldReturnFalseIfNotDescendant() {
 		AddressHierarchyEntry descendant = Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(12);
 		AddressHierarchyEntry ancestor = Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(3);
-		Assert.assertFalse(AddressHierarchyUtil.isDescendantOf(descendant, ancestor));
+		Assertions.assertFalse(AddressHierarchyUtil.isDescendantOf(descendant, ancestor));
 	}
 	
 	@Test
@@ -70,7 +70,7 @@ public class AddressHierarchyUtilTest extends BaseModuleContextSensitiveTest {
 	public void isDescendantOf_shouldReturnTrueIfNotDescendant() {
 		AddressHierarchyEntry descendant = Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(7);
 		AddressHierarchyEntry ancestor = Context.getService(AddressHierarchyService.class).getAddressHierarchyEntry(2);
-		Assert.assertTrue(AddressHierarchyUtil.isDescendantOf(descendant, ancestor));
+		Assertions.assertTrue(AddressHierarchyUtil.isDescendantOf(descendant, ancestor));
 	}
 	
 }

@@ -9,7 +9,7 @@
  */
 package org.openmrs.module.addresshierarchy;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This is a list of all the valid address fields on PersonAddress. Note that the names of some of

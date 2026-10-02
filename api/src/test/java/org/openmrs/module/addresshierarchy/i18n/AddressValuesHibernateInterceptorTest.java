@@ -9,9 +9,10 @@
  */
 package org.openmrs.module.addresshierarchy.i18n;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.Patient;
@@ -49,7 +50,7 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		// not adding any AOP here
 	}
 	
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		
 		patient = new Patient();
@@ -57,7 +58,7 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		patient.addName(new PersonName("John", "", "Doe"));
 		
 		List<PatientIdentifierType> patientIdTypes = Context.getPatientService().getAllPatientIdentifierTypes();
-		Assert.assertNotNull(patientIdTypes);
+		Assertions.assertNotNull(patientIdTypes);
 		PatientIdentifier patientIdentifier = new PatientIdentifier();
 		patientIdentifier.setIdentifier("123-0");
 		patientIdentifier.setIdentifierType(patientIdTypes.get(0));
@@ -82,19 +83,19 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		address.setCountry("United States");
 		
 		Set<String> states = new HashSet<String>(ahs.getPossibleAddressValues(address, "stateProvince"));
-		Assert.assertTrue(states.contains("Massachusetts"));
+		Assertions.assertTrue(states.contains("Massachusetts"));
 		address.setStateProvince("Massachusetts");
 		
 		Set<String> counties = new HashSet<String>(ahs.getPossibleAddressValues(address, "countyDistrict"));
-		Assert.assertTrue(counties.contains("Suffolk County"));
+		Assertions.assertTrue(counties.contains("Suffolk County"));
 		address.setCountyDistrict("Suffolk County");
 		
 		Set<String> cities = new HashSet<String>(ahs.getPossibleAddressValues(address, "cityVillage"));
-		Assert.assertTrue(cities.contains("Boston"));
+		Assertions.assertTrue(cities.contains("Boston"));
 		address.setCityVillage("Boston");
 		
 		Set<String> neighborhoodCells = new HashSet<String>(ahs.getPossibleAddressValues(address, "address3"));
-		Assert.assertTrue(neighborhoodCells.contains("Jamaica Plain"));
+		Assertions.assertTrue(neighborhoodCells.contains("Jamaica Plain"));
 		address.setAddress3("Jamaica Plain");
 		
 		patient.addAddress(address);
@@ -103,16 +104,16 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		//
 		// The i18n codes must be in database
 		//
-		Assert.assertNotNull(patient.getId());
-		Assert.assertEquals(1, patient.getAddresses().size());
+		Assertions.assertNotNull(patient.getId());
+		Assertions.assertEquals(1, patient.getAddresses().size());
 		PersonAddress actualAddress = patient.getPersonAddress();
 		
-		Assert.assertTrue(address.equalsContent(actualAddress));
-		Assert.assertThat(actualAddress.getCountry(), equalTo("addresshierarchy.unitedStates"));
-		Assert.assertThat(actualAddress.getStateProvince(), equalTo("addresshierarchy.massachusetts"));
-		Assert.assertThat(actualAddress.getCountyDistrict(), equalTo("addresshierarchy.suffolkCounty"));
-		Assert.assertThat(actualAddress.getCityVillage(), equalTo("addresshierarchy.boston"));
-		Assert.assertThat(actualAddress.getAddress3(), equalTo("addresshierarchy.jamaicaPlain"));
+		Assertions.assertTrue(address.equalsContent(actualAddress));
+		MatcherAssert.assertThat(actualAddress.getCountry(), equalTo("addresshierarchy.unitedStates"));
+		MatcherAssert.assertThat(actualAddress.getStateProvince(), equalTo("addresshierarchy.massachusetts"));
+		MatcherAssert.assertThat(actualAddress.getCountyDistrict(), equalTo("addresshierarchy.suffolkCounty"));
+		MatcherAssert.assertThat(actualAddress.getCityVillage(), equalTo("addresshierarchy.boston"));
+		MatcherAssert.assertThat(actualAddress.getAddress3(), equalTo("addresshierarchy.jamaicaPlain"));
 		
 		//
 		// Now updating the address
@@ -123,7 +124,7 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		updatedAddress.setStateProvince("Massachusetts");
 		updatedAddress.setCountyDistrict("Suffolk County");
 		updatedAddress.setCityVillage("Boston");
-		Assert.assertTrue(neighborhoodCells.contains("Beacon Hill"));
+		Assertions.assertTrue(neighborhoodCells.contains("Beacon Hill"));
 		updatedAddress.setAddress3("Beacon Hill");
 		
 		patient.addAddress(updatedAddress);
@@ -132,14 +133,14 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		//
 		// The updated i18n codes must be in database
 		//
-		Assert.assertEquals(2, patient.getAddresses().size());
+		Assertions.assertEquals(2, patient.getAddresses().size());
 		actualAddress = patient.getPersonAddress(); // will return the latest saved address
-		Assert.assertTrue(updatedAddress.equalsContent(actualAddress));
-		Assert.assertThat(actualAddress.getCountry(), equalTo("addresshierarchy.unitedStates"));
-		Assert.assertThat(actualAddress.getStateProvince(), equalTo("addresshierarchy.massachusetts"));
-		Assert.assertThat(actualAddress.getCountyDistrict(), equalTo("addresshierarchy.suffolkCounty"));
-		Assert.assertThat(actualAddress.getCityVillage(), equalTo("addresshierarchy.boston"));
-		Assert.assertThat(actualAddress.getAddress3(), equalTo("addresshierarchy.beaconHill"));
+		Assertions.assertTrue(updatedAddress.equalsContent(actualAddress));
+		MatcherAssert.assertThat(actualAddress.getCountry(), equalTo("addresshierarchy.unitedStates"));
+		MatcherAssert.assertThat(actualAddress.getStateProvince(), equalTo("addresshierarchy.massachusetts"));
+		MatcherAssert.assertThat(actualAddress.getCountyDistrict(), equalTo("addresshierarchy.suffolkCounty"));
+		MatcherAssert.assertThat(actualAddress.getCityVillage(), equalTo("addresshierarchy.boston"));
+		MatcherAssert.assertThat(actualAddress.getAddress3(), equalTo("addresshierarchy.beaconHill"));
 	}
 	
 	@Test
@@ -171,9 +172,9 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		// The address should still be as it was originally
 		//
 		PersonAddress actualAddress = patient.getPersonAddress();
-		Assert.assertTrue(address.equalsContent(actualAddress));
-		Assert.assertThat(actualAddress.getCountry(), equalTo("United States"));
-		Assert.assertThat(actualAddress.getStateProvince(), equalTo("Connecticut"));
+		Assertions.assertTrue(address.equalsContent(actualAddress));
+		MatcherAssert.assertThat(actualAddress.getCountry(), equalTo("United States"));
+		MatcherAssert.assertThat(actualAddress.getStateProvince(), equalTo("Connecticut"));
 		
 		// Tear down
 		Context.getAdministrationService()
@@ -205,11 +206,11 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		//
 		// The i18n messages keys must be in database
 		//
-		Assert.assertNotNull(location.getId());
-		Assert.assertThat(location.getCountry(), equalTo("addresshierarchy.unitedStates"));
-		Assert.assertThat(location.getCountyDistrict(), equalTo("addresshierarchy.suffolkCounty"));
-		Assert.assertThat(location.getCityVillage(), equalTo("addresshierarchy.boston"));
-		Assert.assertThat(location.getAddress3(), equalTo("addresshierarchy.beaconHill"));
+		Assertions.assertNotNull(location.getId());
+		MatcherAssert.assertThat(location.getCountry(), equalTo("addresshierarchy.unitedStates"));
+		MatcherAssert.assertThat(location.getCountyDistrict(), equalTo("addresshierarchy.suffolkCounty"));
+		MatcherAssert.assertThat(location.getCityVillage(), equalTo("addresshierarchy.boston"));
+		MatcherAssert.assertThat(location.getAddress3(), equalTo("addresshierarchy.beaconHill"));
 		
 		//
 		// Now updating the location
@@ -221,6 +222,6 @@ public class AddressValuesHibernateInterceptorTest extends I18nModuleContextSens
 		//
 		// The updated i18n message keys must be in database
 		//
-		//		Assert.assertThat(location.getAddress3(), equalTo("addresshierarchy.jamaicaPlain"));
+		//		MatcherAssert.assertThat(location.getAddress3(), equalTo("addresshierarchy.jamaicaPlain"));
 	}
 }

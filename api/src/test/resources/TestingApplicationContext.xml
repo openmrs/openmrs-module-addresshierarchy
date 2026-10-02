@@ -44,10 +44,13 @@
 		<property name="defaultEncoding" value="UTF-8"/>
 	</bean>
 
-	<!-- Ext I18N Interceptors (Spring + Hibernate) -->
-	<bean id="exti18n.addressValuesHibernateInterceptor" class="org.openmrs.module.exti18n.icpt.AddressValuesHibernateInterceptor" primary="true"/>
-	<bean id="exti18n.addressValuesAOPInterceptor" class="org.openmrs.module.exti18n.icpt.AddressValuesAOPInterceptor"/>
-
 	<bean id="addressHierarchyActivator" class="org.openmrs.module.addresshierarchy.AddressHierarchyActivator"/>
+
+	<!--
+	The tests here use @DirtiesContext, so a new application context is started after deleteAllData() has emptied every
+	table, including JobRunr's migrations table. JobRunr's SQL storage would then try to re-create that table and fail
+	to start, so the tests use JobRunr's in-memory storage instead (no test here uses the scheduler's storage).
+	-->
+	<bean id="storageProvider" class="org.jobrunr.storage.InMemoryStorageProvider"/>
 	
 </beans>
