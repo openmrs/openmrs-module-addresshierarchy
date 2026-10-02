@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>addresshierarchy</artifactId>
-	<version>3.1.0-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Address Hierarchy</name>
 	<description>Parent project for Address Hierarchy</description>
@@ -38,6 +38,13 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.openmrs</groupId>
+				<artifactId>openmrs-bom</artifactId>
+				<version>${openMRSVersion}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 			<dependency>
 				<groupId>org.openmrs.api</groupId>
 				<artifactId>openmrs-api</artifactId>
@@ -74,26 +81,16 @@
 				<version>${openMRSVersion}</version>
 				<type>pom</type>
 				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>org.powermock</groupId>
-						<artifactId>powermock-api-mockito2</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.powermock</groupId>
-						<artifactId>powermock-api-mockito</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<properties>
-		<openMRSVersion>2.7.0</openMRSVersion>
+		<openMRSVersion>3.0.0-SNAPSHOT</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<exti18nVersion>1.1.0</exti18nVersion>
-		<legacyUiVersion>1.22.0</legacyUiVersion>
-		<javaxServeletVersion>4.0.1</javaxServeletVersion>
+		<legacyUiVersion>3.0.0-SNAPSHOT</legacyUiVersion>
+		<maven.compiler.release>21</maven.compiler.release>
 	</properties>
 
 	<build>
@@ -102,9 +99,10 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.15.0</version>
 					<configuration>
-						<target>8</target>
-						<source>8</source>
+						<release>${maven.compiler.release}</release>
+						<parameters>true</parameters>
 						<encoding>UTF-8</encoding>
 					</configuration>
 				</plugin>
@@ -125,7 +123,7 @@
 				<plugin>
 				    <groupId>org.apache.maven.plugins</groupId>
 				    <artifactId>maven-surefire-plugin</artifactId>
-				    <version>2.22.1</version>
+				    <version>3.5.4</version>
 				    <configuration>
 				    	<argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true -Djava.awt.headless=true</argLine>
 				    	<systemPropertyVariables>

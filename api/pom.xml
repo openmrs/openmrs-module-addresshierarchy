@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>addresshierarchy</artifactId>
-		<version>3.1.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 	</parent>	
 	<artifactId>addresshierarchy-api</artifactId>
 	<packaging>jar</packaging>
@@ -16,22 +16,10 @@
             <artifactId>openmrs-api</artifactId>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>org.openmrs.web</groupId>
-            <artifactId>openmrs-web</artifactId>
-            <type>jar</type>
-        </dependency>
 
         <dependency>
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs.web</groupId>
-            <artifactId>openmrs-web</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -62,10 +50,31 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.9</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!--
+                    exti18n 1.x does not run on Platform 3.0 (its Hibernate interceptors extend org.hibernate.EmptyInterceptor,
+                    which Hibernate 7 removed, and it uses commons-lang 2), and its jar contributes a moduleApplicationContext.xml
+                    that would break every context sensitive test here. It is kept for compilation only, and the exti18n
+                    integration tests are not run until exti18n supports Platform 3.0.
+                    -->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>org.openmrs.module:exti18n-api</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                    <excludes>
+                        <exclude>org/openmrs/module/addresshierarchy/i18n/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

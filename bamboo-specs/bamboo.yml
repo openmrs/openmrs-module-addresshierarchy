@@ -9,11 +9,8 @@ stages:
     manual: false
     final: false
     jobs:
-    - Build and Test JDK 17
     - Build and Test JDK 21
     - Build and Test JDK 24
-    - Build and Test JDK 11
-    - Build and Test JDK 8
 - Deploy:
     manual: false
     final: false
@@ -24,27 +21,6 @@ stages:
     final: false
     jobs:
     - Release to maven
-Build and Test JDK 17:
-  key: BTJ17
-  tasks:
-  - checkout:
-      force-clean-build: 'false'
-      description: Checkout default repository
-  - script:
-      interpreter: SHELL
-      scripts:
-      - |-
-        #!/bin/bash -eu
-
-        set -x
-
-        export IMAGE="maven:3.9.9-eclipse-temurin-17"
-
-        docker pull ${IMAGE}
-
-        docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" ${IMAGE} bash -c 'mvn clean package && chmod -R 777 .'
-      description: Build and test
-  artifact-subscriptions: []
 Build and Test JDK 21:
   key: JOB1
   tasks:
@@ -81,48 +57,6 @@ Build and Test JDK 24:
         set -x
 
         export IMAGE="maven:3.9.9-eclipse-temurin-24"
-
-        docker pull ${IMAGE}
-
-        docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" ${IMAGE} bash -c 'mvn clean package && chmod -R 777 .'
-      description: Build and test
-  artifact-subscriptions: []
-Build and Test JDK 11:
-  key: BTJ11
-  tasks:
-  - checkout:
-      force-clean-build: 'false'
-      description: Checkout default repository
-  - script:
-      interpreter: SHELL
-      scripts:
-      - |-
-        #!/bin/bash -eu
-
-        set -x
-
-        export IMAGE="maven:3.9.9-eclipse-temurin-11"
-
-        docker pull ${IMAGE}
-
-        docker run -v m2-repo:/root/.m2/repository -v ${PWD}:/module --rm -w="/module" ${IMAGE} bash -c 'mvn clean package && chmod -R 777 .'
-      description: Build and test
-  artifact-subscriptions: []
-Build and Test JDK 8:
-  key: BTJ8
-  tasks:
-  - checkout:
-      force-clean-build: 'false'
-      description: Checkout default repository
-  - script:
-      interpreter: SHELL
-      scripts:
-      - |-
-        #!/bin/bash -eu
-
-        set -x
-
-        export IMAGE="maven:3.9.9-eclipse-temurin-8"
 
         docker pull ${IMAGE}
 

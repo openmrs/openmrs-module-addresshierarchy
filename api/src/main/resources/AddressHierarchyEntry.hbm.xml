@@ -20,7 +20,7 @@
 
 		<id name="addressHierarchyEntryId" type="int" column="address_hierarchy_entry_id"
 			unsaved-value="0">
-			<generator class="native">
+			<generator class="identity">
 				<param name="sequence">address_hierarchy_entry_address_hierarchy_entry_id_seq</param>
 			</generator>
 		</id>
