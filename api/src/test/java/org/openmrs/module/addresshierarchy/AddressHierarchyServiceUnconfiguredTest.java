@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
@@ -51,9 +50,6 @@ public class AddressHierarchyServiceUnconfiguredTest extends BaseModuleContextSe
 	@BeforeEach
 	public void setupDatabase() throws Exception {
 		initializeInMemoryDatabase();
-		// core's role privilege cache loads roles on a background thread with its own session, which cannot see
-		// this test's uncommitted rows, so commit them (tearDown deletes them again)
-		getConnection().commit();
 		authenticate();
 		executeDataSet(INITIAL_XML_DATASET_PACKAGE_PATH);
 		executeDataSet(EXAMPLE_XML_DATASET_PACKAGE_PATH);
@@ -62,11 +58,6 @@ public class AddressHierarchyServiceUnconfiguredTest extends BaseModuleContextSe
 		// initializeFullAddressCache() reads it unconditionally, so it has to exist
 		Context.getAdministrationService().setGlobalProperty(
 		    AddressHierarchyConstants.GLOBAL_PROP_INITIALIZE_ADDRESS_HIERARCHY_CACHE_ON_STARTUP, "true");
-	}
-
-	@AfterEach
-	public void tearDown() {
-		deleteAllData();
 	}
 
 	@Test
