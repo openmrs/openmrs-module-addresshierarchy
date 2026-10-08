@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -133,7 +134,7 @@ public class HibernateAddressHierarchyDAO implements AddressHierarchyDAO {
 	
 	private void setNameParameter(Query<?> query, String name) {
 		if (name != null) {
-			query.setParameter("name", name.toLowerCase());
+			query.setParameter("name", name.toLowerCase(Locale.ROOT));
 		}
 	}
 	

@@ -423,6 +423,26 @@ public class AddressHierarchyServiceTest extends BaseModuleContextSensitiveTest 
 	}
 	
 	@Test
+	@Verifies(value = "should match case insensitively whatever the default locale", method = "getAddressHierarchyEntriesByLevelAndName(AddressHierarchyLevel,String)")
+	public void getAddressHierarchyEntriesByLevelAndName_shouldMatchCaseInsensitivelyWhateverTheDefaultLocale()
+	        throws Exception {
+		AddressHierarchyService ahService = Context.getService(AddressHierarchyService.class);
+		
+		// in a Turkish locale "I".toLowerCase() is a dotless "ı", which does not match the "i" in the stored "United States"
+		Locale defaultLocale = Locale.getDefault();
+		Locale.setDefault(Locale.of("tr", "TR"));
+		try {
+			List<AddressHierarchyEntry> entries = ahService
+			        .getAddressHierarchyEntriesByLevelAndName(ahService.getAddressHierarchyLevel(1), "UNITED STATES");
+			Assertions.assertEquals(1, entries.size());
+			Assertions.assertTrue(entries.contains(ahService.getAddressHierarchyEntry(1)));
+		}
+		finally {
+			Locale.setDefault(defaultLocale);
+		}
+	}
+	
+	@Test
 	@Verifies(value = "should find address hierarchy entry by level and name and parent", method = "getAddressHierarchyEntryByLevelAndNameAndParent(AddressHierarchyLevel,String)")
 	public void getAddressHierarchyEntryByLevelAndNameAndParent_shouldFindAddressHierarchyEntryByLevelAndNameAndParent()
 	        throws Exception {
