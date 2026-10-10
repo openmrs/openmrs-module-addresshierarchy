@@ -13,12 +13,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.module.addresshierarchy.AddressField;
 import org.openmrs.util.OpenmrsClassLoader;
 
@@ -28,7 +28,7 @@ public class AddressConfigurationLoaderTest {
 	
 	public static final String CONFIG_RESOURCE = "org/openmrs/module/addresshierarchy/include/addressConfiguration.xml";
 	
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
 		System.setProperty("user.home", Files.createTempDirectory(null).toString()); // see OpenmrsUtil.getApplicationDataDirectory()
 	}
@@ -38,7 +38,7 @@ public class AddressConfigurationLoaderTest {
 		AddressConfiguration config = getAddressConfiguration();
 		String actualXml = IOUtils.toString(OpenmrsClassLoader.getInstance().getResourceAsStream(CONFIG_RESOURCE), "UTF-8");
 		String expectedXml = AddressConfigurationLoader.writeToString(config);
-		Assert.assertEquals(StringUtils.deleteWhitespace(expectedXml), StringUtils.deleteWhitespace(actualXml));
+		Assertions.assertEquals(StringUtils.deleteWhitespace(expectedXml), StringUtils.deleteWhitespace(actualXml));
 	}
 	
 	@Test
@@ -47,7 +47,7 @@ public class AddressConfigurationLoaderTest {
 		
 		String serialized = IOUtils.toString(OpenmrsClassLoader.getInstance().getResourceAsStream(CONFIG_RESOURCE), "UTF-8");
 		AddressConfiguration actualConfig = AddressConfigurationLoader.readFromString(serialized);
-		Assert.assertEquals(expectedConfig, actualConfig);
+		Assertions.assertEquals(expectedConfig, actualConfig);
 	}
 	
 	protected AddressConfiguration getAddressConfiguration() {

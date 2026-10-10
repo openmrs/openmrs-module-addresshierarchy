@@ -20,7 +20,7 @@
 
 		<id name="levelId" type="int" column="address_hierarchy_level_id"
 			unsaved-value="0">
-			<generator class="native">
+			<generator class="identity">
 				<param name="sequence">address_hierarchy_level_address_hierarchy_level_id_seq</param>
 			</generator>
 		</id>
@@ -31,9 +31,8 @@
 		<property name="name" type="string" column="name" length="255" />
 
 		<property name="addressField" column="address_field" length="50">
-			<type name="org.hibernate.type.EnumType">
+			<type name="org.openmrs.api.db.hibernate.type.StringEnumType">
 		    	<param name="enumClass">org.openmrs.module.addresshierarchy.AddressField</param>
-		    	<param name="type">12</param>
 		    </type>
 		</property>
 		

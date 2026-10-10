@@ -9,16 +9,16 @@
  */
 package org.openmrs.module.addresshierarchy;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.addresshierarchy.config.AddressConfigurationLoader;
 import org.openmrs.module.addresshierarchy.config.ConfigDirUtil;
 import org.openmrs.module.addresshierarchy.service.AddressHierarchyService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 	@Autowired
 	private AddressHierarchyActivator activator;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		
 		Context.getAdministrationService().saveGlobalProperty(
@@ -47,7 +47,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 		
 		setAppDataDirPath(APP_DATA_TEST_DIRECTORY);
 		
-		Assert.assertTrue(
+		Assertions.assertTrue(
 		    CollectionUtils.isEmpty(Context.getService(AddressHierarchyService.class).getAddressHierarchyLevels()));
 	}
 	
@@ -82,23 +82,23 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 		for (AddressHierarchyEntry entry : entries) {
 			entryNames.add(entry.getName());
 		}
-		Assert.assertTrue(entryNames.contains("Beacon Hill"));
-		Assert.assertTrue(entryNames.contains("Jamaica Plain"));
+		Assertions.assertTrue(entryNames.contains("Beacon Hill"));
+		Assertions.assertTrue(entryNames.contains("Jamaica Plain"));
 		
 		level = ahs.getAddressHierarchyLevelByAddressField(AddressField.STATE_PROVINCE);
 		entries = ahs.getAddressHierarchyEntriesByLevel(level);
-		Assert.assertEquals(1, entries.size());
-		Assert.assertEquals("Massachusetts", entries.get(0).getName());
+		Assertions.assertEquals(1, entries.size());
+		Assertions.assertEquals("Massachusetts", entries.get(0).getName());
 		
 		// All levels from the XML should have been created
-		Assert.assertNotNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.COUNTRY));
-		Assert.assertNotNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.COUNTY_DISTRICT));
-		Assert.assertNotNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.CITY_VILLAGE));
+		Assertions.assertNotNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.COUNTRY));
+		Assertions.assertNotNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.COUNTY_DISTRICT));
+		Assertions.assertNotNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.CITY_VILLAGE));
 		
 		// Other levels should not be there
-		Assert.assertNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.ADDRESS_1));
-		Assert.assertNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.ADDRESS_2));
-		Assert.assertNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.ADDRESS_3));
+		Assertions.assertNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.ADDRESS_1));
+		Assertions.assertNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.ADDRESS_2));
+		Assertions.assertNull(ahs.getAddressHierarchyLevelByAddressField(AddressField.ADDRESS_3));
 	}
 	
 	@Test
@@ -115,7 +115,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 		// Editing and re-saving an entry
 		AddressHierarchyLevel level = ahs.getAddressHierarchyLevelByAddressField(AddressField.NEIGHBORHOOD_CELL);
 		List<AddressHierarchyEntry> entries = ahs.getAddressHierarchyEntriesByLevelAndName(level, "Jamaica Plain");
-		Assert.assertEquals(1, entries.size());
+		Assertions.assertEquals(1, entries.size());
 		AddressHierarchyEntry entry = entries.get(0);
 		entry.setName("Havana Plain");
 		String uuid = entry.getUuid();
@@ -126,7 +126,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 		
 		// Verifying that the edited entry hasn't been touched
 		entry = ahs.getAddressHierarchyEntryByUuid(uuid);
-		Assert.assertEquals("Havana Plain", entry.getName());
+		Assertions.assertEquals("Havana Plain", entry.getName());
 	}
 	
 	@Test
@@ -142,7 +142,7 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 		List<AddressHierarchyEntry> entries;
 		entries = ahs.getAddressHierarchyEntriesByLevelAndName(
 		    ahs.getAddressHierarchyLevelByAddressField(AddressField.COUNTY_DISTRICT), "Suffolk County");
-		Assert.assertEquals(entries.size(), 1);
+		Assertions.assertEquals(entries.size(), 1);
 		AddressHierarchyEntry suffolkCounty = entries.get(0);
 		
 		AddressHierarchyEntry winthrop = new AddressHierarchyEntry();
@@ -165,18 +165,18 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 		
 		entries = ahs.getAddressHierarchyEntriesByLevelAndName(
 		    ahs.getAddressHierarchyLevelByAddressField(AddressField.CITY_VILLAGE), "Winthrop");
-		Assert.assertEquals(entries.size(), 1);
+		Assertions.assertEquals(entries.size(), 1);
 		winthrop = entries.get(0);
-		Assert.assertEquals("Winthrop", winthrop.getName());
+		Assertions.assertEquals("Winthrop", winthrop.getName());
 		
 		entries = ahs.getAddressHierarchyEntriesByLevelAndName(
 		    ahs.getAddressHierarchyLevelByAddressField(AddressField.NEIGHBORHOOD_CELL), "Point Shirley");
-		Assert.assertEquals(entries.size(), 1);
+		Assertions.assertEquals(entries.size(), 1);
 		pointShirley = entries.get(0);
-		Assert.assertEquals("Point Shirley", pointShirley.getName());
+		Assertions.assertEquals("Point Shirley", pointShirley.getName());
 	}
 	
-	@Ignore
+	@Disabled
 	@Test
 	@Verifies(value = "should wipe existing entries when wipe is set to true", method = "started()")
 	public void started_shouldWipeExistingEntries() {
@@ -216,9 +216,9 @@ public class AddressHierarchyActivatorTest extends BaseModuleContextSensitiveTes
 		for (AddressHierarchyEntry entry : entries) {
 			entryNames.add(entry.getName());
 		}
-		Assert.assertFalse(entryNames.contains("Beacon Hill"));
-		Assert.assertFalse(entryNames.contains("Jamaica Plain"));
-		Assert.assertTrue(entryNames.contains("Auburndale"));
-		Assert.assertTrue(entryNames.contains("Chestnut Hill"));
+		Assertions.assertFalse(entryNames.contains("Beacon Hill"));
+		Assertions.assertFalse(entryNames.contains("Jamaica Plain"));
+		Assertions.assertTrue(entryNames.contains("Auburndale"));
+		Assertions.assertTrue(entryNames.contains("Chestnut Hill"));
 	}
 }

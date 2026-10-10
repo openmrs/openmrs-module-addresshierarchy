@@ -14,9 +14,9 @@ import java.nio.file.Files;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.test.Verifies;
 import org.openmrs.util.OpenmrsUtil;
 
@@ -26,7 +26,7 @@ public class ConfigDirUtilTest {
 	
 	private ConfigDirUtil util;
 	
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
 		System.setProperty("user.home", Files.createTempDirectory(null).toString()); // see OpenmrsUtil.getApplicationDataDirectory()
 		
@@ -45,10 +45,10 @@ public class ConfigDirUtilTest {
 		
 		String checksum = "ad6821757a52c";
 		util.writeChecksum(configFileName, checksum);
-		Assert.assertEquals(checksum, util.readLatestChecksum(configFileName));
+		Assertions.assertEquals(checksum, util.readLatestChecksum(configFileName));
 		
 		checksum = ConfigDirUtil.NOT_COMPUTABLE_CHECKSUM;
 		util.writeChecksum(configFileName, checksum);
-		Assert.assertEquals(ConfigDirUtil.NOT_READABLE_CHECKSUM, util.readLatestChecksum(configFileName));
+		Assertions.assertEquals(ConfigDirUtil.NOT_READABLE_CHECKSUM, util.readLatestChecksum(configFileName));
 	}
 }
